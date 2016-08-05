@@ -1,8 +1,22 @@
+__precompile__()
+
 module Couchzilla
 
 using Requests
 using URIParser
 using JSON
+
+import Requests: get, post, put, delete
+
+immutable HTTPException <: Exception 
+  status
+  response
+  request
+end
+
+function Base.show(io::IO, err::HTTPException)
+  print(io, "HTTPException - status: $(err.status) request: $(err.request) response: $(err.response)")
+end
 
 type Client
   username
@@ -27,7 +41,6 @@ immutable Database
     new(URI(client.url.scheme, client.url.host, client.url.port, "/$name"), name, client)
 end
 
-
 # Private functions
 #
 # `relax()` makes an HTTP request with the relevant cookies and query strings
@@ -37,9 +50,12 @@ function relax(fun, url_string; cookies=nothing, query=Dict())
     error("Not authenticated")
   end
   response = fun(url_string; cookies=cookies, query=query)
-  # request = requestfor(response)
-  # println(request)
-  Requests.json(response)
+  if response.status in 400:599
+    request = requestfor(response)
+    throw(HTTPException(response.status, Requests.json(response), string(request)))
+  else
+    Requests.json(response)
+  end
 end
 
 # `cookieauth()` hits the `_session` endpoint to obtain a session cookie
@@ -69,17 +85,29 @@ function connect(client::Client; database::AbstractString=nothing)
 end
 
 """
-`db, response_json = createdb(client::Client; databse::AbstractString=nothing)` 
+`db, created = createdb(client::Client; databse::AbstractString=nothing)` 
 
 Create a new database on the remote end called `dbname`. Return an immutable Database
-reference to this newly created db, and the result of the creation request. If the DB
-already exists, the response_json will show an error, but the returned Database is valid.
+reference to this newly created db, and the true if a database was created, false if it
+already existed.
 
 http://docs.couchdb.org/en/1.6.1/api/database/common.html#put--db
 """
 function createdb(client::Client; database::AbstractString=nothing)
   db = Database(client, database)
-  db, relax(put, string(db.url); cookies=client.cookies)
+  created = false
+  try 
+    response = relax(put, string(db.url); cookies=client.cookies)
+    created = true
+  catch err
+    # A 412 (db already exists) isn't always a fatal error. 
+    # We bubble this up in the second returned value and leave
+    # it to the user to decide.
+    if !isa(err, HTTPException) || err.status != 412
+      rethrow()
+    end
+  end
+  return db, created
 end
 
 """
@@ -339,6 +367,6 @@ function changes(db::Database, options)
   end
 end
 
-export Client, Database
+export Client, Database, HTTPException
 
 end # module
