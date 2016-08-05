@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export COUCH_USER='mycouchusername'
+export COUCH_PASS='mycouchpass'
+export COUCH_HOST='mycouchusername.cloudant.com'
+
+$@
