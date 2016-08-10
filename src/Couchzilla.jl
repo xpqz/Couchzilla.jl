@@ -6,7 +6,18 @@ using Requests
 using URIParser
 using JSON
 
-import Requests: get, post, put, delete
+import Requests: get, post, put, delete, requestfor, headers
+
+type QueryResult
+  docs::Array{Dict{AbstractString, Any}, 1}
+  bookmark::AbstractString
+end
+
+@enum INDEXTYPE json=1 text=2
+
+function Base.show(io::IO, idx::INDEXTYPE)
+  print(io, idx==json ? "json" : "text")
+end
 
 immutable HTTPException <: Exception 
   status
@@ -367,6 +378,8 @@ function changes(db::Database, options)
   end
 end
 
-export Client, Database, HTTPException
+include("query.jl")
+
+export Client, Database, HTTPException, INDEXTYPE, QueryResult
 
 end # module

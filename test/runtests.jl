@@ -40,3 +40,4 @@ doc = Couchzilla.update(db; id=data["id"], rev=data["rev"], body=Dict("item" => 
 @test haskey(doc, "rev")
 @test contains(doc["rev"], "2-")
 println("[OK]")
+
