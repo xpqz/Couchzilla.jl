@@ -8,11 +8,6 @@ using JSON
 
 import Requests: get, post, put, delete, requestfor, headers
 
-type QueryResult
-  docs::Array{Dict{AbstractString, Any}, 1}
-  bookmark::AbstractString
-end
-
 @enum INDEXTYPE json=1 text=2
 
 function Base.show(io::IO, idx::INDEXTYPE)
@@ -352,8 +347,6 @@ function list(db::Database;
     query["startkey"] = JSON.json(startkey)
   end
 
-  println(query)
-
   if length(keys) > 0
     Requests.json(post(endpoint(db.url, "_all_docs"); json=Dict("keys" => keys), cookies=db.client.cookies, query=query))
   else
@@ -378,8 +371,9 @@ function changes(db::Database, options)
   end
 end
 
+include("selector.jl")
 include("query.jl")
 
-export Client, Database, HTTPException, INDEXTYPE, QueryResult
+export Client, Database, HTTPException, INDEXTYPE, QueryResult, Selector, @q_str
 
 end # module
