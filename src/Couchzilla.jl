@@ -1,5 +1,13 @@
 __precompile__()
 
+# using Couchzilla
+# importall Couchzilla
+#
+# client = Client("skruger", "cloudantbaloo1129", "https://skruger.cloudant.com")
+# db, created = Couchzilla.createdb(client; database="mynewdb")
+# Couchzilla.find(db, q"name=davina")
+
+
 module Couchzilla
 
 using Requests
@@ -188,6 +196,23 @@ function create(db::Database; body=Dict())
   response[1]
 end
 
+"""
+`result = create(db::Database; data=[Dict()])`
+
+Bulk create a set of new documents.
+
+This is implemented via the `_bulk_docs` endpoint.
+
+http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs
+"""
+function create(db::Database; data=[Dict()])
+  if length(data) == 0
+    error("No data given")
+  end
+  
+  bulkdocs(db; data=data)
+end
+
 # http://docs.couchdb.org/en/1.6.1/api/document/common.html#get--db-docid
 function read(db::Database, id::AbstractString; 
   rev               = "", 
@@ -374,6 +399,8 @@ end
 include("selector.jl")
 include("query.jl")
 
-export Client, Database, HTTPException, INDEXTYPE, QueryResult, Selector, @q_str
+export Client, Database, HTTPException, INDEXTYPE, QueryResult, 
+  Selector, @q_str, createdb, connect, dbinfo, listdbs, deletedb, 
+  create, read, update, delete, list, changes, find, createindex
 
 end # module

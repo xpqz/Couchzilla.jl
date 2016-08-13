@@ -18,36 +18,39 @@ function isempty(sel::Selector)
   length(sel.dict) == 0
 end
 
-macro q_str(data::AbstractString)
-  operators = Dict{UTF8String, UTF8String}(
-    "=="  => "\$eq",
-    "="   => "\$eq",
-    "!="  => "\$ne",
-    "<"   => "\$lt",
-    "<="  => "\$lte",
-    ">"   => "\$gt",
-    ">="  => "\$gte",
-    "in"  => "\$in",
-    "!in" => "\$nin",
-    "all" => "\$all"
-  )
+macro q_str(data)
+  quote
+    operators = Dict{UTF8String, UTF8String}(
+      "=="  => "\$eq",
+      "="   => "\$eq",
+      "!="  => "\$ne",
+      "<"   => "\$lt",
+      "<="  => "\$lte",
+      ">"   => "\$gt",
+      ">="  => "\$gte",
+      "in"  => "\$in",
+      "!in" => "\$nin",
+      "all" => "\$all"
+    )
 
-  m = match(r"^(.+?)\s*(==|=|!=|<|<=|>|>=|in|!in|all)\s*\[?(.+)\]?$", strip(data))
-  if m == nothing
-    error("Badly formatted selector string")
+    m = match(r"^(.+?)\s*(==|=|!=|<|<=|>|>=|in|!in|all)\s*\[?(.+)\]?$", strip($(data)))
+    if m == nothing
+      error("Badly formatted selector string")
+    end
+
+    field    = m.captures[1]
+    operator = m.captures[2]
+    value    = m.captures[3]
+
+    if !haskey(operators, operator)
+      error("Unknown operator '$operator'")
+    end
+
+    if operator in ["in", "!in", "all"]
+      value = map(strip, split(value, ","))
+    end
+  
+    mydict = Dict(field => Dict(operators[operator] => value))
+    Selector(mydict)
   end
-
-  field    = m.captures[1]
-  operator = m.captures[2]
-  value    = m.captures[3]
-
-  if !haskey(operators, operator)
-    error("Unknown operator '$operator'")
-  end
-
-  if operator in ["in", "!in", "all"]
-    value = map(strip, split(value, ","))
-  end
-
-  Dict(field => Dict(operators[operator] => value))
 end
