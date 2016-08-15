@@ -4,7 +4,7 @@ type QueryResult
 end
 
 """
-`result::QueryResult = find(db::Database, selector::Selector;
+`result::QueryResult = query(db::Database, selector::Selector;
   fields::Array{AbstractString, 1}} = [],
   sort::Array{Dict{AbstractString, Any}, 1}} = [],
   limit  = 25,
@@ -16,17 +16,17 @@ Example: find all documents where "year" is greater than 2010, returning
 the fields _id, _rev, year and title, sorted in ascending order on year.
 Set the page size to 10.
 
-`find(db, r"year > 2010";
+`query(db, r"year > 2010";
   fields = ["_id", "_rev", "year", "title"],
   sort   = [Dict("year" => "asc")],
   limit  = 10)`
   
 """
-function find{T<:AbstractString}(db::Database, selector::Selector;
+function query{T<:AbstractString}(db::Database, selector::Selector;
   fields::Vector{T}          = Vector{AbstractString}(),
   sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
-  limit                        = 25,
-  skip                         = 0)
+  limit                      = 25,
+  skip                       = 0)
 
   cquery = Dict{UTF8String, Any}("selector" => selector.dict, "limit" => limit, "skip" => skip)
   if length(fields) > 0
@@ -63,9 +63,9 @@ https://docs.cloudant.com/cloudant_query.html#creating-an-index
 function createindex{T<:AbstractString}(db::Database; 
   name::T              = "",
   ddoc::T              = "",
-  fields::Vector{T}    = [], 
+  fields               = Vector{T}(), 
   selector             = Selector(),
-  default_field        = Dict("analyzer" => "standard", "enabled" => true),
+  default_field        = Dict{UTF8String, Any}("analyzer" => "standard", "enabled" => true),
   indextype::INDEXTYPE = json)
       
   if indextype == json && !isempty(selector)

@@ -54,3 +54,15 @@ macro q_str(data)
     Selector(mydict)
   end
 end
+
+function and(sel::Vector{Selector})
+  Selector(Dict("\$and" => map(sel) do s
+    s.dict
+  end))
+end
+
+function or(sel::Vector{Selector})
+  Selector(Dict("\$or" => map(sel) do s
+    s.dict
+  end))
+end

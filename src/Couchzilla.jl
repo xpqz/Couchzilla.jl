@@ -4,8 +4,17 @@ __precompile__()
 # importall Couchzilla
 #
 # client = Client("skruger", "cloudantbaloo1129", "https://skruger.cloudant.com")
-# db, created = Couchzilla.createdb(client; database="mynewdb")
-# Couchzilla.find(db, q"name=davina")
+# db, created = createdb(client; database="mynewdb")
+# createindex(db; fields=["name", "data"])
+# create(db; data=[
+#     Dict("name"=>"adam", "data"=>"hello"),
+#     Dict("name"=>"billy", "data"=>"world"),
+#     Dict("name"=>"cecilia", "data"=>"authenticate"),
+#     Dict("name"=>"davina", "data"=>"cloudant"),
+#     Dict("name"=>"eric", "data"=>"blobbyblobbyblobby")
+# ])
+# find(db, q"name=davina")
+# deletedb(client, "mynewdb")
 
 
 module Couchzilla
@@ -191,7 +200,7 @@ than a POST to the /{DB}.
 
 http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs
 """
-function create(db::Database; body=Dict())
+function createdoc(db::Database, body=Dict())
   response = bulkdocs(db; data=[body])
   response[1]
 end
@@ -205,7 +214,7 @@ This is implemented via the `_bulk_docs` endpoint.
 
 http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs
 """
-function create(db::Database; data=[Dict()])
+function createdoc(db::Database; data=[Dict()])
   if length(data) == 0
     error("No data given")
   end
@@ -214,7 +223,7 @@ function create(db::Database; data=[Dict()])
 end
 
 # http://docs.couchdb.org/en/1.6.1/api/document/common.html#get--db-docid
-function read(db::Database, id::AbstractString; 
+function readdoc(db::Database, id::AbstractString; 
   rev               = "", 
   attachments       = false, 
   att_encoding_info = false,
@@ -283,7 +292,7 @@ Implemented via the _bulk_docs endpoint:
 
 http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs
 """
-function update(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing, body=Dict())
+function updatedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing, body=Dict())
   response = bulkdocs(db, data=[merge(body, Dict("_id" => id, "_rev" => rev))])
   response[1]
 end
@@ -295,7 +304,7 @@ Implemented via the _bulk_docs endpoint:
 
 http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs
 """
-function delete(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing)
+function deletedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing)
   response = bulkdocs(db, data=[Dict("_id" => id, "_rev" => rev, "_deleted" => true)])
   response[1]
 end
@@ -322,7 +331,7 @@ For a more detailed description of the various options, see:
 
 http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html#db-all-docs
 """
-function list(db::Database;
+function alldocs(db::Database;
   descending    = false,
   endkey        = "",
   include_docs  = false,
@@ -399,8 +408,9 @@ end
 include("selector.jl")
 include("query.jl")
 
-export Client, Database, HTTPException, INDEXTYPE, QueryResult, 
-  Selector, @q_str, createdb, connect, dbinfo, listdbs, deletedb, 
-  create, read, update, delete, list, changes, find, createindex
+export Client, Database, HTTPException, INDEXTYPE, QueryResult, Selector
+export @q_str, createdb, connect, dbinfo, listdbs, deletedb, createdoc
+export readdoc, updatedoc, deletedoc, alldocs, changes, query, createindex
+export and, or
 
 end # module
