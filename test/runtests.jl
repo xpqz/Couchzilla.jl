@@ -126,6 +126,24 @@ Test.with_handler(test_handler) do
   println("\r[OK] Delete attachment (blob mode)")
 end
 
+Test.with_handler(test_handler) do
+  print("[  ] Create a view ")
+  result = make_view(db, "my_ddoc", "my_view", 
+  """
+  function(doc) {
+    if(doc && doc.name) {
+      emit(doc.name, 1);
+    }
+  }""")
+  @test result["ok"] == true
+  println("\r[OK] Create a view")
+  
+  print("[  ] Query view ")
+  result = query_view(db, "my_ddoc", "my_view"; query=Dict("include_docs" => true))
+  println(result)
+  println("\r[OK] Query view")
+end
+
 print("[  ] Delete test database: $database ")
 result = deletedb(cl, database)
 @test result["ok"] == true

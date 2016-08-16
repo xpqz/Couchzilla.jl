@@ -6,16 +6,22 @@ __precompile__()
 # client = Client("skruger", "cloudantbaloo1129", "https://skruger.cloudant.com")
 # db, created = createdb(client; database="mynewdb")
 # createindex(db; fields=["name", "data"])
-# create(db; data=[
+# createdoc(db; data=[
 #     Dict("name"=>"adam", "data"=>"hello"),
 #     Dict("name"=>"billy", "data"=>"world"),
 #     Dict("name"=>"cecilia", "data"=>"authenticate"),
 #     Dict("name"=>"davina", "data"=>"cloudant"),
 #     Dict("name"=>"eric", "data"=>"blobbyblobbyblobby")
 # ])
-# find(db, q"name=davina")
+# query(db, q"name=davina")
 # deletedb(client, "mynewdb")
-
+# make_view(db, "my_ddoc", "my_view", 
+# """
+# function(doc) {
+#   if(doc && doc.name) {
+#     emit(doc.name, 1);
+#   }
+# }""")
 
 module Couchzilla
 
@@ -388,30 +394,16 @@ function alldocs(db::Database;
   end
 end
 
-# The CouchDB replication API
-
-# This should be run as a Task
-function changes(db::Database, options)
-  get_url = string(endpoint(db.url, "_changes"))
-  stream = Requests.get_streaming(get_url, cookies=db.client.cookies, query=options)
-  while !eof(stream)
-    line = readline(stream)
-    m = match(r"(^{\"seq\":.+?),?\s*$", line)
-    if m != nothing
-      object = m.captures[1]
-      js = JSON.parse(object)
-      produce(js)
-    end
-  end
-end
-
 include("selector.jl")
 include("query.jl")
 include("attachments.jl")
+include("replication.jl")
+include("views.jl")
 
 export Client, Database, HTTPException, INDEXTYPE, QueryResult, Selector
 export @q_str, createdb, connect, dbinfo, listdbs, deletedb, createdoc
 export readdoc, updatedoc, deletedoc, alldocs, changes, query, createindex
 export and, or, nor, not, put_attachment, get_attachment, delete_attachment
+export make_view, query_view
 
 end # module
