@@ -8,12 +8,8 @@ password = ENV["COUCH_PASS"]
 host     = ENV["COUCH_HOST"]
 
 database = "juliatest-$(Base.Random.uuid4())"
-
-println("Test database: $database")
-
 cl = Client(username, password, "https://$host")
 db, created = createdb(cl, database=database)
-@test created == true # Only prepared to run these tests if the database is fresh
 
 test_handler(r::Test.Success) = nothing
 function test_handler(r::Test.Failure)
@@ -27,33 +23,39 @@ function test_handler(r::Test.Error)
 end
 
 Test.with_handler(test_handler) do
-  print("[  ] Check that reading a non-existing id fails ")
-  @test_throws HTTPException readdoc(db, "this-id-does-not-exist")
-  println("\r[OK] Check that reading a non-existing id fails")
+  print("[  ] Create test database: $database")
+  @test created == true
+  println("\r[OK] Create test database: $database")
 end
 
 Test.with_handler(test_handler) do
-  print("[  ] Check create document ")
+  print("[  ] Read a non-existing id ")
+  @test_throws HTTPException readdoc(db, "this-id-does-not-exist")
+  println("\r[OK] Read a non-existing id")
+end
+
+Test.with_handler(test_handler) do
+  print("[  ] Create new doc ")
   data = createdoc(db, Dict("item" => "flange", "location" => "under-stairs cupboard"))
   @test haskey(data, "id")
   @test haskey(data, "rev")
-  println("\r[OK] Check create document")
+  println("\r[OK] Create new doc")
 
-  print("[  ] Check reading just created document by id and rev (note: bad idea usually) ")
+  print("[  ] Read new doc by {id, rev} (note: bad idea usually) ")
   doc = readdoc(db, data["id"]; rev=data["rev"])
   @test haskey(doc, "item")
   @test doc["item"] == "flange"
-  println("\r[OK] Check reading just created document by id and rev (note: bad idea usually)")
+  println("\r[OK] Read new doc by {id, rev} (note: bad idea usually)")
 
-  print("[  ] Check reading just created document by id and bad rev ")
+  print("[  ] Reading doc by id and bad rev should fail ")
   @test_throws HTTPException readdoc(db, data["id"]; rev="3-63453748494907")
-  println("\r[OK] Check reading just created document by id and bad rev")
+  println("\r[OK] Reading doc by id and bad rev should fail")
   
-  print("[  ] Update existing document ")
+  print("[  ] Update existing doc ")
   doc = updatedoc(db; id=data["id"], rev=data["rev"], body=Dict("item" => "flange", "location" => "garage"))
   @test haskey(doc, "rev")
   @test contains(doc["rev"], "2-")
-  println("\r[OK] Update existing document")
+  println("\r[OK] Update existing doc")
 end
 
 Test.with_handler(test_handler) do
@@ -122,7 +124,6 @@ Test.with_handler(test_handler) do
   result = delete_attachment(db, result["id"], result["rev"], "test.png")
   @test result["ok"] == true
   println("\r[OK] Delete attachment (blob mode)")
-  
 end
 
 print("[  ] Delete test database: $database ")
