@@ -55,14 +55,24 @@ macro q_str(data)
   end
 end
 
-function and(sel::Vector{Selector})
-  Selector(Dict("\$and" => map(sel) do s
-    s.dict
-  end))
+# Operations on arrays of selectors
+for boolop in [:and, :or, :nor]
+  boolop_str = "\$"*string(boolop)
+  @eval begin
+    function ($boolop)(sel::Vector{Selector})
+      Selector(Dict($boolop_str => map(sel) do s
+        s.dict
+      end))
+    end
+  end
 end
 
-function or(sel::Vector{Selector})
-  Selector(Dict("\$or" => map(sel) do s
-    s.dict
-  end))
+# Selector modifiers
+for op in [:not]
+  op_str = "\$"*string(op)
+  @eval begin
+    function ($op)(sel::Selector)
+      Selector(Dict($op_str => sel.dict))
+    end
+  end
 end

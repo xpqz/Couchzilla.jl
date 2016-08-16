@@ -68,11 +68,11 @@ end
 #
 # `relax()` makes an HTTP request with the relevant cookies and query strings
 # and deserialises the response, assumed to be json.
-function relax(fun, url_string; cookies=nothing, query=Dict())
+function relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict())
   if cookies == nothing
     error("Not authenticated")
   end
-  response = fun(url_string; cookies=cookies, query=query)
+  response = fun(url_string; cookies=cookies, query=query, headers=headers)
   if response.status in 400:599
     request = requestfor(response)
     throw(HTTPException(response.status, Requests.json(response), string(request)))
@@ -407,10 +407,11 @@ end
 
 include("selector.jl")
 include("query.jl")
+include("attachments.jl")
 
 export Client, Database, HTTPException, INDEXTYPE, QueryResult, Selector
 export @q_str, createdb, connect, dbinfo, listdbs, deletedb, createdoc
 export readdoc, updatedoc, deletedoc, alldocs, changes, query, createindex
-export and, or
+export and, or, nor, not, put_attachment, get_attachment, delete_attachment
 
 end # module

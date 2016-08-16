@@ -27,44 +27,44 @@ function test_handler(r::Test.Error)
 end
 
 Test.with_handler(test_handler) do
-  print("Check that reading a non-existing id fails ")
+  print("[  ] Check that reading a non-existing id fails ")
   @test_throws HTTPException readdoc(db, "this-id-does-not-exist")
-  println("[OK]")
+  println("\r[OK] Check that reading a non-existing id fails")
 end
 
 Test.with_handler(test_handler) do
-  print("Check create document ")
+  print("[  ] Check create document ")
   data = createdoc(db, Dict("item" => "flange", "location" => "under-stairs cupboard"))
   @test haskey(data, "id")
   @test haskey(data, "rev")
-  println("[OK]")
+  println("\r[OK] Check create document")
 
-  print("Check reading just created document by id and rev (note: bad idea usually) ")
+  print("[  ] Check reading just created document by id and rev (note: bad idea usually) ")
   doc = readdoc(db, data["id"]; rev=data["rev"])
   @test haskey(doc, "item")
   @test doc["item"] == "flange"
-  println("[OK]")
+  println("\r[OK] Check reading just created document by id and rev (note: bad idea usually)")
 
-  print("Check reading just created document by id and bad rev ")
+  print("[  ] Check reading just created document by id and bad rev ")
   @test_throws HTTPException readdoc(db, data["id"]; rev="3-63453748494907")
-  println("[OK]")
+  println("\r[OK] Check reading just created document by id and bad rev")
   
-  print("Update existing document ")
+  print("[  ] Update existing document ")
   doc = updatedoc(db; id=data["id"], rev=data["rev"], body=Dict("item" => "flange", "location" => "garage"))
   @test haskey(doc, "rev")
   @test contains(doc["rev"], "2-")
-  println("[OK]")
+  println("\r[OK] Update existing document")
 end
 
 Test.with_handler(test_handler) do
-  print("Create a json CQ index ")
+  print("[  ] Create a json CQ index ")
   result = createindex(db; fields=["name", "data"])
   @test result["result"] == "created"
-  println("[OK]")
+  println("\r[OK] Create a json CQ index")
 end
 
 Test.with_handler(test_handler) do
-  print("Bulk load data ")
+  print("[  ] Bulk load data ")
   result = createdoc(db; data=[
     Dict("name"=>"adam",    "data"=>"hello"),
     Dict("name"=>"billy",   "data"=>"world"),
@@ -74,31 +74,58 @@ Test.with_handler(test_handler) do
     Dict("name"=>"eric",    "data"=>"blobbyblobbyblobby")
   ])
   @test length(result) == 6
-  println("[OK]")
+  println("\r[OK] Bulk load data")
 end
 
 Test.with_handler(test_handler) do
-  print("Simple CQ query (equality) ")
+  print("[  ] Simple CQ query (equality) ")
   result = query(db, q"name = billy")
   @test length(result.docs) == 1
   @test result.docs[1]["data"] == "world"
   @test result.bookmark == ""
-  println("[OK]")
+  println("\r[OK] Simple CQ query (equality)")
   
-  print("Compound CQ query (and) ")
+  print("[  ] Compound CQ query (and) ")
   result = query(db, and([q"data = world", q"name = bob"]))
   @test length(result.docs) == 1
   @test result.docs[1]["name"] == "bob"
   @test result.bookmark == ""
-  println("[OK]")
+  println("\r[OK] Compound CQ query (and)")
   
-  print("Compound CQ query (or) ")
+  print("[  ] Compound CQ query (or) ")
   result = query(db, or([q"data = world", q"data = cloudant"]))
   @test length(result.docs) == 3
   @test result.bookmark == ""
-  println("[OK]")
+  println("\r[OK] Compound CQ query (or)")
 end
 
-println("Delete test database: $database")
+Test.with_handler(test_handler) do
+  print("[  ] Upload attachment (blob mode) ")
+  data = createdoc(db, Dict("item" => "screenshot"))
+  result = put_attachment(db, data["id"], data["rev"], "test.png", "image/png", "data/test.png")
+  @test result["ok"] == true
+  println("\r[OK] Upload attachment (blob mode)")
+  
+  print("[  ] Retrieve attachment (blob mode) ")
+  att = get_attachment(db, result["id"], "test.png"; rev=result["rev"])
+  open("data/fetched.png", "w") do f
+    write(f, att)
+  end
+  
+  md5_fetched = chomp(readall(`md5 -q data/fetched.png`))
+  md5_orig = chomp(readall(`md5 -q data/test.png`))
+  @test md5_fetched == md5_orig
+  rm("data/fetched.png")
+  println("\r[OK] Retrieve attachment (blob mode)")
+  
+  print("[  ] Delete attachment (blob mode) ")
+  result = delete_attachment(db, result["id"], result["rev"], "test.png")
+  @test result["ok"] == true
+  println("\r[OK] Delete attachment (blob mode)")
+  
+end
+
+print("[  ] Delete test database: $database ")
 result = deletedb(cl, database)
 @test result["ok"] == true
+println("\r\r[OK] Delete test database: $database")
