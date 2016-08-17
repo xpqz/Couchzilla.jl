@@ -1,5 +1,17 @@
 __precompile__()
 
+"""
+The CouchDB API
+
+This module follows the example set by PouchDB of implementing all
+write operations via the CouchDB _bulk_docs end point, instead of
+ the mess of a mixture of POST, PUT and DELETE. The advantage of this
+is much simpler code paths.
+
+There are some side effects of this, notably that some parameters 
+that the other end points support isn't supported here.
+"""
+
 # using Couchzilla
 # importall Couchzilla
 #
@@ -58,9 +70,16 @@ type Client
 end
 
 """
-The Database type is a client connection tied to a specific remote DB. It is normally
-not created directly, but via a call to `connect(client, dbname)`. Note that
-this doesn't verify that the database exists."""
+The Database immutable is a client connection tied to a specific remote DB. It is normally
+not created directly, but via a call to `connect(client; database=dbname)`. Note that
+this doesn't verify that the database exists. 
+
+You can also use
+
+```julia
+db, created = createdb(client; database="mydb")
+```
+"""
 immutable Database
   url
   name
@@ -71,9 +90,10 @@ immutable Database
 end
 
 # Private functions
-#
-# `relax()` makes an HTTP request with the relevant cookies and query strings
-# and deserialises the response, assumed to be json.
+"""
+`relax()` makes an HTTP request with the relevant cookies and query strings
+and deserialises the response, assumed to be json.
+"""
 function relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict())
   if cookies == nothing
     error("Not authenticated")
@@ -87,38 +107,50 @@ function relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict())
   end
 end
 
-# `cookieauth()` hits the `_session` endpoint to obtain a session cookie
-# that is used to authenticate subsequent requests.
+"""
+`cookieauth()` hits the `_session` endpoint to obtain a session cookie
+that is used to authenticate subsequent requests.
+"""
 function cookieauth(client::Client)
-  response = post(string(endpoint(client.url, "_session")); 
+  response = post(endpoint(client.url, "_session"); 
     data=Dict("name" => client.username, "password" => client.password))
   client.cookies = cookies(response)
   client
 end
 
-# `endpoint()` appends a path string to the current URI
+"""
+`endpoint()` appends a path string to the current URI
+"""
 function endpoint(uri::URI, path::AbstractString)
-  URI(uri.scheme, uri.host, uri.port, replace("$(uri.path)/$path", "//", "/"))
+  string(URI(uri.scheme, uri.host, uri.port, replace("$(uri.path)/$path", "//", "/")))
 end
 
 """
-`db = connect(client::Client; database::AbstractString=nothing)` 
+Return an immutable Database reference. 
 
-Return an immutable Database reference. This means that database-level operations
-will operate on the chosen database. If you need to operate on a different database,
-you need to create a new Database reference. `connect(...)` does not check that the 
-chosen remote database exists.
+```julia
+db = connect(client::Client; database::AbstractString=nothing)
+```
+
+Subsequent database-level operations will operate on the chosen database. 
+If you need to operate on a different database, you need to create a new 
+Database reference. `connect(...)` does not check that the chosen remote 
+database exists.
 """
 function connect(client::Client; database::AbstractString=nothing) 
   Database(client, database)
 end
 
 """
-`db, created = createdb(client::Client; databse::AbstractString=nothing)` 
-
 Create a new database on the remote end called `dbname`. Return an immutable Database
 reference to this newly created db, and the true if a database was created, false if it
 already existed.
+
+```julia
+db, created = createdb(client::Client; databse::AbstractString=nothing)
+```
+
+See
 
 http://docs.couchdb.org/en/1.6.1/api/database/common.html#put--db
 """
@@ -140,66 +172,77 @@ function createdb(client::Client; database::AbstractString=nothing)
 end
 
 """
-`info = dbinfo(client::Client, name::AbstractString)`
+Return the meta data about the `dbname` database.
 
-Return the meta data about the `dbname` database, as reported by 
+```julia
+info = dbinfo(client::Client, name::AbstractString)
+```
+
+See 
 
 http://docs.couchdb.org/en/1.6.1/api/database/common.html#get--db
 """
 function dbinfo(client::Client, name::AbstractString)
-  relax(get, string(endpoint(client.url, name)); cookies=client.cookies)
+  relax(get, endpoint(client.url, name); cookies=client.cookies)
 end
 
 """
-`dblist = listdbs(client::Client)`
-
 Return a list of all databases under the authenticated user.
+
+```julia
+dblist = listdbs(client::Client)
+```
+
+See
 
 http://docs.couchdb.org/en/1.6.1/api/server/common.html#all-dbs
 """
 function listdbs(client::Client)
-  relax(get, string(endpoint(client.url, "_all_dbs")); cookies=client.cookies)
+  relax(get, endpoint(client.url, "_all_dbs"); cookies=client.cookies)
 end
 
 """
-`result = deletedb(client::Client, name::AbstractString)`
-
 Delete the named database.
+
+```julia
+result = deletedb(client::Client, name::AbstractString)
+```
+
+See
 
 http://docs.couchdb.org/en/1.6.1/api/database/common.html?#delete--db
 """
 function deletedb(client::Client, name::AbstractString)
-  relax(delete, string(endpoint(client.url, name)); cookies=client.cookies)
+  relax(delete, endpoint(client.url, name); cookies=client.cookies)
 end
 
 """
-The CouchDB document API
 
-This module follows the example set by PouchDB of implementing all
-write operations via the CouchDB _bulk_docs end point, instead of
- the mess of a mixture of POST, PUT and DELETE. The advantage of this
-is much simpler code paths.
+Raw _bulk_docs.
 
-There are some side effects of this, notably that some parameters 
-that the other end points support isn't supported here.
-
-`result = bulkdocs(db::Database; data=[], options=Dict())`
+```julia
+result = bulkdocs(db::Database; data=[], options=Dict())
+```
 
 This is a function primarily intended for internal use, but can
 be used directly to create, update or delete documents in bulk,
 so as to save on the HTTP overhead.
 
+See
+
 http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs
 """
 function bulkdocs(db::Database; data=[], options=Dict())
-  post_url = string(endpoint(db.url, "_bulk_docs"))
+  post_url = endpoint(db.url, "_bulk_docs")
   Requests.json(post(post_url; json=Dict("docs" => data), cookies=db.client.cookies, query=options))
 end
 
 """
-`result = create(db::Database; body=Dict())`
-
 Create a new document.
+
+```julia
+result = create(db::Database; body=Dict())
+```
 
 Note that this is implemented via the `_bulk_docs` endpoint, rather 
 than a POST to the /{DB}.
@@ -212,11 +255,13 @@ function createdoc(db::Database, body=Dict())
 end
 
 """
-`result = create(db::Database; data=[Dict()])`
-
 Bulk create a set of new documents.
 
-This is implemented via the `_bulk_docs` endpoint.
+```julia
+result = create(db::Database; data=[Dict()])
+```
+
+This is implemented via the `_bulk_docs` endpoint. See
 
 http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs
 """
@@ -228,7 +273,28 @@ function createdoc(db::Database; data=[Dict()])
   bulkdocs(db; data=data)
 end
 
+"""
+Fetch a document by `id`.
+
+```julia
+readdoc(db::Database, id::AbstractString; 
+  rev               = "", 
+  attachments       = false, 
+  att_encoding_info = false,
+  atts_since        = [],
+  conflicts         = false,
+  deleted_conflicts = false,
+  latest            = false,
+  meta              = false,
+  open_revs         = [],
+  revs              = false,
+  revs_info         = false)
+```
+
+For a description of the parameters, see
+
 # http://docs.couchdb.org/en/1.6.1/api/document/common.html#get--db-docid
+"""
 function readdoc(db::Database, id::AbstractString; 
   rev               = "", 
   attachments       = false, 
@@ -288,11 +354,15 @@ function readdoc(db::Database, id::AbstractString;
     query["open_revs"] = open_revs
   end
 
-  relax(get, string(endpoint(db.url, id)); cookies=db.client.cookies, query=query)
+  relax(get, endpoint(db.url, id); cookies=db.client.cookies, query=query)
 end
 
 """
-`result = update(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing, body=Dict())`
+Update an existing document, creating a new revision.
+
+```julia
+result = update(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing, body=Dict())
+```
 
 Implemented via the _bulk_docs endpoint:
 
@@ -304,7 +374,11 @@ function updatedoc(db::Database; id::AbstractString=nothing, rev::AbstractString
 end
 
 """
-`result = delete(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing)`
+Delete a document revision.
+
+```julia
+result = delete(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing)
+```
 
 Implemented via the _bulk_docs endpoint:
 
@@ -316,9 +390,11 @@ function deletedoc(db::Database; id::AbstractString=nothing, rev::AbstractString
 end
 
 """
-`data = list(db::Database; ...options...)`
-
 Return all documents in the database by the primary index.
+
+```julia
+data = list(db::Database; ...options...)
+```
 
 The optional parameters are:
 
@@ -390,7 +466,7 @@ function alldocs(db::Database;
   if length(keys) > 0
     Requests.json(post(endpoint(db.url, "_all_docs"); json=Dict("keys" => keys), cookies=db.client.cookies, query=query))
   else
-    relax(get, string(endpoint(db.url, "_all_docs")); cookies=db.client.cookies, query=query)
+    relax(get, endpoint(db.url, "_all_docs"); cookies=db.client.cookies, query=query)
   end
 end
 

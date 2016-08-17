@@ -6,18 +6,57 @@ function Selector()
   Selector(Dict{AbstractString, Any}())
 end
 
+"""
+Create a Selector from the raw json.
+
+```julia
+Selector(raw_json::AbstractString)
+```
+"""
 function Selector(raw_json::AbstractString) 
   Selector(JSON.parse(raw_json))
 end
 
-function Selector(op::AbstractString, selectors::Array{Selector, 1}) 
-  Selector(Dict(op => selectors))
-end
+"""
+Check if a Selector is empty
 
+```julia
+isempty(sel::Selector)
+```
+"""
 function isempty(sel::Selector)
   length(sel.dict) == 0
 end
 
+"""
+Custom string literal for a limited Selector definition DSL.
+
+It takes the form:
+
+`field op data`
+
+where `field` is a field name, op is one of 
+
+`=, !=, <, <=, >, >=, in, !in, all`
+
+This allows you to write things like:
+
+q"name = bob"
+q"value < 5"
+q"occupation in [fishmonger, pilot, welder]"
+
+Note that the Selector DSL only covers a fraction of the full Selector
+syntax. It can be used with the boolean functions `and()`, `or()` etc
+to build up more complex Selectors, e.g.
+
+```julia
+sel = and([q"name = bob", q"age > 18"])
+```
+
+For more information on the actual Selector syntax, see
+
+https://docs.cloudant.com/cloudant_query.html#selector-syntax
+"""
 macro q_str(data)
   quote
     operators = Dict{UTF8String, UTF8String}(
@@ -55,7 +94,12 @@ macro q_str(data)
   end
 end
 
-# Operations on arrays of selectors
+# Boolean logic composition of Selectors:
+#
+# sel = and([q"name = bob", q"age > 18"])
+# sel = or([q"name = bob", q"age > 18"])
+# sel = nor([q"name = bob", q"age > 18"])
+# 
 for boolop in [:and, :or, :nor]
   boolop_str = "\$"*string(boolop)
   @eval begin
@@ -67,7 +111,10 @@ for boolop in [:and, :or, :nor]
   end
 end
 
-# Selector modifiers
+# Selector modifiers:
+#
+# sel = not(and([q"name = bob", q"age > 18"]))
+# 
 for op in [:not]
   op_str = "\$"*string(op)
   @eval begin

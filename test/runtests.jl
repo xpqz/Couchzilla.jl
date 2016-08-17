@@ -139,12 +139,12 @@ Test.with_handler(test_handler) do
   println("\r[OK] Create a view")
   
   print("[  ] Query view ")
-  result = query_view(db, "my_ddoc", "my_view"; query=Dict("include_docs" => true))
-  println(result)
+  result = query_view(db, "my_ddoc", "my_view"; include_docs=true, key="adam")
+  @test length(result["rows"]) == 1
   println("\r[OK] Query view")
 end
 
 print("[  ] Delete test database: $database ")
 result = deletedb(cl, database)
 @test result["ok"] == true
-println("\r\r[OK] Delete test database: $database")
+println("\r[OK] Delete test database: $database")

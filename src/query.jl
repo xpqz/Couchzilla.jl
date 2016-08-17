@@ -4,22 +4,29 @@ type QueryResult
 end
 
 """
-`result::QueryResult = query(db::Database, selector::Selector;
-  fields::Array{AbstractString, 1}} = [],
-  sort::Array{Dict{AbstractString, Any}, 1}} = [],
-  limit  = 25,
-  skip   = 0)`
+Query database (Mango/Cloudant Query).
 
-Query database (Mango/Cloudant Query). 
+```julia
+query{T<:AbstractString}(db::Database, selector::Selector;
+  fields::Vector{T}          = Vector{AbstractString}(),
+  sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
+  limit                      = 25,
+  skip                       = 0)
+```
+
+See the `Selector` type and the associated `q"..."` custom string literal
+which implements a simplified DSL for writing selectors.
 
 Example: find all documents where "year" is greater than 2010, returning 
 the fields _id, _rev, year and title, sorted in ascending order on year.
 Set the page size to 10.
 
-`query(db, r"year > 2010";
+```julia
+query(db, q"year > 2010";
   fields = ["_id", "_rev", "year", "title"],
   sort   = [Dict("year" => "asc")],
-  limit  = 10)`
+  limit  = 10)
+```
   
 """
 function query{T<:AbstractString}(db::Database, selector::Selector;
@@ -42,21 +49,27 @@ function query{T<:AbstractString}(db::Database, selector::Selector;
 end
 
 """
-`createindex(db::Database; 
-  name          = Nullable{AbstractString}(),
-  ddoc          = Nullable{AbstractString}(),
-  fields        = Nullable{Array{AbstractString, 1}}(), 
-  selector      = Nullable{Selector}(),
-  default_field = Nullable{Dict{Any, Any}}(),
-  indextype     = json)`
+Create a Mango index. 
+
+```julia
+createindex{T<:AbstractString}(db::Database; 
+  name::T              = "",
+  ddoc::T              = "",
+  fields               = Vector{T}(), 
+  selector             = Selector(),
+  default_field        = Dict{UTF8String, Any}("analyzer" => "standard", "enabled" => true),
+  indextype::INDEXTYPE = json)
+```
   
-Create a Mango index. All parameters optional, but note that not giving a 'fields' argument will
-result in all fields being indexed which is very costly. Defaults to type 'json'.
+All parameters optional, but note that not giving a `fields` argument will
+result in all fields being indexed which is very costly. Defaults to type `json`.
 
 Here's an example:
 
-result = Couchzilla.createindex(db; ddoc="my-ddoc", fields=[Dict("name"=>"lastname", "type"=>"string")], 
+```julia
+result = createindex(db; ddoc="my-ddoc", fields=[Dict("name"=>"lastname", "type"=>"string")], 
   indextype=text, default_field=Dict("analyzer" => "german", "enabled" => true))
+```
 
 https://docs.cloudant.com/cloudant_query.html#creating-an-index
 """
