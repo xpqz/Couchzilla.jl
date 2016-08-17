@@ -157,6 +157,11 @@ Test.with_handler(test_handler) do
   result = query_view(db, "my_ddoc", "my_view"; include_docs=true, key="adam")
   @test length(result["rows"]) == 1
   println("\r[OK] Query view")
+  
+  print("[  ] Query view (POST)")
+  result = query_view(db, "my_ddoc", "my_view"; keys=["adam", "billy"])
+  @test length(result["rows"]) == 2
+  println("\r[OK] Query view (POST)")
 end
 
 print("[  ] Delete test database: $database ")
