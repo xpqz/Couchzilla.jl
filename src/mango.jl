@@ -10,8 +10,9 @@ Query database (Mango/Cloudant Query).
 query{T<:AbstractString}(db::Database, selector::Selector;
   fields::Vector{T}          = Vector{AbstractString}(),
   sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
-  limit                      = 25,
-  skip                       = 0)
+  limit                      = 0,
+  skip                       = 0,
+  bookmark                   = "")
 ```
 
 See the `Selector` type and the associated `q"..."` custom string literal
@@ -27,21 +28,34 @@ query(db, q"year > 2010";
   sort   = [Dict("year" => "asc")],
   limit  = 10)
 ```
-  
+
+See 
+
+* https://docs.cloudant.com/cloudant_query.html
+* https://cloudant.com/blog/cloudant-query-grows-up-to-handle-ad-hoc-queries/
 """
 function query{T<:AbstractString}(db::Database, selector::Selector;
   fields::Vector{T}          = Vector{AbstractString}(),
   sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
-  limit                      = 25,
-  skip                       = 0)
+  limit                      = 0,
+  skip                       = 0,
+  bookmark                   = "")
 
-  cquery = Dict{UTF8String, Any}("selector" => selector.dict, "limit" => limit, "skip" => skip)
+  cquery = Dict{UTF8String, Any}("selector" => selector.dict, "skip" => skip)
   if length(fields) > 0
     cquery["fields"] = fields
   end
 
   if length(sort) > 0
     cquery["sort"] = sort
+  end
+  
+  if limit > 0
+    cquery["limit"] = limit
+  end
+  
+  if bookmark != ""
+    cquery["bookmark"] = bookmark
   end
 
   result = Requests.json(post(endpoint(db.url, "_find"); json=cquery, cookies=db.client.cookies))
@@ -57,18 +71,18 @@ createindex{T<:AbstractString}(db::Database;
   ddoc::T              = "",
   fields               = Vector{T}(), 
   selector             = Selector(),
-  default_field        = Dict{UTF8String, Any}("analyzer" => "standard", "enabled" => true),
-  indextype::INDEXTYPE = json)
+  default_field        = Dict{UTF8String, Any}("analyzer" => "standard", "enabled" => true))
 ```
   
 All parameters optional, but note that not giving a `fields` argument will
-result in all fields being indexed which is very costly. Defaults to type `json`.
+result in all fields being indexed which is very costly. Defaults to type `"json"` and
+will be assumed to be `"text"` if the data in the `fields` array are `Dict`s.
 
 Here's an example:
 
 ```julia
 result = createindex(db; ddoc="my-ddoc", fields=[Dict("name"=>"lastname", "type"=>"string")], 
-  indextype=text, default_field=Dict("analyzer" => "german", "enabled" => true))
+  default_field=Dict("analyzer" => "german", "enabled" => true))
 ```
 
 https://docs.cloudant.com/cloudant_query.html#creating-an-index
@@ -78,20 +92,24 @@ function createindex{T<:AbstractString}(db::Database;
   ddoc::T              = "",
   fields               = Vector{T}(), 
   selector             = Selector(),
-  default_field        = Dict{UTF8String, Any}("analyzer" => "standard", "enabled" => true),
-  indextype::INDEXTYPE = json)
-      
-  if indextype == json && !isempty(selector)
+  default_field        = Dict{UTF8String, Any}("analyzer" => "standard", "enabled" => true))
+
+  indextype = "json"
+  if length(fields) > 0 && isa(fields[1], Dict)
+    indextype = "text"
+  end
+
+  if indextype == "json" && !isempty(selector)
     error("Indextype 'json' does not support a selector.")
   end
   
-  if indextype == json && fields == []
+  if indextype == "json" && fields == []
     error("Indextype 'json' requires a fields specification.")
   end
   
   idxquery = fields == [] ? Dict{T, Any}("index" => Dict{T, Any}()) : Dict{T, Any}("index" => Dict{T, Any}("fields" => fields))
   
-  if indextype == text
+  if indextype == "text"
     idxquery["index"]["default_field"] = default_field
   end
   
@@ -107,8 +125,8 @@ function createindex{T<:AbstractString}(db::Database;
     idxquery["ddoc"] = ddoc
   end
   
-  if indextype != json
-    idxquery["type"] = string(indextype)
+  if indextype != "json"
+    idxquery["type"] = "text"
   end
   
   Requests.json(post(endpoint(db.url, "_index"); json=idxquery, cookies=db.client.cookies))

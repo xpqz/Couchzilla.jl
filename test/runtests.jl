@@ -59,46 +59,61 @@ Test.with_handler(test_handler) do
 end
 
 Test.with_handler(test_handler) do
-  print("[  ] Create a json CQ index ")
-  result = createindex(db; fields=["name", "data"])
+  print("[  ] Create a json Mango index ")
+  result = createindex(db; fields=["data", "data2"])
   @test result["result"] == "created"
-  println("\r[OK] Create a json CQ index")
-end
-
-Test.with_handler(test_handler) do
+  println("\r[OK] Create a json Mango index")
+  
   print("[  ] Bulk load data ")
-  result = createdoc(db; data=[
-    Dict("name"=>"adam",    "data"=>"hello"),
-    Dict("name"=>"billy",   "data"=>"world"),
-    Dict("name"=>"bob",     "data"=>"world"),
-    Dict("name"=>"cecilia", "data"=>"authenticate"),
-    Dict("name"=>"davina",  "data"=>"cloudant"),
-    Dict("name"=>"eric",    "data"=>"blobbyblobbyblobby")
-  ])
-  @test length(result) == 6
+  data=[
+      Dict("name"=>"adam",    "data"=>"hello",              "data2" => "television"),
+      Dict("name"=>"billy",   "data"=>"world",              "data2" => "vocabulary"),
+      Dict("name"=>"bob",     "data"=>"world",              "data2" => "organize"),
+      Dict("name"=>"cecilia", "data"=>"authenticate",       "data2" => "study"),
+      Dict("name"=>"frank",   "data"=>"authenticate",       "data2" => "region"),    
+      Dict("name"=>"davina",  "data"=>"cloudant",           "data2" => "research"),
+      Dict("name"=>"eric",    "data"=>"blobbyblobbyblobby", "data2" => "knowledge")
+  ]
+    
+  result = createdoc(db; data=data)
+  @test length(result) == length(data)
   println("\r[OK] Bulk load data")
-end
-
-Test.with_handler(test_handler) do
-  print("[  ] Simple CQ query (equality) ")
-  result = query(db, q"name = billy")
-  @test length(result.docs) == 1
-  @test result.docs[1]["data"] == "world"
-  @test result.bookmark == ""
-  println("\r[OK] Simple CQ query (equality)")
+    
+  print("[  ] Simple Mango query (equality) ")
+  result = query(db, q"data = authenticate")
+  @test length(result.docs) == 2
+  println("\r[OK] Simple Mango query (equality)")
   
-  print("[  ] Compound CQ query (and) ")
-  result = query(db, and([q"data = world", q"name = bob"]))
+  print("[  ] Compound Mango query (and) ")
+  result = query(db, and([q"data = world", q"data2 = vocabulary"]))
   @test length(result.docs) == 1
-  @test result.docs[1]["name"] == "bob"
-  @test result.bookmark == ""
-  println("\r[OK] Compound CQ query (and)")
+  @test result.docs[1]["name"] == "billy"
+  println("\r[OK] Compound Mango query (and)")
   
-  print("[  ] Compound CQ query (or) ")
-  result = query(db, or([q"data = world", q"data = cloudant"]))
+  print("[  ] Compound Mango query (or) ")
+  result = query(db, or([q"data = world", q"data2 = region"]))
   @test length(result.docs) == 3
-  @test result.bookmark == ""
-  println("\r[OK] Compound CQ query (or)")
+  println("\r[OK] Compound Mango query (or)")
+  
+  print("[  ] Create a text Mango index ")
+  result = createindex(db; fields=[
+    Dict("name" => "cust",  "type" => "string"), 
+    Dict("name" => "value", "type" => "string")
+  ])
+  @test result["result"] == "created"
+  println("\r[OK] Create a text Mango index")
+  
+  maxdoc = 102
+  createdoc(db; data=[Dict("cust" => "john", "value" => "hello$x") for x=1:maxdoc])
+  print("[  ] Mango query with multi-page return ")
+  result = query(db, q"cust=john")
+  count = length(result.docs)
+  while length(result.docs) > 0
+    result = query(db, q"cust = john", bookmark=result.bookmark)
+    count += length(result.docs)
+  end
+  @test count == maxdoc
+  println("\r[OK] Mango query with multi-page return")
 end
 
 Test.with_handler(test_handler) do
