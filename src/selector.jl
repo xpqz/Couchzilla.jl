@@ -1,61 +1,92 @@
+"""
+    Selector
+  
+Immutable represention of a Mango Selector used to query a Mango index.
+
+Usually created using the custom string literal `q"..."` (see the `@q_str` macro),
+but can be created directly from either the raw json string containing a Selector
+expression or a Julia `Dict(...)` representing the same.
+
+## Examples
+
+    ```julia
+    sel = q"name = bob"
+    sel = Selector("{\"name\":{\"\$eq\":\"bob\"}}")
+    sel = Selector(Dict("name" => Dict("\$eq" => "bob")))
+    sel = and([q"name = bob", q"age > 18"])
+    ```
+
+## API details
+
+* https://docs.cloudant.com/cloudant_query.html#selector-syntax
+"""
 immutable Selector
   dict::Dict{AbstractString, Any}
 end
 
+"""
+    Selector()
+
+The empty Selector.
+"""
 function Selector()
   Selector(Dict{AbstractString, Any}())
 end
 
 """
+    Selector(raw_json::AbstractString)
+
 Create a Selector from the raw json.
 
-```julia
-Selector(raw_json::AbstractString)
-```
+## API endpoint details
+
+* https://docs.cloudant.com/cloudant_query.html#selector-syntax
 """
 function Selector(raw_json::AbstractString) 
   Selector(JSON.parse(raw_json))
 end
 
 """
-Check if a Selector is empty
-
-```julia
-isempty(sel::Selector)
-```
+    isempty(sel::Selector)
+  
+True if sel is the empty Selector.
 """
 function isempty(sel::Selector)
   length(sel.dict) == 0
 end
 
 """
+    q"....."
+  
 Custom string literal for a limited Selector definition DSL.
 
 It takes the form:
 
-`field op data`
+    field op data
 
 where `field` is a field name, op is one of 
 
-`=, !=, <, <=, >, >=, in, !in, all`
+    =, !=, <, <=, >, >=, in, !in, all
 
 This allows you to write things like:
 
-q"name = bob"
-q"value < 5"
-q"occupation in [fishmonger, pilot, welder]"
+    q"name = bob"
+    q"value < 5"
+    q"occupation in [fishmonger, pilot, welder]"
 
 Note that the Selector DSL only covers a fraction of the full Selector
 syntax. It can be used with the boolean functions `and()`, `or()` etc
 to build up more complex Selectors, e.g.
 
-```julia
-sel = and([q"name = bob", q"age > 18"])
-```
+  ```julia
+  sel = and([q"name = bob", q"age > 18"])
+  ```
 
-For more information on the actual Selector syntax, see
+For more information on the actual Selector syntax, see link below.
 
-https://docs.cloudant.com/cloudant_query.html#selector-syntax
+## API endpoint details
+
+* https://docs.cloudant.com/cloudant_query.html#selector-syntax
 """
 macro q_str(data)
   quote
@@ -97,7 +128,7 @@ end
 # Boolean logic composition of Selectors:
 #
 # sel = and([q"name = bob", q"age > 18"])
-# sel = or([q"name = bob", q"age > 18"])
+# sel = or( [q"name = bob", q"age > 18"])
 # sel = nor([q"name = bob", q"age > 18"])
 # 
 for boolop in [:and, :or, :nor]

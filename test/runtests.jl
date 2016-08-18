@@ -96,11 +96,11 @@ Test.with_handler(test_handler) do
   println("\r[OK] Compound Mango query (or)")
   
   print("[  ] Create a text Mango index ")
-  result = createindex(db; fields=[
+  textindex = createindex(db; fields=[
     Dict("name" => "cust",  "type" => "string"), 
     Dict("name" => "value", "type" => "string")
   ])
-  @test result["result"] == "created"
+  @test textindex["result"] == "created"
   println("\r[OK] Create a text Mango index")
   
   maxdoc = 102
@@ -114,6 +114,16 @@ Test.with_handler(test_handler) do
   end
   @test count == maxdoc
   println("\r[OK] Mango query with multi-page return")
+
+  print("[  ] List Mango indexes ")
+  result = listindexes(db)
+  @test length(result["indexes"]) == 3
+  println("\r[OK] List Mango indexes")
+  
+  print("[  ] Delete Mango index ")
+  result = deleteindex(db; ddoc=textindex["id"], name=textindex["name"], indextype="text")
+  @test result["ok"] == true
+  println("\r[OK] Delete Mango index")
 end
 
 Test.with_handler(test_handler) do
