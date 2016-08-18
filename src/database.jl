@@ -18,12 +18,12 @@
     end
 
 The Database immutable is a client connection tied to a specific remote DB. It is 
-normally not created directly, but via a call to `connect()`, or `createdb()`. 
+normally not created directly, but via a call to `connectdb()`, or `createdb()`. 
 
 ## Examples
 
     # Connect to existing DB. Does not verify it exists.
-    db = connect(client; database="mydb")
+    db = connectdb(client; database="mydb")
 
     # Create a new db if it doesn't exist, otherwise connect 
     db, created = createdb(client; database="mydb")

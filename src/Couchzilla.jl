@@ -3,7 +3,56 @@ __precompile__()
 """
 The CouchDB API.
 
+## Types
 
+* `Client`
+* `Database`
+* `HTTPException`
+* `QueryResult`
+* `Selector`
+
+## CouchDB instance API
+
+* `createdb()`
+* `connectdb()`
+* `dbinfo()`
+* `listdbs()`
+* `deletedb()`
+
+## CouchDB CRUD  
+
+* `createdoc()`
+* `readdoc()`
+* `updatedoc()`
+* `deletedoc()`
+
+## Attachments
+
+* `put_attachment()`
+* `get_attachment()`
+* `delete_attachment()`
+
+## Mango/Cloudant Query
+
+* `createindex()`
+* `query()`
+* `listindexes()`
+* `deleteindex()`
+* `and()`
+* `or()`
+* `nor()`
+* `not()`
+* `@q_str()`
+
+## Views
+
+* `make_view()`
+* `query_view()`
+* `alldocs()`
+
+## Replication
+
+* `changes()`
 """
 module Couchzilla
 

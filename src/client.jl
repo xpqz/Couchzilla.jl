@@ -13,7 +13,6 @@
 
     The Client type represents an authenticated connection to a remote CouchDB/Cloudant instance.
 """
-
 type Client
   username
   password
@@ -42,16 +41,16 @@ function cookieauth!(client::Client)
 end
 
 """
-    connect(client::Client; database::AbstractString=nothing)
+    connectdb(client::Client; database::AbstractString=nothing)
 
 Return an immutable Database reference.
 
 Subsequent database-level operations will operate on the chosen database. 
 If you need to operate on a different database, you need to create a new 
-Database reference. `connect(...)` does not check that the chosen remote 
+Database reference. `connectdb(...)` does not check that the chosen remote 
 database exists.
 """
-function connect(client::Client; database::AbstractString=nothing) 
+function connectdb(client::Client; database::AbstractString=nothing) 
   Database(client, database)
 end
 
