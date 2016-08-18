@@ -9,12 +9,10 @@ expression or a Julia `Dict(...)` representing the same.
 
 ## Examples
 
-    ```julia
     sel = q"name = bob"
     sel = Selector("{\"name\":{\"\$eq\":\"bob\"}}")
     sel = Selector(Dict("name" => Dict("\$eq" => "bob")))
     sel = and([q"name = bob", q"age > 18"])
-    ```
 
 ## API details
 
@@ -78,9 +76,7 @@ Note that the Selector DSL only covers a fraction of the full Selector
 syntax. It can be used with the boolean functions `and()`, `or()` etc
 to build up more complex Selectors, e.g.
 
-  ```julia
   sel = and([q"name = bob", q"age > 18"])
-  ```
 
 For more information on the actual Selector syntax, see link below.
 

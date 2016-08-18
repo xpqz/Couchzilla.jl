@@ -13,9 +13,7 @@ reducer, e.g. `"_stats"`.
 
 ## Examples
 
-    ```julia
     result = make_view(db, "my_ddoc", "my_view", "function(doc){if(doc&&doc.name){emit(doc.name,1);}}")
-    ```
     
 ## Returns
 
@@ -65,10 +63,8 @@ Query a secondary index.
 
 ## Examples
 
-  ```julia
   # Query the view for a known key subset
   result = query_view(db, "my_ddoc", "my_view"; keys=["adam", "billy"])
-  ```
 
 ## Returns
 

@@ -22,13 +22,11 @@ normally not created directly, but via a call to `connect()`, or `createdb()`.
 
 ## Examples
 
-    ```julia
     # Connect to existing DB. Does not verify it exists.
     db = connect(client; database="mydb")
 
     # Create a new db if it doesn't exist, otherwise connect 
     db, created = createdb(client; database="mydb")
-    ```
 """
 immutable Database
   url

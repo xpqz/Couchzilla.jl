@@ -12,10 +12,8 @@ Write an attachment to an existing document. Attachment read from a file.
 
 ## Examples
 
-    ```julia
     doc = createdoc(db, Dict("item" => "screenshot"))
     result = put_attachment(db, doc["id"], doc["rev"], "test.png", "image/png", "data/test.png")
-    ```
 
 ## API endpoint details
 
@@ -38,12 +36,10 @@ Read an attachment.
 
 ## Examples
 
-    ```julia
     att = get_attachment(db, id, "test.png"; rev=rev)
     open("data/fetched.png", "w") do f
       write(f, att)
     end
-    ```
 
 ## API endpoint details
 
@@ -61,9 +57,7 @@ Delete an attachment.
 
 ## Examples
 
-    ```julia
     result = delete_attachment(db, id, rev, "test.png")
-    ```
 
 ## API endpoint details
 
