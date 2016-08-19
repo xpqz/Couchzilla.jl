@@ -2,8 +2,6 @@
 
 """
     type Client
-      username
-      password
       url
       cookies
 
@@ -14,26 +12,24 @@
 The Client type represents an authenticated connection to a remote CouchDB/Cloudant instance.
 """
 type Client
-  username
-  password
   url
   cookies
 
   Client(username::AbstractString, password::AbstractString, urlstr::AbstractString) = 
-    cookieauth!(new(username, password, URI(urlstr)))
+    cookieauth!(new(URI(urlstr)), username, password)
 end
 
 """
-    cookieauth!() 
+    cookieauth!(client::Client, username, password) 
 
 Private. Hits the `_session` endpoint to obtain a session cookie
 that is used to authenticate subsequent requests.
 
 [API reference](https://docs.cloudant.com/authentication.html#cookie-authentication)
 """
-function cookieauth!(client::Client)
+function cookieauth!(client::Client, username, password)
   response = post(endpoint(client.url, "_session"); 
-    data=Dict("name" => client.username, "password" => client.password))
+    data=Dict("name" => username, "password" => password))
   client.cookies = cookies(response)
   client
 end
