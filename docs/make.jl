@@ -1,3 +1,5 @@
+# julia make.jl
+# mkdocs gh-deploy --clean
 using Documenter, Couchzilla
  
 makedocs(modules=[Couchzilla], doctest=true)
