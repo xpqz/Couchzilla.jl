@@ -115,6 +115,15 @@ Test.with_handler(test_handler) do
   @test count == maxdoc
   println("\r[OK] Mango query with multi-page return")
 
+  print("[  ] Multi-page Mango query as a Task ")
+  createdoc(db; data=[Dict("data" => "paged", "data2" => "world$x") for x=1:maxdoc])
+  total = 0
+  for page in @task paged_query(db, q"data = paged"; pagesize=10)
+    total += length(page.docs)
+  end
+  @test total == maxdoc
+  println("\r[OK] Multi-page Mango query as a Task ")
+
   print("[  ] List Mango indexes ")
   result = listindexes(db)
   @test length(result["indexes"]) == 3
@@ -124,6 +133,14 @@ Test.with_handler(test_handler) do
   result = deleteindex(db; ddoc=textindex["id"], name=textindex["name"], indextype="text")
   @test result["ok"] == true
   println("\r[OK] Delete Mango index")
+end
+
+Test.with_handler(test_handler) do
+  print("[  ] Changes ")
+  for ch in @task changes(db; limit=5)
+    print("*")
+  end
+  println("\r[OK] Changes ")
 end
 
 Test.with_handler(test_handler) do

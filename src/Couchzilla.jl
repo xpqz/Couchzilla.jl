@@ -43,6 +43,7 @@ The CouchDB API.
 * `nor()`
 * `not()`
 * `@q_str()`
+* `paged_query()`
 
 ## Views
 
@@ -70,11 +71,13 @@ include("mango.jl")
 include("attachments.jl")
 include("replication.jl")
 include("views.jl")
+include("tasks.jl")
 
 export Client, Database, HTTPException, QueryResult, Selector, @q_str
 export createdb, connect, dbinfo, listdbs, deletedb, createdoc, readdoc
 export updatedoc, deletedoc, alldocs, changes, query, createindex
 export and, or, nor, not, put_attachment, get_attachment, delete_attachment
 export make_view, query_view, listindexes, deleteindex
+export paged_query
 
 end # module

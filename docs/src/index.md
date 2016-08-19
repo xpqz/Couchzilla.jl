@@ -4,7 +4,7 @@ CurrentModule = Couchzilla
 
 # Couchzilla
  
-Couchzilla is a client library for CouchDB (and Cloudant).
+Couchzilla – CouchDB access for Julians.
 
 ## Philosophy
 
@@ -188,9 +188,10 @@ Couchzilla.isempty
 Couchzilla.@q_str
 Couchzilla.QueryResult
 Couchzilla.query
+Couchzilla.paged_query
 Couchzilla.createindex
 Couchzilla.listindexes(db::Database)
-deleteindex(db::Database; ddoc="", name="", indextype="")
+Couchzilla.deleteindex(db::Database; ddoc="", name="", indextype="")
 ```
 
 ## Attachments
@@ -198,6 +199,11 @@ deleteindex(db::Database; ddoc="", name="", indextype="")
 Couchzilla.put_attachment(db::Database, id::AbstractString, rev::AbstractString, name::AbstractString, mimetype::AbstractString, file::AbstractString)
 Couchzilla.get_attachment(db::Database, id::AbstractString, name::AbstractString; rev::AbstractString = "")
 Couchzilla.delete_attachment(db::Database, id::AbstractString, rev::AbstractString, name::AbstractString)
+```
+
+## Replication
+```@docs
+Couchzilla.changes
 ```
 
 ## Utility stuff

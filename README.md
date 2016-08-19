@@ -1,6 +1,6 @@
 # Couchzilla
 
-Couchzilla is a client library for CouchDB/Cloudant in Julia.
+Couchzilla – CouchDB access for Julians.
 
 Documentation can be found on [http://xpqz.github.io/couchzilla](http://xpqz.github.io/couchzilla)
 
