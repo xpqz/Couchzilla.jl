@@ -1,4 +1,4 @@
-# Implementation of the instance-level CouchDB API.
+# Implementation of the instance-level CouchDB CouchDB.
 
 """
     type Client
@@ -8,10 +8,10 @@
       cookies
 
       Client(username::AbstractString, password::AbstractString, urlstr::AbstractString) = 
-        cookieauth(new(username, password, URI(urlstr)))
+        cookieauth!(new(username, password, URI(urlstr)))
     end
 
-    The Client type represents an authenticated connection to a remote CouchDB/Cloudant instance.
+The Client type represents an authenticated connection to a remote CouchDB/Cloudant instance.
 """
 type Client
   username
@@ -29,9 +29,7 @@ end
 Private. Hits the `_session` endpoint to obtain a session cookie
 that is used to authenticate subsequent requests.
 
-## API endpoint details
-
-* https://docs.cloudant.com/authentication.html#cookie-authentication
+[API reference](https://docs.cloudant.com/authentication.html#cookie-authentication)
 """
 function cookieauth!(client::Client)
   response = post(endpoint(client.url, "_session"); 
@@ -41,7 +39,7 @@ function cookieauth!(client::Client)
 end
 
 """
-    connectdb(client::Client; database::AbstractString=nothing)
+    db = connectdb(client::Client; database::AbstractString=nothing)
 
 Return an immutable Database reference.
 
@@ -55,15 +53,13 @@ function connectdb(client::Client; database::AbstractString=nothing)
 end
 
 """
-    db, created = createdb(client::Client; databse::AbstractString=nothing)
+    db, created = createdb(client::Client; database::AbstractString=nothing)
 
 Create a new database on the remote end called `dbname`. Return an immutable 
 Database reference to this newly created db, and a boolean which is true if 
 a database was created, false if it already existed.
 
-## API endpoint details
-
-* http://docs.couchdb.org/en/1.6.1/api/database/common.html#put--db
+[API reference](http://docs.couchdb.org/en/1.6.1/CouchDB/database/common.html#put--db)
 """
 function createdb(client::Client; database::AbstractString=nothing)
   db = Database(client, database)
@@ -87,9 +83,7 @@ end
 
 Return the meta data about the `dbname` database.
 
-## API endpoint details 
-
-* http://docs.couchdb.org/en/1.6.1/api/database/common.html#get--db
+[API reference](http://docs.couchdb.org/en/1.6.1/CouchDB/database/common.html#get--db)
 """
 function dbinfo(client::Client, name::AbstractString)
   relax(get, endpoint(client.url, name); cookies=client.cookies)
@@ -100,9 +94,7 @@ end
 
 Return a list of all databases under the authenticated user.
 
-## API endpoint details 
-
-* http://docs.couchdb.org/en/1.6.1/api/server/common.html#all-dbs
+[API reference](http://docs.couchdb.org/en/1.6.1/CouchDB/server/common.html#all-dbs)
 """
 function listdbs(client::Client)
   relax(get, endpoint(client.url, "_all_dbs"); cookies=client.cookies)
@@ -113,9 +105,7 @@ end
 
 Delete the named database.
 
-## API endpoint details 
-
-* http://docs.couchdb.org/en/1.6.1/api/database/common.html?#delete--db
+[API reference](http://docs.couchdb.org/en/1.6.1/CouchDB/database/common.html?#delete--db)
 """
 function deletedb(client::Client, name::AbstractString)
   relax(delete, endpoint(client.url, name); cookies=client.cookies)

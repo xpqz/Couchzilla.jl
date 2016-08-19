@@ -4,30 +4,28 @@
 
 Create a secondary index.
 
-The `map` is a string containing a map function in Javascript. Currently can only 
-create a single view per design document.
+The `map` is a string containing a map function in Javascript. Currently, `make_view` 
+can only create a single view per design document.
 
 The optional `reduce` parameter is a string containing either a custom Javascript
 reducer (best avoided for performance reasons) or the name of a built-in Erlang 
 reducer, e.g. `"_stats"`.
 
-## Examples
+### Examples
 
     result = make_view(db, "my_ddoc", "my_view", "function(doc){if(doc&&doc.name){emit(doc.name,1);}}")
     
-## Returns
+### Returns
 
 Returns a `Dict(...)` from the CouchDB response, of the type
 
-  Dict(
-    "ok"  => true, 
-    "rev" => "1-b950984b19bb1b8bb43513c9d5b235bc",
-    "id"  => "_design/my_ddoc"
-  )
+    Dict(
+      "ok"  => true, 
+      "rev" => "1-b950984b19bb1b8bb43513c9d5b235bc",
+      "id"  => "_design/my_ddoc"
+    )
 
-## API endpoint details
-
-https://docs.cloudant.com/creating_views.html
+[API reference](https://docs.cloudant.com/creating_views.html)
 """
 function make_view(db::Database, ddoc::AbstractString, name::AbstractString, map::AbstractString; reduce::AbstractString = "")
   data = Dict{AbstractString, Any}(
@@ -61,25 +59,23 @@ end
 
 Query a secondary index.
 
-## Examples
+### Examples
 
-  # Query the view for a known key subset
-  result = query_view(db, "my_ddoc", "my_view"; keys=["adam", "billy"])
+    # Query the view for a known key subset
+    result = query_view(db, "my_ddoc", "my_view"; keys=["adam", "billy"])
 
-## Returns
+### Returns
 
-  Dict(
-    "rows" => [
-      Dict("key" => "adam", "id" => "591c02fa8b8ff14dd4c0553670cc059a", "value" => 1),
-      Dict("key" => "billy", "id" => "591c02fa8b8ff14dd4c0553670cc13c1", "value" => 1)
-    ],
-    "offset" => 0,
-    "total_rows" => 7 
-  )
+    Dict(
+      "rows" => [
+        Dict("key" => "adam", "id" => "591c02fa8b8ff14dd4c0553670cc059a", "value" => 1),
+        Dict("key" => "billy", "id" => "591c02fa8b8ff14dd4c0553670cc13c1", "value" => 1)
+      ],
+      "offset" => 0,
+      "total_rows" => 7 
+    )
 
-## API endpoint details
-
-https://docs.cloudant.com/using_views.html
+[API reference](https://docs.cloudant.com/using_views.html)
 """
 function query_view(db::Database, ddoc::AbstractString, name::AbstractString;
   descending    = false,
@@ -187,9 +183,7 @@ The optional parameters are:
 * limit          int          -- return only max `limit` number of rows. Optional.
 * skip           int          -- skip over the first `skip` number of rows. Default 0.
 
-## API endpoint details
-
-* http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html#db-all-docs
+[API reference](http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html#db-all-docs)
 """
 function alldocs(db::Database;
   descending    = false,

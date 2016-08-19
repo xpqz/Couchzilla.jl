@@ -24,7 +24,7 @@ type QueryResult
 end
 
 """
-    query{T<:AbstractString}(db::Database, selector::Selector;
+    result = query{T<:AbstractString}(db::Database, selector::Selector;
       fields::Vector{T}          = Vector{AbstractString}(),
       sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
       limit                      = 0,
@@ -36,27 +36,23 @@ Query database (Mango/Cloudant Query).
 See the `Selector` type and the associated `q"..."` custom string literal
 which implements a simplified DSL for writing selectors.
 
-## Examples
+### Examples
 
 Find all documents where "year" is greater than 2010, returning 
-the fields _id, _rev, year and title, sorted in ascending order on year.
-Set the page size to 10.
+the fields `_id`, `_rev`, `year` and `title`, sorted in ascending order 
+on `year`. Set the page size to 10.
 
-    ```julia
-    query(db, q"year > 2010";
+    result = query(db, q"year > 2010";
       fields = ["_id", "_rev", "year", "title"],
       sort   = [Dict("year" => "asc")],
       limit  = 10)
-    ```
 
-## Returns
+### Returns
 
     type QueryResult
 
-## API endpoint details
-
-* https://docs.cloudant.com/cloudant_query.html
-* https://cloudant.com/blog/cloudant-query-grows-up-to-handle-ad-hoc-queries/
+* [API reference](https://docs.cloudant.com/cloudant_query.html)
+* [Cloudant Query blog post](https://cloudant.com/blog/cloudant-query-grows-up-to-handle-ad-hoc-queries/)
 """
 function query{T<:AbstractString}(db::Database, selector::Selector;
   fields::Vector{T}          = Vector{AbstractString}(),
@@ -87,7 +83,7 @@ function query{T<:AbstractString}(db::Database, selector::Selector;
 end
 
 """
-    createindex{T<:AbstractString}(db::Database; 
+    result = createindex{T<:AbstractString}(db::Database; 
       name::T       = "",
       ddoc::T       = "",
       fields        = Vector{T}(), 
@@ -100,21 +96,18 @@ All `kw` parameters are optional, but note that not giving a `fields` argument w
 result in all fields being indexed which is very costly. Defaults to type `"json"` and
 will be assumed to be `"text"` if the data in the `fields` array are `Dict`s.
 
-## Examples
+### Examples
 
 * Make a text index
 
-    ```julia
     result = createindex(db; ddoc="my-ddoc", fields=[Dict("name"=>"lastname", "type"=>"string")], 
       default_field=Dict("analyzer" => "german", "enabled" => true))
-    ```
+
 * Make a json index
 
-  ```julia
   result = createindex(db; fields=["data", "data2"])
-  ```
 
-## Returns
+### Returns
 
 `createindex()` returns a `Dict(...)` version of the CouchDB response, of the type
 
@@ -124,9 +117,7 @@ will be assumed to be `"text"` if the data in the `fields` array are `Dict`s.
       "result" => "created"
     )
 
-## API endpoint details
-
-https://docs.cloudant.com/cloudant_query.html#creating-an-index
+[API reference](https://docs.cloudant.com/cloudant_query.html#creating-an-index)
 """
 function createindex{T<:AbstractString}(db::Database; 
   name::T       = "",
@@ -174,13 +165,13 @@ function createindex{T<:AbstractString}(db::Database;
 end
 
 """
-    listindexes(db::Database)
+    result = listindexes(db::Database)
 
 List all existing indexes for the database. Note that this includes indexes not created 
 via the `createindex()` function, such as the primary index and secondary indexes created 
 as map-reduce views.
 
-## Returns
+### Returns
 
 `listindexes()` returns a `Dict(...)` version of the CouchDB response:
 
@@ -213,30 +204,26 @@ as map-reduce views.
       ]
     )
     
-## API endpoint details
-
-https://docs.cloudant.com/cloudant_query.html#list-all-cloudant-query-indexes
+[API reference](https://docs.cloudant.com/cloudant_query.html#list-all-cloudant-query-indexes)
 """
 function listindexes(db::Database)
   relax(get, endpoint(db.url, "_index"); cookies=db.client.cookies)
 end
 
 """
-    deleteindex(db::Database; ddoc="", name="", indextype="")
+    result = deleteindex(db::Database; ddoc="", name="", indextype="")
     
 Delete a query index given its ddoc, index name and index type.
 
 Indextype is either "text" or "json".
 
-## Returns
+### Returns
 
 `deleteindex()` returns a `Dict(...)` version of the CouchDB response:
 
     Dict("ok" => true)
 
-## API endpoint details
-
-https://docs.cloudant.com/cloudant_query.html#deleting-an-index
+[API reference](https://docs.cloudant.com/cloudant_query.html#deleting-an-index)
 """
 function deleteindex(db::Database; ddoc="", name="", indextype="")
   if indextype ∉ ["json", "text"]

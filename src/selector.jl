@@ -1,5 +1,7 @@
 """
-    Selector
+    immutable Selector
+      dict::Dict{AbstractString, Any}
+    end
   
 Immutable represention of a Mango Selector used to query a Mango index.
 
@@ -7,16 +9,14 @@ Usually created using the custom string literal `q"..."` (see the `@q_str` macro
 but can be created directly from either the raw json string containing a Selector
 expression or a Julia `Dict(...)` representing the same.
 
-## Examples
+### Examples
 
     sel = q"name = bob"
     sel = Selector("{\"name\":{\"\$eq\":\"bob\"}}")
     sel = Selector(Dict("name" => Dict("\$eq" => "bob")))
     sel = and([q"name = bob", q"age > 18"])
 
-## API details
-
-* https://docs.cloudant.com/cloudant_query.html#selector-syntax
+[API reference](https://docs.cloudant.com/cloudant_query.html#selector-syntax)
 """
 immutable Selector
   dict::Dict{AbstractString, Any}
@@ -36,9 +36,7 @@ end
 
 Create a Selector from the raw json.
 
-## API endpoint details
-
-* https://docs.cloudant.com/cloudant_query.html#selector-syntax
+[API reference](https://docs.cloudant.com/cloudant_query.html#selector-syntax)
 """
 function Selector(raw_json::AbstractString) 
   Selector(JSON.parse(raw_json))
@@ -80,9 +78,7 @@ to build up more complex Selectors, e.g.
 
 For more information on the actual Selector syntax, see link below.
 
-## API endpoint details
-
-* https://docs.cloudant.com/cloudant_query.html#selector-syntax
+[API reference](https://docs.cloudant.com/cloudant_query.html#selector-syntax)
 """
 macro q_str(data)
   quote

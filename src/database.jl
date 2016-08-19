@@ -20,7 +20,7 @@
 The Database immutable is a client connection tied to a specific remote DB. It is 
 normally not created directly, but via a call to `connectdb()`, or `createdb()`. 
 
-## Examples
+### Examples
 
     # Connect to existing DB. Does not verify it exists.
     db = connectdb(client; database="mydb")
@@ -38,7 +38,7 @@ immutable Database
 end
 
 """
-    bulkdocs(db::Database; data=[], options=Dict())
+    result = bulkdocs(db::Database; data=[], options=Dict())
 
 Raw _bulk_docs.
 
@@ -46,9 +46,7 @@ This is a function primarily intended for internal use, but can
 be used directly to create, update or delete documents in bulk,
 so as to save on the HTTP overhead.
 
-## API endpoint details
-
-* http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs
+[API reference](http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs)
 """
 function bulkdocs(db::Database; data=[], options=Dict())
   post_url = endpoint(db.url, "_bulk_docs")
@@ -56,16 +54,14 @@ function bulkdocs(db::Database; data=[], options=Dict())
 end
 
 """
-    create(db::Database; body=Dict())
+    result = createdoc(db::Database; body=Dict())
 
 Create a new document.
 
 Note that this is implemented via the `_bulk_docs` endpoint, rather 
-than a POST to the /{DB}.
+than a `POST` to the `/{DB}`.
 
-## API endpoint details
-
-* http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs
+[API reference](http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs)
 """
 function createdoc(db::Database, body=Dict())
   response = bulkdocs(db; data=[body])
@@ -73,15 +69,11 @@ function createdoc(db::Database, body=Dict())
 end
 
 """
-    create(db::Database; data=[Dict()])
+    result = createdoc(db::Database; data=[Dict()])
 
-Bulk create a set of new documents.
+Bulk create a set of new documents via the CouchDB `_bulk_docs` endpoint.
 
-This is implemented via the `_bulk_docs` endpoint.
-
-## API endpoint details
-
-* http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs
+[API reference](http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs)
 """
 function createdoc(db::Database; data=[Dict()])
   if length(data) == 0
@@ -92,7 +84,7 @@ function createdoc(db::Database; data=[Dict()])
 end
 
 """
-    readdoc(db::Database, id::AbstractString; 
+    result = readdoc(db::Database, id::AbstractString; 
       rev               = "", 
       attachments       = false, 
       att_encoding_info = false,
@@ -109,9 +101,7 @@ Fetch a document by `id`.
 
 For a description of the parameters, see reference below.
 
-## API endpoint details
-
-* http://docs.couchdb.org/en/1.6.1/api/document/common.html#get--db-docid
+[API reference](http://docs.couchdb.org/en/1.6.1/api/document/common.html#get--db-docid)
 """
 function readdoc(db::Database, id::AbstractString; 
   rev               = "", 
@@ -176,15 +166,13 @@ function readdoc(db::Database, id::AbstractString;
 end
 
 """
-    updatedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing, body=Dict())
+    result = updatedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing, body=Dict())
 
 Update an existing document, creating a new revision.
 
 Implemented via the _bulk_docs endpoint.
 
-## API endpoint details
-
-* http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs
+[API reference](http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs)
 """
 function updatedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing, body=Dict())
   response = bulkdocs(db, data=[merge(body, Dict("_id" => id, "_rev" => rev))])
@@ -192,13 +180,11 @@ function updatedoc(db::Database; id::AbstractString=nothing, rev::AbstractString
 end
 
 """
-    deletedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing)
+    result = deletedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing)
 
 Delete a document revision. Implemented via the _bulk_docs endpoint:
 
-## API endpoint details
-
-* http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs
+[API reference](http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs)
 """
 function deletedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing)
   response = bulkdocs(db, data=[Dict("_id" => id, "_rev" => rev, "_deleted" => true)])

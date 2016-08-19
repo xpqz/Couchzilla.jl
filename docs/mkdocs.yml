@@ -1,0 +1,19 @@
+site_name:           Couchzilla
+repo_url:            https://github.com/xpqz/couchzilla
+site_description:    A client library for CouchDB/Cloudant in Julia
+site_author:         Stefan Kruger
+theme:               material
+
+markdown_extensions:
+  - codehilite
+  - extra
+  - tables
+  - fenced_code
+
+extra_css:
+  - assets/Documenter.css
+
+docs_dir: 'build'
+
+pages:
+- Introduction: index.md
