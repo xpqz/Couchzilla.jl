@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="no-js ie6"><![endif]-->
+<!--[if IE 7 ]><html class="no-js ie7"><![endif]-->
+<!--[if IE 8 ]><html class="no-js ie8"><![endif]-->
+<!--[if IE 9 ]><html class="no-js ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+    
+      
+        <title>Couchzilla - A client library for CouchDB/Cloudant in Julia</title>
+      
+      
+        <meta name="description" content="A client library for CouchDB/Cloudant in Julia">
+      
+      
+      
+        <meta name="author" content="Stefan Kruger">
+      
+    
+    <meta property="og:url" content="None">
+    <meta property="og:title" content="Couchzilla">
+    <meta property="og:image" content="None/./">
+    <meta name="apple-mobile-web-app-title" content="Couchzilla">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    
+    <link rel="shortcut icon" type="image/x-icon" href="./assets/images/favicon-e565ddfa3b.ico">
+    <link rel="icon" type="image/x-icon" href="./assets/images/favicon-e565ddfa3b.ico">
+    <style>
+      @font-face {
+      	font-family: 'Icon';
+      	src: url('./assets/fonts/icon.eot?52m981');
+      	src: url('./assets/fonts/icon.eot?#iefix52m981')
+               format('embedded-opentype'),
+      		   url('./assets/fonts/icon.woff?52m981')
+               format('woff'),
+      		   url('./assets/fonts/icon.ttf?52m981')
+               format('truetype'),
+      		   url('./assets/fonts/icon.svg?52m981#icon')
+               format('svg');
+      	font-weight: normal;
+      	font-style: normal;
+      }
+    </style>
+    <link rel="stylesheet" href="./assets/stylesheets/application-a422ff04cc.css">
+    
+    
+      
+      
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,700|Ubuntu+Mono">
+      <style>
+        body, input {
+          font-family: 'Ubuntu', Helvetica, Arial, sans-serif;
+        }
+        pre, code {
+          font-family: 'Ubuntu Mono', 'Courier New', 'Courier', monospace;
+        }
+      </style>
+    
+    
+      <link rel="stylesheet" href="./assets/Documenter.css">
+    
+    <script src="./assets/javascripts/modernizr-4ab42b99fd.js"></script>
+    
+  </head>
+  
+  
+  
+  <body class=" ">
+    
+      
+      
+    
+    <div class="backdrop">
+      <div class="backdrop-paper"></div>
+    </div>
+    <input class="toggle" type="checkbox" id="toggle-drawer">
+    <input class="toggle" type="checkbox" id="toggle-search">
+    <label class="toggle-button overlay" for="toggle-drawer"></label>
+    <header class="header">
+      <nav aria-label="Header">
+  <div class="bar default">
+    <div class="button button-menu" role="button" aria-label="Menu">
+      <label class="toggle-button icon icon-menu" for="toggle-drawer">
+        <span></span>
+      </label>
+    </div>
+    <div class="stretch">
+      <div class="title">
+        
+          <span class="path">
+            
+          </span>
+        
+        Couchzilla
+      </div>
+    </div>
+    
+    
+    <div class="button button-search" role="button" aria-label="Search">
+      <label class="toggle-button icon icon-search" title="Search" for="toggle-search"></label>
+    </div>
+  </div>
+  <div class="bar search">
+    <div class="button button-close" role="button" aria-label="Close">
+      <label class="toggle-button icon icon-back" for="toggle-search"></label>
+    </div>
+    <div class="stretch">
+      <div class="field">
+        <input class="query" type="text" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck>
+      </div>
+    </div>
+    <div class="button button-reset" role="button" aria-label="Search">
+      <button class="toggle-button icon icon-close" id="reset-search"></button>
+    </div>
+  </div>
+</nav>
+    </header>
+    <main class="main">
+      
+      <div class="drawer">
+        <nav aria-label="Navigation">
+  
+  <a href="https://github.com/xpqz/couchzilla" class="project">
+    <div class="banner">
+      
+      <div class="name">
+        <strong>
+          Couchzilla
+          <span class="version">
+            
+          </span>
+        </strong>
+        
+          <br>
+          xpqz/couchzilla
+        
+      </div>
+    </div>
+  </a>
+  <div class="scrollable">
+    <div class="wrapper">
+      
+        <ul class="repo">
+          <li class="repo-download">
+            
+            <a href="https://github.com/xpqz/couchzilla/archive/master.zip" target="_blank" title="Download" data-action="download">
+              <i class="icon icon-download"></i> Download
+            </a>
+          </li>
+          <li class="repo-stars">
+            <a href="https://github.com/xpqz/couchzilla/stargazers" target="_blank" title="Stargazers" data-action="star">
+              <i class="icon icon-star"></i> Stars
+              <span class="count">&ndash;</span>
+            </a>
+          </li>
+        </ul>
+        <hr>
+      
+      <div class="toc">
+        <ul>
+          
+            
+  <li>
+    <a class="current" title="Introduction" href=".">
+      Introduction
+    </a>
+    
+      
+        
+      
+      
+        <ul>
+          
+            <li class="anchor">
+              <a title="Client" href="#client">
+                Client
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="Database" href="#database">
+                Database
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="Views" href="#views">
+                Views
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="Mango/Cloudant Query" href="#mangocloudant-query">
+                Mango/Cloudant Query
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="Attachments" href="#attachments">
+                Attachments
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="Utility stuff" href="#utility-stuff">
+                Utility stuff
+              </a>
+            </li>
+          
+        </ul>
+      
+    
+  </li>
+
+          
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+      </div>
+      <article class="article">
+        <div class="wrapper">
+          
+          <p><a id='Couchzilla-1'></a></p>
+<h1 id="couchzilla">Couchzilla</h1>
+<p>Couchzilla is a client library for CouchDB (and Cloudant).</p>
+<p><a id='Client-1'></a></p>
+<h2 id="client">Client</h2>
+<p><a id='Couchzilla.Client' href='#Couchzilla.Client'>#</a>
+<strong><code>Couchzilla.Client</code></strong> &mdash; <em>Type</em>.</p>
+<pre class="codehilite"><code>type Client
+  username
+  password
+  url
+  cookies
+
+  Client(username::AbstractString, password::AbstractString, urlstr::AbstractString) = 
+    cookieauth!(new(username, password, URI(urlstr)))
+end</code></pre>
+
+
+<p>The Client type represents an authenticated connection to a remote CouchDB/Cloudant instance.</p>
+<p><a id='Couchzilla.connectdb-Tuple{Couchzilla.Client}' href='#Couchzilla.connectdb-Tuple{Couchzilla.Client}'>#</a>
+<strong><code>Couchzilla.connectdb</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>db = connectdb(client::Client; database::AbstractString=nothing)</code></pre>
+
+
+<p>Return an immutable Database reference.</p>
+<p>Subsequent database-level operations will operate on the chosen database.  If you need to operate on a different database, you need to create a new  Database reference. <code>connectdb(...)</code> does not check that the chosen remote  database exists.</p>
+<p><a id='Couchzilla.createdb-Tuple{Couchzilla.Client}' href='#Couchzilla.createdb-Tuple{Couchzilla.Client}'>#</a>
+<strong><code>Couchzilla.createdb</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>db, created = createdb(client::Client; database::AbstractString=nothing)</code></pre>
+
+
+<p>Create a new database on the remote end called <code>dbname</code>. Return an immutable  Database reference to this newly created db, and a boolean which is true if  a database was created, false if it already existed.</p>
+<p><a href="http://docs.couchdb.org/en/1.6.1/CouchDB/database/common.html#put--db">API reference</a></p>
+<p><a id='Couchzilla.dbinfo-Tuple{Couchzilla.Client,AbstractString}' href='#Couchzilla.dbinfo-Tuple{Couchzilla.Client,AbstractString}'>#</a>
+<strong><code>Couchzilla.dbinfo</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>info = dbinfo(client::Client, name::AbstractString)</code></pre>
+
+
+<p>Return the meta data about the <code>dbname</code> database.</p>
+<p><a href="http://docs.couchdb.org/en/1.6.1/CouchDB/database/common.html#get--db">API reference</a></p>
+<p><a id='Couchzilla.listdbs-Tuple{Couchzilla.Client}' href='#Couchzilla.listdbs-Tuple{Couchzilla.Client}'>#</a>
+<strong><code>Couchzilla.listdbs</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>dblist = listdbs(client::Client)</code></pre>
+
+
+<p>Return a list of all databases under the authenticated user.</p>
+<p><a href="http://docs.couchdb.org/en/1.6.1/CouchDB/server/common.html#all-dbs">API reference</a></p>
+<p><a id='Couchzilla.deletedb-Tuple{Couchzilla.Client,AbstractString}' href='#Couchzilla.deletedb-Tuple{Couchzilla.Client,AbstractString}'>#</a>
+<strong><code>Couchzilla.deletedb</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = deletedb(client::Client, name::AbstractString)</code></pre>
+
+
+<p>Delete the named database.</p>
+<p><a href="http://docs.couchdb.org/en/1.6.1/CouchDB/database/common.html?#delete--db">API reference</a></p>
+<p><a id='Couchzilla.cookieauth!' href='#Couchzilla.cookieauth!'>#</a>
+<strong><code>Couchzilla.cookieauth!</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>cookieauth!()</code></pre>
+
+
+<p>Private. Hits the <code>_session</code> endpoint to obtain a session cookie that is used to authenticate subsequent requests.</p>
+<p><a href="https://docs.cloudant.com/authentication.html#cookie-authentication">API reference</a></p>
+<p><a id='Database-1'></a></p>
+<h2 id="database">Database</h2>
+<p><a id='Couchzilla.Database' href='#Couchzilla.Database'>#</a>
+<strong><code>Couchzilla.Database</code></strong> &mdash; <em>Type</em>.</p>
+<pre class="codehilite"><code>immutable Database
+  url
+  name
+  client
+
+  Database(client::Client, name::AbstractString) =
+    new(URI(client.url.scheme, client.url.host, client.url.port, &quot;/$name&quot;), name, client)
+end</code></pre>
+
+
+<p>The Database immutable is a client connection tied to a specific remote DB. It is  normally not created directly, but via a call to <code>connectdb()</code>, or <code>createdb()</code>. </p>
+<p><strong>Examples</strong></p>
+<pre class="codehilite"><code># Connect to existing DB. Does not verify it exists.
+db = connectdb(client; database=&quot;mydb&quot;)
+
+# Create a new db if it doesn't exist, otherwise connect 
+db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
+
+
+<p><a id='Couchzilla.bulkdocs-Tuple{Couchzilla.Database}' href='#Couchzilla.bulkdocs-Tuple{Couchzilla.Database}'>#</a>
+<strong><code>Couchzilla.bulkdocs</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = bulkdocs(db::Database; data=[], options=Dict())</code></pre>
+
+
+<p>Raw _bulk_docs.</p>
+<p>This is a function primarily intended for internal use, but can be used directly to create, update or delete documents in bulk, so as to save on the HTTP overhead.</p>
+<p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs">API reference</a></p>
+<p><a id='Couchzilla.createdoc' href='#Couchzilla.createdoc'>#</a>
+<strong><code>Couchzilla.createdoc</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>result = createdoc(db::Database; body=Dict())</code></pre>
+
+
+<p>Create a new document.</p>
+<p>Note that this is implemented via the <code>_bulk_docs</code> endpoint, rather  than a <code>POST</code> to the <code>/{DB}</code>.</p>
+<p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs">API reference</a></p>
+<p><a id='Couchzilla.createdoc-Tuple{Couchzilla.Database}' href='#Couchzilla.createdoc-Tuple{Couchzilla.Database}'>#</a>
+<strong><code>Couchzilla.createdoc</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = createdoc(db::Database; data=[Dict()])</code></pre>
+
+
+<p>Bulk create a set of new documents via the CouchDB <code>_bulk_docs</code> endpoint.</p>
+<p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs">API reference</a></p>
+<p><a id='Couchzilla.readdoc-Tuple{Couchzilla.Database,AbstractString}' href='#Couchzilla.readdoc-Tuple{Couchzilla.Database,AbstractString}'>#</a>
+<strong><code>Couchzilla.readdoc</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = readdoc(db::Database, id::AbstractString; 
+  rev               = &quot;&quot;, 
+  attachments       = false, 
+  att_encoding_info = false,
+  atts_since        = [],
+  conflicts         = false,
+  deleted_conflicts = false,
+  latest            = false,
+  meta              = false,
+  open_revs         = [],
+  revs              = false,
+  revs_info         = false)</code></pre>
+
+
+<p>Fetch a document by <code>id</code>.</p>
+<p>For a description of the parameters, see reference below.</p>
+<p><a href="http://docs.couchdb.org/en/1.6.1/api/document/common.html#get--db-docid">API reference</a></p>
+<p><a id='Couchzilla.updatedoc-Tuple{Couchzilla.Database}' href='#Couchzilla.updatedoc-Tuple{Couchzilla.Database}'>#</a>
+<strong><code>Couchzilla.updatedoc</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = updatedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing, body=Dict())</code></pre>
+
+
+<p>Update an existing document, creating a new revision.</p>
+<p>Implemented via the _bulk_docs endpoint.</p>
+<p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs">API reference</a></p>
+<p><a id='Couchzilla.deletedoc-Tuple{Couchzilla.Database}' href='#Couchzilla.deletedoc-Tuple{Couchzilla.Database}'>#</a>
+<strong><code>Couchzilla.deletedoc</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = deletedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing)</code></pre>
+
+
+<p>Delete a document revision. Implemented via the _bulk_docs endpoint:</p>
+<p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs">API reference</a></p>
+<p><a id='Views-1'></a></p>
+<h2 id="views">Views</h2>
+<p><a id='Couchzilla.make_view-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}' href='#Couchzilla.make_view-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}'>#</a>
+<strong><code>Couchzilla.make_view</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = make_view(db::Database, ddoc::AbstractString, name::AbstractString, map::AbstractString; 
+  reduce::AbstractString = &quot;&quot;)</code></pre>
+
+
+<p>Create a secondary index.</p>
+<p>The <code>map</code> is a string containing a map function in Javascript. Currently, <code>make_view</code>  can only create a single view per design document.</p>
+<p>The optional <code>reduce</code> parameter is a string containing either a custom Javascript reducer (best avoided for performance reasons) or the name of a built-in Erlang  reducer, e.g. <code>"_stats"</code>.</p>
+<p><strong>Examples</strong></p>
+<pre class="codehilite"><code>result = make_view(db, &quot;my_ddoc&quot;, &quot;my_view&quot;, &quot;function(doc){if(doc&amp;&amp;doc.name){emit(doc.name,1);}}&quot;)</code></pre>
+
+
+<p><strong>Returns</strong></p>
+<p>Returns a <code>Dict(...)</code> from the CouchDB response, of the type</p>
+<pre class="codehilite"><code>Dict(
+  &quot;ok&quot;  =&gt; true, 
+  &quot;rev&quot; =&gt; &quot;1-b950984b19bb1b8bb43513c9d5b235bc&quot;,
+  &quot;id&quot;  =&gt; &quot;_design/my_ddoc&quot;
+)</code></pre>
+
+
+<p><a href="https://docs.cloudant.com/creating_views.html">API reference</a></p>
+<p><a id='Couchzilla.query_view' href='#Couchzilla.query_view'>#</a>
+<strong><code>Couchzilla.query_view</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>result = query_view(db::Database, ddoc::AbstractString, name::AbstractString;
+  descending    = false,
+  endkey        = &quot;&quot;,
+  include_docs  = false,
+  conflicts     = false,
+  inclusive_end = true,
+  group         = false,
+  group_level   = 0,
+  reduce        = true,
+  stale         = false,
+  key           = &quot;&quot;,
+  keys          = [],
+  limit         = 0,
+  skip          = 0,
+  startkey      = &quot;&quot;)</code></pre>
+
+
+<p>Query a secondary index.</p>
+<p><strong>Examples</strong></p>
+<pre class="codehilite"><code># Query the view for a known key subset
+result = query_view(db, &quot;my_ddoc&quot;, &quot;my_view&quot;; keys=[&quot;adam&quot;, &quot;billy&quot;])</code></pre>
+
+
+<p><strong>Returns</strong></p>
+<pre class="codehilite"><code>Dict(
+  &quot;rows&quot; =&gt; [
+    Dict(&quot;key&quot; =&gt; &quot;adam&quot;, &quot;id&quot; =&gt; &quot;591c02fa8b8ff14dd4c0553670cc059a&quot;, &quot;value&quot; =&gt; 1),
+    Dict(&quot;key&quot; =&gt; &quot;billy&quot;, &quot;id&quot; =&gt; &quot;591c02fa8b8ff14dd4c0553670cc13c1&quot;, &quot;value&quot; =&gt; 1)
+  ],
+  &quot;offset&quot; =&gt; 0,
+  &quot;total_rows&quot; =&gt; 7 
+)</code></pre>
+
+
+<p><a href="https://docs.cloudant.com/using_views.html">API reference</a></p>
+<p><a id='Couchzilla.alldocs' href='#Couchzilla.alldocs'>#</a>
+<strong><code>Couchzilla.alldocs</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>alldocs(db::Database;
+  descending    = false,
+  endkey        = &quot;&quot;,
+  include_docs  = false,
+  conflicts     = false,
+  inclusive_end = true,
+  key           = &quot;&quot;,
+  keys          = [],
+  limit         = 0,
+  skip          = 0,
+  startkey      = &quot;&quot;)</code></pre>
+
+
+<p>Return all documents in the database by the primary index.</p>
+<p>The optional parameters are:</p>
+<ul>
+<li>descending     true/false   – lexicographical ordering of keys. Default false.</li>
+<li>endkey         id           – stop when <code>endkey</code> is reached. Optional.</li>
+<li>startkey       id           – start at <code>startkey</code>. Optional. </li>
+<li>include_docs   true/false   – return the document body. Default false.</li>
+<li>conflicts      true/false   – also return any conflicting revisions. Default false.</li>
+<li>inclusive_end  true/false   – if <code>endkey</code> is given, should this be included? Default true</li>
+<li>key            id           – return only specific key. Optional.</li>
+<li>keys           [id, id,...] – return only specific set of keys (will POST). Optional. </li>
+<li>limit          int          – return only max <code>limit</code> number of rows. Optional.</li>
+<li>skip           int          – skip over the first <code>skip</code> number of rows. Default 0.</li>
+</ul>
+<p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html#db-all-docs">API reference</a></p>
+<p><a id='Mango/Cloudant-Query-1'></a></p>
+<h2 id="mangocloudant-query">Mango/Cloudant Query</h2>
+<p><a id='Couchzilla.Selector' href='#Couchzilla.Selector'>#</a>
+<strong><code>Couchzilla.Selector</code></strong> &mdash; <em>Type</em>.</p>
+<pre class="codehilite"><code>immutable Selector
+  dict::Dict{AbstractString, Any}
+end</code></pre>
+
+
+<p>Immutable represention of a Mango Selector used to query a Mango index.</p>
+<p>Usually created using the custom string literal <code>q"..."</code> (see the <code>@q_str</code> macro), but can be created directly from either the raw json string containing a Selector expression or a Julia <code>Dict(...)</code> representing the same.</p>
+<p><strong>Examples</strong></p>
+<pre class="codehilite"><code>sel = q&quot;name = bob&quot;
+sel = Selector(&quot;{&quot;name&quot;:{&quot;$eq&quot;:&quot;bob&quot;}}&quot;)
+sel = Selector(Dict(&quot;name&quot; =&gt; Dict(&quot;$eq&quot; =&gt; &quot;bob&quot;)))
+sel = and([q&quot;name = bob&quot;, q&quot;age &gt; 18&quot;])</code></pre>
+
+
+<p><a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">API reference</a></p>
+<p><a id='Couchzilla.Selector-Tuple{}' href='#Couchzilla.Selector-Tuple{}'>#</a>
+<strong><code>Couchzilla.Selector</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>Selector()</code></pre>
+
+
+<p>The empty Selector.</p>
+<p><a id='Couchzilla.Selector-Tuple{AbstractString}' href='#Couchzilla.Selector-Tuple{AbstractString}'>#</a>
+<strong><code>Couchzilla.Selector</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>Selector(raw_json::AbstractString)</code></pre>
+
+
+<p>Create a Selector from the raw json.</p>
+<p><a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">API reference</a></p>
+<p><a id='Couchzilla.isempty' href='#Couchzilla.isempty'>#</a>
+<strong><code>Couchzilla.isempty</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>isempty(sel::Selector)</code></pre>
+
+
+<p>True if sel is the empty Selector.</p>
+<p><a id='Couchzilla.@q_str' href='#Couchzilla.@q_str'>#</a>
+<strong><code>Couchzilla.@q_str</code></strong> &mdash; <em>Macro</em>.</p>
+<pre class="codehilite"><code>q&quot;.....&quot;</code></pre>
+
+
+<p>Custom string literal for a limited Selector definition DSL.</p>
+<p>It takes the form:</p>
+<pre class="codehilite"><code>field op data</code></pre>
+
+
+<p>where <code>field</code> is a field name, op is one of </p>
+<pre class="codehilite"><code>=, !=, &lt;, &lt;=, &gt;, &gt;=, in, !in, all</code></pre>
+
+
+<p>This allows you to write things like:</p>
+<pre class="codehilite"><code>q&quot;name = bob&quot;
+q&quot;value &lt; 5&quot;
+q&quot;occupation in [fishmonger, pilot, welder]&quot;</code></pre>
+
+
+<p>Note that the Selector DSL only covers a fraction of the full Selector syntax. It can be used with the boolean functions <code>and()</code>, <code>or()</code> etc to build up more complex Selectors, e.g.</p>
+<p>sel = and([q"name = bob", q"age &gt; 18"])</p>
+<p>For more information on the actual Selector syntax, see link below.</p>
+<p><a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">API reference</a></p>
+<p><a id='Couchzilla.QueryResult' href='#Couchzilla.QueryResult'>#</a>
+<strong><code>Couchzilla.QueryResult</code></strong> &mdash; <em>Type</em>.</p>
+<pre class="codehilite"><code>type QueryResult
+  docs::Vector{Dict{AbstractString, Any}}
+  bookmark::AbstractString 
+end</code></pre>
+
+
+<p>Returned by <code>query(...)</code>.</p>
+<p><code>bookmark</code> is only relevant when querying indexes of type <code>text</code>.</p>
+<p><a id='Couchzilla.query' href='#Couchzilla.query'>#</a>
+<strong><code>Couchzilla.query</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>result = query{T&lt;:AbstractString}(db::Database, selector::Selector;
+  fields::Vector{T}          = Vector{AbstractString}(),
+  sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
+  limit                      = 0,
+  skip                       = 0,
+  bookmark                   = &quot;&quot;)</code></pre>
+
+
+<p>Query database (Mango/Cloudant Query).</p>
+<p>See the <code>Selector</code> type and the associated <code>q"..."</code> custom string literal which implements a simplified DSL for writing selectors.</p>
+<p><strong>Examples</strong></p>
+<p>Find all documents where "year" is greater than 2010, returning  the fields <code>_id</code>, <code>_rev</code>, <code>year</code> and <code>title</code>, sorted in ascending order  on <code>year</code>. Set the page size to 10.</p>
+<pre class="codehilite"><code>result = query(db, q&quot;year &gt; 2010&quot;;
+  fields = [&quot;_id&quot;, &quot;_rev&quot;, &quot;year&quot;, &quot;title&quot;],
+  sort   = [Dict(&quot;year&quot; =&gt; &quot;asc&quot;)],
+  limit  = 10)</code></pre>
+
+
+<p><strong>Returns</strong></p>
+<pre class="codehilite"><code>type QueryResult</code></pre>
+
+
+<ul>
+<li><a href="https://docs.cloudant.com/cloudant_query.html">API reference</a></li>
+<li><a href="https://cloudant.com/blog/cloudant-query-grows-up-to-handle-ad-hoc-queries/">Cloudant Query blog post</a></li>
+</ul>
+<p><a id='Couchzilla.createindex' href='#Couchzilla.createindex'>#</a>
+<strong><code>Couchzilla.createindex</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>result = createindex{T&lt;:AbstractString}(db::Database; 
+  name::T       = &quot;&quot;,
+  ddoc::T       = &quot;&quot;,
+  fields        = Vector{T}(), 
+  selector      = Selector(),
+  default_field = Dict{UTF8String, Any}(&quot;analyzer&quot; =&gt; &quot;standard&quot;, &quot;enabled&quot; =&gt; true))</code></pre>
+
+
+<p>Create a Mango index. </p>
+<p>All <code>kw</code> parameters are optional, but note that not giving a <code>fields</code> argument will result in all fields being indexed which is very costly. Defaults to type <code>"json"</code> and will be assumed to be <code>"text"</code> if the data in the <code>fields</code> array are <code>Dict</code>s.</p>
+<p><strong>Examples</strong></p>
+<ul>
+<li>Make a text index</li>
+</ul>
+<pre class="codehilite"><code>result = createindex(db; ddoc=&quot;my-ddoc&quot;, fields=[Dict(&quot;name&quot;=&gt;&quot;lastname&quot;, &quot;type&quot;=&gt;&quot;string&quot;)], 
+  default_field=Dict(&quot;analyzer&quot; =&gt; &quot;german&quot;, &quot;enabled&quot; =&gt; true))</code></pre>
+
+
+<ul>
+<li>Make a json index</li>
+</ul>
+<p>result = createindex(db; fields=["data", "data2"])</p>
+<p><strong>Returns</strong></p>
+<p><code>createindex()</code> returns a <code>Dict(...)</code> version of the CouchDB response, of the type</p>
+<pre class="codehilite"><code>Dict(
+  &quot;name&quot;   =&gt; &quot;e7d18f69aa0deaa1ffcdf8f705895b61515a6bf6&quot;,
+  &quot;id&quot;     =&gt; &quot;_design/e7d18f69aa0deaa1ffcdf8f705895b61515a6bf6&quot;,
+  &quot;result&quot; =&gt; &quot;created&quot;
+)</code></pre>
+
+
+<p><a href="https://docs.cloudant.com/cloudant_query.html#creating-an-index">API reference</a></p>
+<p><a id='Couchzilla.listindexes-Tuple{Couchzilla.Database}' href='#Couchzilla.listindexes-Tuple{Couchzilla.Database}'>#</a>
+<strong><code>Couchzilla.listindexes</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = listindexes(db::Database)</code></pre>
+
+
+<p>List all existing indexes for the database. Note that this includes indexes not created  via the <code>createindex()</code> function, such as the primary index and secondary indexes created  as map-reduce views.</p>
+<p><strong>Returns</strong></p>
+<p><code>listindexes()</code> returns a <code>Dict(...)</code> version of the CouchDB response:</p>
+<pre class="codehilite"><code>Dict(
+  &quot;indexes&quot; =&gt; [
+    Dict(
+      &quot;name&quot; =&gt; &quot;_all_docs&quot;,
+      &quot;def&quot;  =&gt; Dict(
+        &quot;fields&quot; =&gt; [Dict(&quot;_id&quot; =&gt; &quot;asc&quot;)]
+      ),
+      &quot;ddoc&quot; =&gt; nothing,
+      &quot;type&quot; =&gt; &quot;special&quot;
+    ),
+    Dict(
+      &quot;ddoc&quot; =&gt; &quot;_design/cc79a71f562af7ef36deafe511fea9a857b05bcc&quot;,
+      &quot;name&quot; =&gt; &quot;cc79a71f562af7ef36deafe511fea9a857b05bcc&quot;,
+      &quot;type&quot; =&gt; &quot;text&quot;,
+      &quot;def&quot;  =&gt; Dict(
+        &quot;index_array_lengths&quot; =&gt; true,
+        &quot;fields&quot; =&gt; [Dict(&quot;cust&quot; =&gt; &quot;string&quot;), Dict(&quot;value&quot; =&gt; &quot;string&quot;)],
+        &quot;default_field&quot; =&gt; Dict(
+          &quot;analyzer&quot; =&gt; &quot;standard&quot;, 
+          &quot;enabled&quot; =&gt; true
+        ), 
+        &quot;selector&quot; =&gt; Dict(),
+        &quot;default_analyzer&quot; =&gt; &quot;keyword&quot;
+      )
+    ), 
+    # ...
+  ]
+)</code></pre>
+
+
+<p><a href="https://docs.cloudant.com/cloudant_query.html#list-all-cloudant-query-indexes">API reference</a></p>
+<p><a id='Couchzilla.deleteindex-Tuple{Couchzilla.Database}' href='#Couchzilla.deleteindex-Tuple{Couchzilla.Database}'>#</a>
+<strong><code>Couchzilla.deleteindex</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = deleteindex(db::Database; ddoc=&quot;&quot;, name=&quot;&quot;, indextype=&quot;&quot;)</code></pre>
+
+
+<p>Delete a query index given its ddoc, index name and index type.</p>
+<p>Indextype is either "text" or "json".</p>
+<p><strong>Returns</strong></p>
+<p><code>deleteindex()</code> returns a <code>Dict(...)</code> version of the CouchDB response:</p>
+<pre class="codehilite"><code>Dict(&quot;ok&quot; =&gt; true)</code></pre>
+
+
+<p><a href="https://docs.cloudant.com/cloudant_query.html#deleting-an-index">API reference</a></p>
+<p><a id='Attachments-1'></a></p>
+<h2 id="attachments">Attachments</h2>
+<p><a id='Couchzilla.put_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString,AbstractString,AbstractString}' href='#Couchzilla.put_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString,AbstractString,AbstractString}'>#</a>
+<strong><code>Couchzilla.put_attachment</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>put_attachment(db::Database, 
+  id::AbstractString, 
+  rev::AbstractString, 
+  name::AbstractString, 
+  mimetype::AbstractString, 
+  file::AbstractString)</code></pre>
+
+
+<p>Write an attachment to an existing document. Attachment read from a file.</p>
+<p><strong>Examples</strong></p>
+<pre class="codehilite"><code>doc = createdoc(db, Dict(&quot;item&quot; =&gt; &quot;screenshot&quot;))
+result = put_attachment(db, doc[&quot;id&quot;], doc[&quot;rev&quot;], &quot;test.png&quot;, &quot;image/png&quot;, &quot;data/test.png&quot;)</code></pre>
+
+
+<p><a href="https://docs.cloudant.com/attachments.html">API reference</a></p>
+<p><a id='Couchzilla.get_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString}' href='#Couchzilla.get_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString}'>#</a>
+<strong><code>Couchzilla.get_attachment</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = get_attachment(db::Database, id::AbstractString, name::AbstractString; rev::AbstractString = &quot;&quot;)</code></pre>
+
+
+<p>Read an attachment.</p>
+<p><strong>Examples</strong></p>
+<pre class="codehilite"><code>att = get_attachment(db, id, &quot;test.png&quot;; rev=rev)
+open(&quot;data/fetched.png&quot;, &quot;w&quot;) do f
+  write(f, att)
+end</code></pre>
+
+
+<p><a href="https://docs.cloudant.com/attachments.html">API reference</a></p>
+<p><a id='Couchzilla.delete_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}' href='#Couchzilla.delete_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}'>#</a>
+<strong><code>Couchzilla.delete_attachment</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = delete_attachment(db::Database, id::AbstractString, rev::AbstractString, name::AbstractString)</code></pre>
+
+
+<p>Delete an attachment.</p>
+<p><strong>Examples</strong></p>
+<pre class="codehilite"><code>result = delete_attachment(db, id, rev, &quot;test.png&quot;)</code></pre>
+
+
+<p><a href="https://docs.cloudant.com/attachments.html">API reference</a></p>
+<p><a id='Utility-stuff-1'></a></p>
+<h2 id="utility-stuff">Utility stuff</h2>
+<p><a id='Couchzilla.relax' href='#Couchzilla.relax'>#</a>
+<strong><code>Couchzilla.relax</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict())</code></pre>
+
+
+<p>Makes an HTTP request with the relevant cookies and query strings and deserialises the response, assumed to be json.</p>
+<p><a id='Couchzilla.endpoint' href='#Couchzilla.endpoint'>#</a>
+<strong><code>Couchzilla.endpoint</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>endpoint(uri::URI, path::AbstractString)</code></pre>
+
+
+<p>Appends a path string to the URI, returning as a string.</p>
+          <aside class="copyright" role="note">
+            
+            Documentation built with
+            <a href="http://www.mkdocs.org" target="_blank">MkDocs</a>
+            using the
+            <a href="http://squidfunk.github.io/mkdocs-material/" target="_blank">
+              Material
+            </a>
+            theme.
+          </aside>
+          
+            <footer class="footer">
+              
+            </footer>
+          
+        </div>
+      </article>
+      <div class="results" role="status" aria-live="polite">
+        <div class="scrollable">
+          <div class="wrapper">
+            <div class="meta"></div>
+            <div class="list"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script>
+      var base_url = '.';
+      var repo_id  = 'xpqz/couchzilla';
+    </script>
+    <script src="./assets/javascripts/application-997097ee0c.js"></script>
+    
+      <script src="./assets/mathjaxhelper.js"></script>
+    
+    
+  </body>
+</html>
