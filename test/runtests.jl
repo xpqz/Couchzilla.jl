@@ -215,6 +215,20 @@ Test.with_handler(test_handler) do
   println("\r[OK] Query view (POST)")
 end
 
+Test.with_handler(test_handler) do
+  print("[  ] Create a geospatial index ")
+  result = geo_index(db, "geodd", "geoidx", 
+    "function(doc){if(doc.geometry&&doc.geometry.coordinates){st_index(doc.geometry);}}"
+  )
+  @test result["ok"] == true
+  println("\r[OK] Create a geospatial index")
+
+  print("[  ] Get geospatial index info ")
+  result = geo_index_info(db, "geodd", "geoidx")
+  @test haskey(result, "geo_index") == true
+  println("\r[OK] Get geospatial index info")
+end
+
 print("[  ] Delete test database: $database ")
 result = deletedb(cl, database)
 @test result["ok"] == true
