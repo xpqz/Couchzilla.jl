@@ -243,6 +243,12 @@
             </li>
           
             <li class="anchor">
+              <a title="Geospatial" href="#geospatial">
+                Geospatial
+              </a>
+            </li>
+          
+            <li class="anchor">
               <a title="Utility stuff" href="#utility-stuff">
                 Utility stuff
               </a>
@@ -320,11 +326,11 @@ db, created = createdb(client; database=dbname)</code></pre>
 
 
 <pre class="codehilite"><code>5-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb893500186c5&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb8935001941e&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350019c8f&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350019e77&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb8935001a2ca&quot;)</code></pre>
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9c3bf&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9cf37&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9d82b&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9e5b9&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9ea1f&quot;)</code></pre>
 
 
 <p>This form of <a href=".#Couchzilla.createdoc"><code>createdoc</code></a> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
@@ -336,7 +342,7 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 4 entries:
   &quot;_rev&quot; =&gt; &quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;
   &quot;name&quot; =&gt; &quot;billy&quot;
-  &quot;_id&quot;  =&gt; &quot;78891cd5ef4ae33d834fb8935001941e&quot;
+  &quot;_id&quot;  =&gt; &quot;4302ac1700bd7c8bbc0e36e762e9cf37&quot;
   &quot;data&quot; =&gt; &quot;world&quot;</code></pre>
 
 
@@ -359,14 +365,14 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code class="language-julia">query(db, q&quot;name=davina&quot;)</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350019e77&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9e5b9&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>The construct <code>q"..."</code> (see <a href=".#Couchzilla.@q_str"><code>@q_str</code></a>) is a custom string literal type which takes a simplistic DSL  expression which gets converted to the actual JSON-representation of a Mango selector. If you are familiar with <a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">Mango selectors</a>,  you can use the raw JSON expression if you prefer:</p>
 <pre class="codehilite"><code class="language-julia">query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350019e77&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9e5b9&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>There are also coroutine versions of some of the functions that return data from views. If we had many results to process, we could use <a href=".#Couchzilla.paged_query"><code>paged_query</code></a> in a Julia Task:</p>
@@ -399,7 +405,7 @@ function(doc) {
 
 
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
-  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae…
+  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;4302ac1700bd7…
   &quot;offset&quot;     =&gt; 1
   &quot;total_rows&quot; =&gt; 5</code></pre>
 
@@ -1025,6 +1031,119 @@ Dict(
 
 
 <p><a href="https://issues.apache.org/jira/browse/COUCHDB-2310">Reference</a></p>
+<p><a id='Geospatial-1'></a></p>
+<h2 id="geospatial">Geospatial</h2>
+<p><a id='Couchzilla.geo_index' href='#Couchzilla.geo_index'>#</a>
+<strong><code>Couchzilla.geo_index</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>result = geo_index(db::Database, ddoc::AbstractString, name::AbstractString, index::AbstractString)</code></pre>
+
+
+<p>Create a geospatial index.</p>
+<p>The <code>index</code> parameter is a string containing an index function in Javascript. </p>
+<p><strong>Examples</strong></p>
+<pre class="codehilite"><code>result = geo_index(db, &quot;geodd&quot;, &quot;geoidx&quot;, 
+  &quot;function(doc){if(doc.geometry&amp;&amp;doc.geometry.coordinates){st_index(doc.geometry);}}&quot;
+)</code></pre>
+
+
+<p><strong>Returns</strong></p>
+<p>Returns a <code>Dict(...)</code> from the CouchDB response, of the type</p>
+<pre class="codehilite"><code>Dict(
+  &quot;ok&quot;  =&gt; true, 
+  &quot;rev&quot; =&gt; &quot;1-b950984b19bb1b8bb43513c9d5b235bc&quot;,
+  &quot;id&quot;  =&gt; &quot;_design/geodd&quot;
+)</code></pre>
+
+
+<p><a href="https://docs.cloudant.com/geo.html">API reference</a></p>
+<p><a id='Couchzilla.geo_index_info' href='#Couchzilla.geo_index_info'>#</a>
+<strong><code>Couchzilla.geo_index_info</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>result = geo_index_info(db::Database, ddoc::AbstractString, name::AbstractString)</code></pre>
+
+
+<p>Retrieve stats for a geospatial index.</p>
+<p><strong>Examples</strong></p>
+<pre class="codehilite"><code>result = geo_index_info(db, &quot;geodd&quot;, &quot;geoidx&quot;)</code></pre>
+
+
+<p><strong>Returns</strong></p>
+<p>Returns a <code>Dict(...)</code> from the CouchDB response, of the type</p>
+<pre class="codehilite"><code>Dict(
+  &quot;name&quot; =&gt; &quot;_design/geodd/geoidx&quot;,
+  &quot;geo_index&quot; =&gt; Dict(
+    &quot;doc_count&quot; =&gt; 269,
+    &quot;disk_size&quot; =&gt; 33416,
+    &quot;data_size&quot; =&gt; 26974
+  )
+)</code></pre>
+
+
+<p><a href="https://docs.cloudant.com/geo.html#obtaining-information-about-a-cloudant-geo-index">API reference</a></p>
+<p><a id='Couchzilla.geo_query' href='#Couchzilla.geo_query'>#</a>
+<strong><code>Couchzilla.geo_query</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>geo_query(db::Database, ddoc::AbstractString, name::AbstractString;
+  lat::Float64    = -360.0,
+  lon::Float64    = -360.0,
+  rangex::Float64 = 0.0,
+  rangey::Float64 = 0.0,
+  radius::Float64 = 0.0,
+  bbox::Vector{Float64}  = Vector{Float64}(),
+  relation::AbstractString = &quot;intersects&quot;,
+  nearest = false,
+  bookmark::AbstractString = &quot;&quot;,
+  format::AbstractString = &quot;view&quot;, 
+  skip = 0,
+  limit = 0,
+  stale = false,
+  g::AbstractString = &quot;&quot;)</code></pre>
+
+
+<p>Query a geospatial index. This quickly becomes complicated. See the references below. </p>
+<p>The "g" parameter is a string representing a <a href="https://en.wikipedia.org/wiki/Well-known_text"><code>Well Known Text</code></a> object (<code>WKT</code>). It can be used to describe various geometries, such as lines and polygons. Currently supported  geometric objects are</p>
+<ul>
+<li>point       </li>
+<li>linestring</li>
+<li>polygon         </li>
+<li>multipoint        </li>
+<li>multilinestring   </li>
+<li>multipolygon    </li>
+<li>geometrycollection</li>
+</ul>
+<p>Geo queries can be configured to return its results in a number of different formats using the <code>format</code> parameter. The accepted values are:</p>
+<ul>
+<li>legacy              </li>
+<li>geojson                 </li>
+<li>view (default)               </li>
+<li>application/vnd.geo+json</li>
+</ul>
+<p>The <code>relation</code> parameter follows the <a href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a> spec for geometric relationships. Acceptable values are:</p>
+<ul>
+<li>contains      </li>
+<li>contains_properly</li>
+<li>covered_by      </li>
+<li>covers          </li>
+<li>crosses         </li>
+<li>disjoint        </li>
+<li>intersects (default)</li>
+<li>overlaps        </li>
+<li>touches         </li>
+<li>within          </li>
+</ul>
+<p><strong>Examples</strong></p>
+<p>Radial query</p>
+<pre class="codehilite"><code>result = geo_query(geodb, &quot;geodd&quot;, &quot;geoidx&quot;;
+  lat    = 42.357963,
+  lon    = -71.063991,
+  radius = 10000.0,
+  limit  = 200)</code></pre>
+
+
+<p>Polygon query </p>
+<pre class="codehilite"><code>result = geo_query(geodb, &quot;geodd&quot;, &quot;geoidx&quot;;
+  g=&quot;POLYGON ((-71.0537124 42.3681995 0,-71.054399 42.3675178 0,-71.0522962 42.3667409 0,-71.051631 42.3659324 0,-71.051631 42.3621431 0,-71.0502148 42.3618577 0,-71.0505152 42.3660275 0,-71.0511589 42.3670263 0,-71.0537124 42.3681995 0))&quot;)</code></pre>
+
+
+<p><a href="https://docs.cloudant.com/geo.html#querying-a-cloudant-geo-index">API reference</a></p>
 <p><a id='Utility-stuff-1'></a></p>
 <h2 id="utility-stuff">Utility stuff</h2>
 <p><a id='Couchzilla.relax' href='#Couchzilla.relax'>#</a>
