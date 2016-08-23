@@ -207,6 +207,12 @@
             </li>
           
             <li class="anchor">
+              <a title="Geospatial queries" href="#geospatial-queries">
+                Geospatial queries
+              </a>
+            </li>
+          
+            <li class="anchor">
               <a title="Client" href="#client">
                 Client
               </a>
@@ -326,11 +332,11 @@ db, created = createdb(client; database=dbname)</code></pre>
 
 
 <pre class="codehilite"><code>5-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9c3bf&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9cf37&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9d82b&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9e5b9&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9ea1f&quot;)</code></pre>
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fece4fa&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fecf24c&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fed01e7&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fed0b1e&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fed17e6&quot;)</code></pre>
 
 
 <p>This form of <a href=".#Couchzilla.createdoc"><code>createdoc</code></a> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
@@ -342,7 +348,7 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 4 entries:
   &quot;_rev&quot; =&gt; &quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;
   &quot;name&quot; =&gt; &quot;billy&quot;
-  &quot;_id&quot;  =&gt; &quot;4302ac1700bd7c8bbc0e36e762e9cf37&quot;
+  &quot;_id&quot;  =&gt; &quot;3c955a5fca1e8f3b65606bc12fecf24c&quot;
   &quot;data&quot; =&gt; &quot;world&quot;</code></pre>
 
 
@@ -365,14 +371,14 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code class="language-julia">query(db, q&quot;name=davina&quot;)</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9e5b9&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fed0b1e&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>The construct <code>q"..."</code> (see <a href=".#Couchzilla.@q_str"><code>@q_str</code></a>) is a custom string literal type which takes a simplistic DSL  expression which gets converted to the actual JSON-representation of a Mango selector. If you are familiar with <a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">Mango selectors</a>,  you can use the raw JSON expression if you prefer:</p>
 <pre class="codehilite"><code class="language-julia">query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;4302ac1700bd7c8bbc0e36e762e9e5b9&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fed0b1e&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>There are also coroutine versions of some of the functions that return data from views. If we had many results to process, we could use <a href=".#Couchzilla.paged_query"><code>paged_query</code></a> in a Julia Task:</p>
@@ -405,7 +411,7 @@ function(doc) {
 
 
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
-  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;4302ac1700bd7…
+  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8…
   &quot;offset&quot;     =&gt; 1
   &quot;total_rows&quot; =&gt; 5</code></pre>
 
@@ -423,6 +429,58 @@ result = put_attachment(db, data[&quot;id&quot;], data[&quot;rev&quot;], &quot;t
 open(&quot;data/fetched.png&quot;, &quot;w&quot;) do f
   write(f, att)
 end</code></pre>
+
+
+<p><a id='Geospatial-queries-1'></a></p>
+<h2 id="geospatial-queries">Geospatial queries</h2>
+<p>One of the fancier aspects of Cloudant is its geospatial capabilities, and Couchzilla provides access to this functionality. Using this it is possible to use Cloudant to  answer questions such as "show me all documents that fall within a given radius of a given point". A full description of this capability is beyond the scope of this  document, but Cloudand provides rich documentation on the <a href="https://docs.cloudant.com/geo.html">subject</a>.</p>
+<p>In order to try out the geospatial stuff using Couchzilla, we first need some data.  Cloudant provides an open database that you can replicate into your own account  <a href="https://education.cloudant.com/crimes">here</a>. It's a database of the locations of  reported crimes in the Boston area.</p>
+<p>Let's connect Couchzilla to a replica of this database, and run through the examples from Cloudant's geospatial tutorial <a href="https://cloudant.com/using-cloudant-geospatial-tutorial/">page</a>.  We can re-use the client from before:</p>
+<pre class="codehilite"><code class="language-julia">geodb = connectdb(client; database=&quot;crimes&quot;)</code></pre>
+
+
+<p>The database already contains the necessary geospatial indexes. Had this not been the case we could have indexed it using <a href=".#Couchzilla.geo_index"><code>geo_index</code></a>.</p>
+<p>So let's list the first 20 crimes within a radius of 10,000m of the Boston State House:</p>
+<pre class="codehilite"><code class="language-julia">result = geo_query(geodb, &quot;geodd&quot;, &quot;geoidx&quot;;
+  lat    = 42.357963,
+  lon    = -71.063991,
+  radius = 10000.0,
+  limit  = 200)
+result[&quot;rows&quot;]</code></pre>
+
+
+<pre class="codehilite"><code>200-element Array{Any,1}:
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-caa129c6e0c9e7667cd401675859da2a&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38fcf2b&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.06659956,42.35930134],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-e7c7eb51c49d7e5fab38b33b19542106&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38c548a&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.06455956,42.36115135],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-de437f29d19bb55a495693fa40975962&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38b22cc&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05998657,42.36164815],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-4c4650e64d0cc0bb01e32a0b5aca2802&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e3917804&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05998657,42.36164815],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-e557e2555201054b924f618299cb9b64&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e392e828&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05998657,42.36164815],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-86261a0030776d68d98f805afec21c94&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38a779d&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.0587,42.3594],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-0892e7f4eb551df2453e9a11b274e190&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38d6b78&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.0587,42.3594],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-4ce963293c1810c3fc8fe606e9345e8e&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38ee226&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.0587,42.3594],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-816e850ff5ec2249993675fd568b2e9c&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e3927629&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.0587,42.3594],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-59e512ec186a17dc3e94a3f1d7c13392&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e392867d&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.0587,42.3594],&quot;type&quot;=&gt;&quot;Point&quot;))
+ ⋮
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-be45124918034417ce77adbd99d3d54f&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38c8ead&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.13312909,42.36337538],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-e17545f877d7fc1442abe71557ec44c8&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e391c876&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.10727955,42.30375135],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-50e1dd9b9ad194f90a0fb4f9001d1b43&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e3929889&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05512457,42.28895136],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-f8407a2467b8fea166aa451994de75da&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38b682a&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.07728456,42.28963636],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-459aadf6156187de8c11ecce3b5f1f28&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38afe98&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05007094,42.28966431],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-1d1c012db58954c6d799646e0e009728&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38b0d38&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.04731414,42.29018867],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-21dea1eb417bff225b4932acbe983314&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38c9b44&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.10965455,42.30423135],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-edd6492692311118baaa8cbb980ef1c5&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38d51e7&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.13410611,42.34900151],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-13144e283f47d611d62d9f11d94161be&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e39168d7&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.13495453,42.35041635],&quot;type&quot;=&gt;&quot;Point&quot;))</code></pre>
+
+
+<p>We can specify a polygon for the Commercial Street corridor, which should yield only two docs:</p>
+<pre class="codehilite"><code class="language-julia">result = geo_query(geodb, &quot;geodd&quot;, &quot;geoidx&quot;;
+  g=&quot;POLYGON ((-71.0537124 42.3681995 0,-71.054399 42.3675178 0,-71.0522962 42.3667409 0,-71.051631 42.3659324 0,-71.051631 42.3621431 0,-71.0502148 42.3618577 0,-71.0505152 42.3660275 0,-71.0511589 42.3670263 0,-71.0537124 42.3681995 0))&quot;)
+result[&quot;rows&quot;]</code></pre>
+
+
+<pre class="codehilite"><code>2-element Array{Any,1}:
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-f0551b24741f182c5944621f87f9ac76&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38d6349&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05107956,42.36510634],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-8a9f1673b2b15232bbbb956a7f3b5397&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e3924516&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05204477,42.36674199],&quot;type&quot;=&gt;&quot;Point&quot;))</code></pre>
 
 
 <p>If you want to delete a database, simply call <a href=".#Couchzilla.deletedb-Tuple{Couchzilla.Client,AbstractString}"><code>deletedb</code></a>:</p>
