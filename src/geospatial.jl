@@ -87,10 +87,75 @@ function geo_index_info(db::Database, ddoc::AbstractString, name::AbstractString
 end
 
 """
-https://education.cloudant.com/crimes/_design/geodd/_geo/geoidx?lat=42.357963&lon=-71.063991&radius=10000&limit=200&include_docs=true
+    geo_query(db::Database, ddoc::AbstractString, name::AbstractString;
+      lat::Float64    = -360.0,
+      lon::Float64    = -360.0,
+      rangex::Float64 = 0.0,
+      rangey::Float64 = 0.0,
+      radius::Float64 = 0.0,
+      bbox::Vector{Float64}  = Vector{Float64}(),
+      relation::AbstractString = "intersects",
+      nearest = false,
+      bookmark::AbstractString = "",
+      format::AbstractString = "view", 
+      skip = 0,
+      limit = 0,
+      stale = false,
+      g::AbstractString = "")
 
-Boston Commercial Street corridor polyon
-https://education.cloudant.com/crimes/_design/geodd/_geo/geoidx?relation=contains&g=POLYGON%20((-71.0537124%2042.3681995%200,-71.054399%2042.3675178%200,-71.0522962%2042.3667409%200,-71.051631%2042.3659324%200,-71.051631%2042.3621431%200,-71.0502148%2042.3618577%200,-71.0505152%2042.3660275%200,-71.0511589%2042.3670263%200,-71.0537124%2042.3681995%200))&include_docs=true';
+Query a geospatial index. This quickly becomes complicated. See the references below. 
+
+The "g" parameter is a string representing a [`Well Known Text`](https://en.wikipedia.org/wiki/Well-known_text)
+object (`WKT`). It can be used to describe various geometries, such as lines and polygons. Currently supported 
+geometric objects are
+
+* point       
+* linestring
+* polygon         
+* multipoint        
+* multilinestring   
+* multipolygon    
+* geometrycollection
+
+Geo queries can be configured to return its results in a number of different formats
+using the `format` parameter. The accepted values are:
+
+* legacy              
+* geojson                 
+* view (default)               
+* application/vnd.geo+json
+
+The `relation` parameter follows the [DE-9IM](https://en.wikipedia.org/wiki/DE-9IM)
+spec for geometric relationships. Acceptable values are:
+
+* contains      
+* contains_properly
+* covered_by      
+* covers          
+* crosses         
+* disjoint        
+* intersects (default)
+* overlaps        
+* touches         
+* within          
+
+### Examples 
+
+Radial query
+
+    result = geo_query(geodb, "geodd", "geoidx";
+      lat    = 42.357963,
+      lon    = -71.063991,
+      radius = 10000.0,
+      limit  = 200)
+
+Polygon query 
+
+    result = geo_query(geodb, "geodd", "geoidx";
+      g="POLYGON ((-71.0537124 42.3681995 0,-71.054399 42.3675178 0,-71.0522962 42.3667409 0,-71.051631 42.3659324 0,-71.051631 42.3621431 0,-71.0502148 42.3618577 0,-71.0505152 42.3660275 0,-71.0511589 42.3670263 0,-71.0537124 42.3681995 0))")
+
+
+[API reference](https://docs.cloudant.com/geo.html#querying-a-cloudant-geo-index)
 """
 
 function geo_query(db::Database, ddoc::AbstractString, name::AbstractString;

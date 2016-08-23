@@ -265,6 +265,14 @@ Couchzilla.revs_diff
 Couchzilla.bulk_get
 ```
 
+## Geospatial
+
+```@docs
+Couchzilla.geo_index
+Couchzilla.geo_index_info
+Couchzilla.geo_query
+```
+
 ## Utility stuff
 ```@docs
 Couchzilla.relax
