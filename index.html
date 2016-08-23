@@ -320,11 +320,11 @@ db, created = createdb(client; database=dbname)</code></pre>
 
 
 <pre class="codehilite"><code>5-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d89607&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d899c3&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d8a57e&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d8a5d8&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d8b329&quot;)</code></pre>
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb893500186c5&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb8935001941e&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350019c8f&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350019e77&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb8935001a2ca&quot;)</code></pre>
 
 
 <p>This form of <a href=".#Couchzilla.createdoc"><code>createdoc</code></a> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
@@ -336,7 +336,7 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 4 entries:
   &quot;_rev&quot; =&gt; &quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;
   &quot;name&quot; =&gt; &quot;billy&quot;
-  &quot;_id&quot;  =&gt; &quot;5c94ad1e3d1c8f4f5708185844d899c3&quot;
+  &quot;_id&quot;  =&gt; &quot;78891cd5ef4ae33d834fb8935001941e&quot;
   &quot;data&quot; =&gt; &quot;world&quot;</code></pre>
 
 
@@ -359,14 +359,14 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code class="language-julia">query(db, q&quot;name=davina&quot;)</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d8a5d8&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350019e77&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>The construct <code>q"..."</code> (see <a href=".#Couchzilla.@q_str"><code>@q_str</code></a>) is a custom string literal type which takes a simplistic DSL  expression which gets converted to the actual JSON-representation of a Mango selector. If you are familiar with <a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">Mango selectors</a>,  you can use the raw JSON expression if you prefer:</p>
 <pre class="codehilite"><code class="language-julia">query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d8a5d8&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350019e77&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>There are also coroutine versions of some of the functions that return data from views. If we had many results to process, we could use <a href=".#Couchzilla.paged_query"><code>paged_query</code></a> in a Julia Task:</p>
@@ -399,7 +399,7 @@ function(doc) {
 
 
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
-  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;5c94ad1e3d1c8…
+  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae…
   &quot;offset&quot;     =&gt; 1
   &quot;total_rows&quot; =&gt; 5</code></pre>
 
@@ -996,7 +996,18 @@ Dict(
 <p>It is supported in CouchDB &gt;= 2.0 (Cloudant "DBNext"), and also suported by PouchDB.</p>
 <p>The <code>data</code> parameter is a list of <code>Dict</code>s with keys <code>id</code> and <code>rev</code>.</p>
 <p><strong>Examples</strong></p>
-<p>result = revs_diff(db; data = [     Dict(       "id"  =&gt; "f6b40e2fdc017e7e4ec4fa88ae3a4950",        "rev" =&gt; "2-1f0e2f0d841ba6b7e3d735b870ebeb8c"     ),     Dict(       "id"  =&gt; "2f8b7921cbcfde79fb2ff8079cada273",        "rev" =&gt; "1-6c3ef2ba29b6631a01ce00f80b5b4ad3"     )       ])</p>
+<pre class="codehilite"><code>result = revs_diff(db; data = [
+  Dict(
+    &quot;id&quot;  =&gt; &quot;f6b40e2fdc017e7e4ec4fa88ae3a4950&quot;, 
+    &quot;rev&quot; =&gt; &quot;2-1f0e2f0d841ba6b7e3d735b870ebeb8c&quot;
+  ),
+  Dict(
+    &quot;id&quot;  =&gt; &quot;2f8b7921cbcfde79fb2ff8079cada273&quot;, 
+    &quot;rev&quot; =&gt; &quot;1-6c3ef2ba29b6631a01ce00f80b5b4ad3&quot;
+  )    
+])</code></pre>
+
+
 <p><strong>Returns</strong></p>
 <p>The response format is convoluted, and seemingly undocumented for both CouchDB and Cloudant at the time of writing.</p>
 <pre class="codehilite"><code>&quot;results&quot;: [
