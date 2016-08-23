@@ -7,7 +7,13 @@ username = ENV["COUCH_USER"]
 password = ENV["COUCH_PASS"]
 host     = ENV["COUCH_HOST_URL"]
 
+geo_database = ""
+if haskey(ENV, "COUCH_GEO_DATABASE")
+  geo_database = ENV["COUCH_GEO_DATABASE"]
+end
+
 database = "juliatest-$(Base.Random.uuid4())"
+geo_database = "crimes"
 cl = Client(username, password, host)
 db, created = createdb(cl, database=database)
 
@@ -227,6 +233,28 @@ Test.with_handler(test_handler) do
   result = geo_index_info(db, "geodd", "geoidx")
   @test haskey(result, "geo_index") == true
   println("\r[OK] Get geospatial index info")
+
+  if geo_database != ""
+    geodb = connectdb(cl, database=geo_database)
+    print("[  ] Radius geospatial query ")
+    result = geo_query(geodb, "geodd", "geoidx";
+      lat    = 42.357963,
+      lon    = -71.063991,
+      radius = 10000.0,
+      limit  = 200)
+    
+    @test length(result["rows"]) == 200
+    println("\r[OK] Radius geospatial query")
+
+    print("[  ] Polygon geospatial query ")
+    result = geo_query(geodb, "geodd", "geoidx";
+      g="POLYGON ((-71.0537124 42.3681995 0,-71.054399 42.3675178 0,-71.0522962 42.3667409 0,-71.051631 42.3659324 0,-71.051631 42.3621431 0,-71.0502148 42.3618577 0,-71.0505152 42.3660275 0,-71.0511589 42.3670263 0,-71.0537124 42.3681995 0))")
+    @test length(result["rows"]) == 2
+    println("\r[OK] Polygon geospatial query")
+  else 
+    println("** Skipping geospatial query tests")
+    println("** Replicate https://education.cloudant.com/crimes and set the variable COUCH_GEO_DATABASE")
+  end
 end
 
 print("[  ] Delete test database: $database ")
