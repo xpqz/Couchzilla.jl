@@ -189,6 +189,24 @@
             </li>
           
             <li class="anchor">
+              <a title="Query" href="#query">
+                Query
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="Views" href="#views">
+                Views
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="Using attachments" href="#using-attachments">
+                Using attachments
+              </a>
+            </li>
+          
+            <li class="anchor">
               <a title="Client" href="#client">
                 Client
               </a>
@@ -201,7 +219,7 @@
             </li>
           
             <li class="anchor">
-              <a title="Views" href="#views">
+              <a title="Views" href="#views_1">
                 Views
               </a>
             </li>
@@ -215,6 +233,12 @@
             <li class="anchor">
               <a title="Attachments" href="#attachments">
                 Attachments
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="Replication" href="#replication">
+                Replication
               </a>
             </li>
           
@@ -242,7 +266,7 @@
           
           <p><a id='Couchzilla-1'></a></p>
 <h1 id="couchzilla">Couchzilla</h1>
-<p>Couchzilla is a client library for CouchDB (and Cloudant).</p>
+<p>Couchzilla – CouchDB/Cloudant access for Julians.</p>
 <p><a id='Philosophy-1'></a></p>
 <h2 id="philosophy">Philosophy</h2>
 <p>We've tried to wrap the CouchDB API as thinly as possible, hiding the JSON and the HTTP but no  overwrought abstractions on top. That means that a CouchDB JSON document is represented as the  corresponding de-serialisation into native Julia types:</p>
@@ -270,96 +294,137 @@
 <p>Along similar lines, Couchzilla will return CouchDB's JSON-responses simply converted as-is.</p>
 <p><a id='Getting-Started-1'></a></p>
 <h2 id="getting-started">Getting Started</h2>
-<p>Couchzilla defines two types, <code>Client</code> and <code>Database</code>. <code>Client</code> represents an authenticated  connection to the remote CouchDB <em>instance</em>. Using this you can perform database-level operations,  such as creating, listing and deleting databases. The Database immutable type represents a client that is connected to a specific database, allowing you to perform document-level operations.</p>
+<p>Couchzilla defines two types, <a href=".#Couchzilla.Client"><code>Client</code></a> and <a href=".#Couchzilla.Database"><code>Database</code></a>. <code>Client</code> represents an authenticated  connection to the remote CouchDB <em>instance</em>. Using this you can perform database-level operations,  such as creating, listing and deleting databases. The Database immutable type represents a client that is connected to a specific database, allowing you to perform document-level operations.</p>
 <p>Install the library using the normal Julia facilities <code>Pkg.add("Couchzilla")</code>.</p>
 <p>Let's load up the credentials from environment variables.</p>
-<pre class="codehilite"><code> username = ENV[&quot;COUCH_USER&quot;]
- password = ENV[&quot;COUCH_PASS&quot;]
- host     = ENV[&quot;COUCH_HOST_URL&quot;] # e.g. https://accountname.cloudant.com</code></pre>
+<pre class="codehilite"><code class="language-julia">username = ENV[&quot;COUCH_USER&quot;]
+password = ENV[&quot;COUCH_PASS&quot;]
+host     = ENV[&quot;COUCH_HOST_URL&quot;] # e.g. https://accountname.cloudant.com</code></pre>
 
 
-<p>We can now create a client connection:</p>
-<pre class="codehilite"><code>client = Client(username, password, host)</code></pre>
-
-
-<p>Using the client we can create a database:</p>
-<pre class="codehilite"><code>db, created = createdb(client; database=&quot;mynewdb&quot;)</code></pre>
+<p>We can now create a client connection, and use that to create a new database:</p>
+<pre class="codehilite"><code class="language-julia">dbname = &quot;mynewdb&quot;
+client = Client(username, password, host)
+db, created = createdb(client; database=dbname)</code></pre>
 
 
 <p>If the database already existed, <code>created</code> will be set to <code>false</code> on return, and <code>true</code> means that the database was created.</p>
-<p>We can now add documents to the new database using <code>createdoc</code>:</p>
-<pre class="codehilite"><code>createdoc(db; data=[
-    Dict(&quot;name&quot;=&gt;&quot;adam&quot;, &quot;data&quot;=&gt;&quot;hello&quot;),
-    Dict(&quot;name&quot;=&gt;&quot;billy&quot;, &quot;data&quot;=&gt;&quot;world&quot;),
-    Dict(&quot;name&quot;=&gt;&quot;cecilia&quot;, &quot;data&quot;=&gt;&quot;authenticate&quot;),
-    Dict(&quot;name&quot;=&gt;&quot;davina&quot;, &quot;data&quot;=&gt;&quot;cloudant&quot;),
-    Dict(&quot;name&quot;=&gt;&quot;eric&quot;, &quot;data&quot;=&gt;&quot;blobbyblobbyblobby&quot;)
+<p>We can now add documents to the new database using <a href=".#Couchzilla.createdoc"><code>createdoc</code></a>. It returns an array of  <code>Dict</code>s showing the <code>{id, rev}</code> tuples of the new documents:</p>
+<pre class="codehilite"><code class="language-julia">result = createdoc(db; data=[
+    Dict(&quot;name&quot; =&gt; &quot;adam&quot;,    &quot;data&quot; =&gt; &quot;hello&quot;),
+    Dict(&quot;name&quot; =&gt; &quot;billy&quot;,   &quot;data&quot; =&gt; &quot;world&quot;),
+    Dict(&quot;name&quot; =&gt; &quot;cecilia&quot;, &quot;data&quot; =&gt; &quot;authenticate&quot;),
+    Dict(&quot;name&quot; =&gt; &quot;davina&quot;,  &quot;data&quot; =&gt; &quot;cloudant&quot;),
+    Dict(&quot;name&quot; =&gt; &quot;eric&quot;,    &quot;data&quot; =&gt; &quot;blobbyblobbyblobby&quot;)
 ])</code></pre>
 
 
-<p>It returns an array of <code>Dict</code>s showing the <code>{id, rev}</code> tuples of the new documents:</p>
 <pre class="codehilite"><code>5-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;6163490e3753b6461cd212ec1e496b56&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;6163490e3753b6461cd212ec1e496fb0&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;6163490e3753b6461cd212ec1e497092&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;6163490e3753b6461cd212ec1e497f8f&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;6163490e3753b6461cd212ec1e4984e2&quot;)</code></pre>
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d89607&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d899c3&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d8a57e&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d8a5d8&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d8b329&quot;)</code></pre>
 
 
-<p>This form of <code>createdoc</code> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
-<p>We can read a document back using <code>readdoc</code>, hitting the CouchDB primary index:</p>
-<pre class="codehilite"><code>readdoc(db, &quot;6163490e3753b6461cd212ec1e496b56&quot;)</code></pre>
+<p>This form of <a href=".#Couchzilla.createdoc"><code>createdoc</code></a> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
+<p>We can read a document back using <a href=".#Couchzilla.readdoc-Tuple{Couchzilla.Database,AbstractString}"><code>readdoc</code></a>, hitting the CouchDB primary index. Note that  reading back a document you just created is normally bad practice, as it will sooner or  later fall foul of CouchDB's <a href="http://guide.couchdb.org/draft/consistency.html">eventual consistency</a>  and give rise to sporadic, hard to troubleshoot errors. Having said that, let's do it  anyway, and hope for the best:</p>
+<pre class="codehilite"><code class="language-julia">id = result[2][&quot;id&quot;]
+readdoc(db, id)</code></pre>
 
 
-<p>which returns the winning revision for the given <code>id</code> as a <code>Dict</code>:</p>
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 4 entries:
-  &quot;_id&quot;  =&gt; &quot;6163490e3753b6461cd212ec1e496b56&quot;
-  &quot;_rev&quot; =&gt; &quot;1-783f91178091c10cce61c326473e8849&quot;
-  &quot;name&quot; =&gt; &quot;adam&quot;
-  &quot;data&quot; =&gt; &quot;hello&quot;</code></pre>
+  &quot;_rev&quot; =&gt; &quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;
+  &quot;name&quot; =&gt; &quot;billy&quot;
+  &quot;_id&quot;  =&gt; &quot;5c94ad1e3d1c8f4f5708185844d899c3&quot;
+  &quot;data&quot; =&gt; &quot;world&quot;</code></pre>
 
 
-<p>In order to use the new Mango/Cloudant Query language to interact with the database we first need to create an index:</p>
-<pre class="codehilite"><code>createindex(db; fields=[&quot;name&quot;, &quot;data&quot;])
+<p>returning the winning revision for the given <code>id</code> as a <code>Dict</code>.</p>
+<p><a href="http://guide.couchdb.org/draft/conflicts.html">Conflict handling</a> in CouchDB and eventual  consistency is beyond the scope of this documentation, but worth understanding fully before using  CouchDB in anger.</p>
+<p><a id='Query-1'></a></p>
+<h2 id="query">Query</h2>
+<p><code>Mango</code> (also known as <a href="https://docs.cloudant.com/cloudant_query.html">Cloudant Query</a>) is  a declarative query language inspired by <a href="https://docs.mongodb.com/">MongoDB</a>. It allows us to query the database in a (slightly) more ad-hoc fashion than using map reduce views.</p>
+<p>In order to use this feature we first need to set up the necessary indexes:</p>
+<pre class="codehilite"><code class="language-julia">createindex(db; fields=[&quot;name&quot;, &quot;data&quot;])</code></pre>
 
-Dict{UTF8String,Any} with 3 entries:
+
+<pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
   &quot;name&quot;   =&gt; &quot;f519be04f7f80838b6a88811f75de4fb83d966dd&quot;
   &quot;id&quot;     =&gt; &quot;_design/f519be04f7f80838b6a88811f75de4fb83d966dd&quot;
   &quot;result&quot; =&gt; &quot;created&quot;</code></pre>
 
 
 <p>We can now use this index to retrieve data:</p>
-<pre class="codehilite"><code>query(db, q&quot;name=davina&quot;)
-
-Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;6163490e3753b6461cd212ec1e497f8f&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code class="language-julia">query(db, q&quot;name=davina&quot;)</code></pre>
 
 
-<p>The construct <code>r"..."</code> is a custom string literal type which takes a simplistic DSL  expression which gets converted to the actual JSON-representation of a Mango selector. If you are familiar with Mango selectors, you can use the raw JSON expression if you prefer:</p>
-<pre class="codehilite"><code>query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d8a5d8&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
-<p>You can also create secondary indexes, known as <code>views</code>. They are created using a map function written in Javascript. For example, to create a view on the <code>name</code> field, we could use the following:</p>
-<pre class="codehilite"><code>make_view(db, &quot;my_ddoc&quot;, &quot;my_view&quot;, 
+<p>The construct <code>q"..."</code> (see <a href=".#Couchzilla.@q_str"><code>@q_str</code></a>) is a custom string literal type which takes a simplistic DSL  expression which gets converted to the actual JSON-representation of a Mango selector. If you are familiar with <a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">Mango selectors</a>,  you can use the raw JSON expression if you prefer:</p>
+<pre class="codehilite"><code class="language-julia">query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
+
+
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;5c94ad1e3d1c8f4f5708185844d8a5d8&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+
+
+<p>There are also coroutine versions of some of the functions that return data from views. If we had many results to process, we could use <a href=".#Couchzilla.paged_query"><code>paged_query</code></a> in a Julia Task:</p>
+<pre class="codehilite"><code>for page in @task paged_query(db, q&quot;name=davina&quot;; pagesize=10)
+    # Do something with the page.docs array
+end</code></pre>
+
+
+<p>This version uses the <code>limit</code> and <code>skip</code> parameters and issues an HTTP(S) request per page.</p>
+<p><a id='Views-1'></a></p>
+<h2 id="views">Views</h2>
+<p>A powerful feature of CouchDB are <a href="http://docs.couchdb.org/en/1.6.1/couchapp/views/intro.html">secondary indexes</a>,  known as <a href="http://guide.couchdb.org/draft/views.html">views</a>. They are created using  a map function written most commonly in Javascript, and optionally a reduce part. For  example, to create a view on the <code>name</code> field, we use the following:</p>
+<pre class="codehilite"><code class="language-julia">make_view(db, &quot;my_ddoc&quot;, &quot;my_view&quot;,
 &quot;&quot;&quot;
 function(doc) {
   if(doc &amp;&amp; doc.name) {
     emit(doc.name, 1);
   }
-}&quot;&quot;&quot;)
+}&quot;&quot;&quot;)</code></pre>
 
-Dict{UTF8String,Any} with 3 entries:
+
+<pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
   &quot;ok&quot;  =&gt; true
   &quot;rev&quot; =&gt; &quot;1-b950984b19bb1b8bb43513c9d5b235bc&quot;
-  &quot;id&quot;  =&gt; &quot;_design/my_ddoc</code></pre>
+  &quot;id&quot;  =&gt; &quot;_design/my_ddoc&quot;</code></pre>
 
 
-<p>To read from this view, use the <code>query_view</code> method:</p>
-<pre class="codehilite"><code>query_view(db, &quot;my_ddoc&quot;, &quot;my_view&quot;; keys=[&quot;davina&quot;, &quot;billy&quot;])
+<p>To read from this view, use the <a href=".#Couchzilla.query_view"><code>query_view</code></a> method:</p>
+<pre class="codehilite"><code class="language-julia">query_view(db, &quot;my_ddoc&quot;, &quot;my_view&quot;; keys=[&quot;davina&quot;, &quot;billy&quot;])</code></pre>
 
-Dict{UTF8String,Any} with 3 entries:
-  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;...)
+
+<pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
+  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;5c94ad1e3d1c8…
   &quot;offset&quot;     =&gt; 1
   &quot;total_rows&quot; =&gt; 5</code></pre>
+
+
+<p><a id='Using-attachments-1'></a></p>
+<h2 id="using-attachments">Using attachments</h2>
+<p>CouchDB can store files alongside documents as attachments. This can be a convenient feature for many applications, but it has drawbacks, especially in terms of performance. If you find that you need to store large (say greater than a couple of meg) binary attachments, you should probably consider a dedicated, separate file store and only use CouchDB for metadata.</p>
+<p>To write an attachment, use <a href=".#Couchzilla.put_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString,AbstractString,AbstractString}"><code>put_attachment</code></a>, which expects an <code>{id, rev}</code> tuple referencing and existing document in the database and the path to the file holding the attachment:</p>
+<pre class="codehilite"><code>data = createdoc(db, Dict(&quot;item&quot; =&gt; &quot;screenshot&quot;))
+result = put_attachment(db, data[&quot;id&quot;], data[&quot;rev&quot;], &quot;test.png&quot;, &quot;image/png&quot;, &quot;data/test.png&quot;)</code></pre>
+
+
+<p>In order to read the attachment, use <a href=".#Couchzilla.get_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString}"><code>get_attachment</code></a>, which returns an IO stream:</p>
+<pre class="codehilite"><code>att = get_attachment(db, result[&quot;id&quot;], &quot;test.png&quot;; rev=result[&quot;rev&quot;])
+open(&quot;data/fetched.png&quot;, &quot;w&quot;) do f
+  write(f, att)
+end</code></pre>
+
+
+<p>If you want to delete a database, simply call <a href=".#Couchzilla.deletedb-Tuple{Couchzilla.Client,AbstractString}"><code>deletedb</code></a>:</p>
+<pre class="codehilite"><code class="language-julia">deletedb(client, dbname)</code></pre>
+
+
+<pre class="codehilite"><code>Dict{UTF8String,Any} with 1 entry:
+  &quot;ok&quot; =&gt; true</code></pre>
 
 
 <p><a id='Client-1'></a></p>
@@ -420,6 +485,7 @@ end</code></pre>
 <p><a href="https://docs.cloudant.com/authentication.html#cookie-authentication">API reference</a></p>
 <p><a id='Database-1'></a></p>
 <h2 id="database">Database</h2>
+<p>The Database type represents a client connection tied to a specific database name. This is  immutable, meaning that if you need to talk to several databases you need to create one Database type for each.</p>
 <p><a id='Couchzilla.Database' href='#Couchzilla.Database'>#</a>
 <strong><code>Couchzilla.Database</code></strong> &mdash; <em>Type</em>.</p>
 <pre class="codehilite"><code>immutable Database
@@ -498,8 +564,8 @@ db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
 
 <p>Delete a document revision. Implemented via the _bulk_docs endpoint:</p>
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs">API reference</a></p>
-<p><a id='Views-1'></a></p>
-<h2 id="views">Views</h2>
+<p><a id='Views-2'></a></p>
+<h2 id="views_1">Views</h2>
 <p><a id='Couchzilla.make_view-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}' href='#Couchzilla.make_view-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}'>#</a>
 <strong><code>Couchzilla.make_view</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>result = make_view(db::Database, ddoc::AbstractString, name::AbstractString, map::AbstractString; 
@@ -690,6 +756,23 @@ end</code></pre>
 <li><a href="https://docs.cloudant.com/cloudant_query.html">API reference</a></li>
 <li><a href="https://cloudant.com/blog/cloudant-query-grows-up-to-handle-ad-hoc-queries/">Cloudant Query blog post</a></li>
 </ul>
+<p><a id='Couchzilla.paged_query' href='#Couchzilla.paged_query'>#</a>
+<strong><code>Couchzilla.paged_query</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>paged_query{T&lt;:AbstractString}(db::Database, selector::Selector;
+  fields::Vector{T}          = Vector{AbstractString}(),
+  sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
+  pagesize                   = 100)</code></pre>
+
+
+<p>Perform multiple HTTP requests against a JSON-type index producing the  intermediate results. This is a wrapper around <code>query()</code> using the  <code>skip</code> and <code>limit</code> parameters.</p>
+<p><strong>Examples</strong></p>
+<pre class="codehilite"><code>for page in @task paged_query(db, q&quot;data = ...&quot;; pagesize=10)
+  for doc in page.docs
+    # ... 
+  end
+end</code></pre>
+
+
 <p><a id='Couchzilla.createindex' href='#Couchzilla.createindex'>#</a>
 <strong><code>Couchzilla.createindex</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>result = createindex{T&lt;:AbstractString}(db::Database; 
@@ -778,6 +861,7 @@ end</code></pre>
 <p><a href="https://docs.cloudant.com/cloudant_query.html#deleting-an-index">API reference</a></p>
 <p><a id='Attachments-1'></a></p>
 <h2 id="attachments">Attachments</h2>
+<p>You can attach files to documents in CouchDB. This can occasionally be convenient, but using attachments has performance implications, especially when combined with  replication. See Cloudant's <a href="https://docs.cloudant.com/attachments.html">docs</a> on  the subject.</p>
 <p><a id='Couchzilla.put_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString,AbstractString,AbstractString}' href='#Couchzilla.put_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString,AbstractString,AbstractString}'>#</a>
 <strong><code>Couchzilla.put_attachment</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>put_attachment(db::Database, 
@@ -820,6 +904,116 @@ end</code></pre>
 
 
 <p><a href="https://docs.cloudant.com/attachments.html">API reference</a></p>
+<p><a id='Replication-1'></a></p>
+<h2 id="replication">Replication</h2>
+<p>Unlike e.g. <a href="https://pouchdb.com/">PouchDB</a>, <a href="https://github.com/cloudant/CDTDatastore">CDTDatastore</a>  and <a href="https://github.com/cloudant/sync-android">sync-android</a>, <code>Couchzilla</code> is not a replication library  in that it does not implement a local data store. However, you have access to all replication-related endpoints provided by CouchDB. The CouchDB replication algorithm is largely undocumented, but a good <a href="https://github.com/couchbase/couchbase-lite-ios/wiki/Replication-Algorithm">write-up</a> can be found  in Couchbase's repo.</p>
+<p><a id='Couchzilla.changes' href='#Couchzilla.changes'>#</a>
+<strong><code>Couchzilla.changes</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>changes(db::Database;
+  doc_ids = [],
+  conflicts = false,
+  descending = false,
+  include_docs = false,
+  attachments = false,
+  att_encoding_info = false,
+  last-event-id = 0,
+  limit = 0
+  since = 0)</code></pre>
+
+
+<p>Query the CouchDB changes feed, returned as a big <code>Dict</code>. Normal mode only. Filtering options not supported.</p>
+<p><strong>Examples</strong></p>
+<pre class="codehilite"><code>results = changes(db; include_docs=true, since=0)</code></pre>
+
+
+<p><a href="http://docs.couchdb.org/en/1.6.1/api/database/changes.html">API reference</a></p>
+<p><a id='Couchzilla.changes_streaming' href='#Couchzilla.changes_streaming'>#</a>
+<strong><code>Couchzilla.changes_streaming</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>changes_streaming(db::Database;
+  doc_ids = [],
+  conflicts = false,
+  descending = false,
+  include_docs = false,
+  attachments = false,
+  att_encoding_info = false,
+  last-event-id = 0,
+  limit = 0
+  since = 0)</code></pre>
+
+
+<p>Query the CouchDB changes feed, line by line. This is a co-routine.  Note that the last item produced will always  be the CouchDB <code>last_seq</code>  entry.</p>
+<p>This is a co-routine. Filtering options not supported.</p>
+<p><strong>Examples</strong></p>
+<pre class="codehilite"><code>for ch in @task changes_streaming(db, limit=1)
+  println(ch)
+end
+
+Dict(
+  &quot;seq&quot;=&gt;&quot;1-g1...gm-&quot;,
+  &quot;changes&quot;=&gt;[Dict(&quot;rev&quot;=&gt;&quot;1-24213171b98945a2ed3578c926eb3651&quot;)], 
+  &quot;id&quot;=&gt;&quot;37f11227ef384458b01e4afc7eed7194&quot;
+)
+Dict(
+  &quot;pending&quot;=&gt;213,
+  &quot;last_seq&quot;=&gt;&quot;1-g1...gm-&quot;
+)</code></pre>
+
+
+<p><a href="http://docs.couchdb.org/en/1.6.1/api/database/changes.html">API reference</a></p>
+<p><a id='Couchzilla.revs_diff' href='#Couchzilla.revs_diff'>#</a>
+<strong><code>Couchzilla.revs_diff</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>revs_diff{T&lt;:AbstractString}(db::Database; data::Dict{T, Vector{T}} = Dict())</code></pre>
+
+
+<p><code>revs_diff</code> is a component of the CouchDB replication algorithm.</p>
+<p>Given set of ids and revs, it will return a potentially empty subset of ids and revs from this list which the remote end doesn't have.</p>
+<pre class="codehilite"><code>Dict(
+    &quot;190f721ca3411be7aa9477db5f948bbb&quot; =&gt; [
+        &quot;3-bb72a7682290f94a985f7afac8b27137&quot;,
+        &quot;4-10265e5a26d807a3cfa459cf1a82ef2e&quot;,
+        &quot;5-067a00dff5e02add41819138abb3284d&quot;
+    ]
+)</code></pre>
+
+
+<p><strong>Returns</strong></p>
+<p>The returned structure is a <code>Dict</code> where the keys are the <code>id</code>s of any documents where missing <code>rev</code>s are found. An example:</p>
+<pre class="codehilite"><code>Dict(
+  &quot;e1132d11a43933948cb46c5e72e13659&quot; =&gt; Dict(
+    &quot;missing&quot; =&gt; [&quot;2-1f0e2f0d841ba6b7e3d735b870ebeb8c&quot;],
+    &quot;possible_ancestors&quot; =&gt; [&quot;1-efda16b0115e5fcf2cfd065faee674fc&quot;]
+  )
+)</code></pre>
+
+
+<p><a href="http://docs.couchdb.org/en/1.6.1/api/database/misc.html#db-revs-diff">API reference</a></p>
+<p><a id='Couchzilla.bulk_get' href='#Couchzilla.bulk_get'>#</a>
+<strong><code>Couchzilla.bulk_get</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>bulk_get{T&lt;:AbstractString}(db::Database; data::Vector{Dict{T, T}} = [])</code></pre>
+
+
+<p><code>bulk_get</code> is used as part of an optimisation of the CouchDB replication algorithm in  recent versions, allowing the replicator to request many documents with full ancestral information in a singe HTTP request.</p>
+<p>It is supported in CouchDB &gt;= 2.0 (Cloudant "DBNext"), and also suported by PouchDB.</p>
+<p>The <code>data</code> parameter is a list of <code>Dict</code>s with keys <code>id</code> and <code>rev</code>.</p>
+<p><strong>Examples</strong></p>
+<p>result = revs_diff(db; data = [     Dict(       "id"  =&gt; "f6b40e2fdc017e7e4ec4fa88ae3a4950",        "rev" =&gt; "2-1f0e2f0d841ba6b7e3d735b870ebeb8c"     ),     Dict(       "id"  =&gt; "2f8b7921cbcfde79fb2ff8079cada273",        "rev" =&gt; "1-6c3ef2ba29b6631a01ce00f80b5b4ad3"     )       ])</p>
+<p><strong>Returns</strong></p>
+<p>The response format is convoluted, and seemingly undocumented for both CouchDB and Cloudant at the time of writing.</p>
+<pre class="codehilite"><code>&quot;results&quot;: [
+{
+  &quot;id&quot;: &quot;1c43dd76fee5036c0cb360648301a710&quot;,
+  &quot;docs&quot;: [
+    {
+      &quot;ok&quot;: { ..doc body here...
+
+        }
+      }
+    }
+  ]
+},</code></pre>
+
+
+<p><a href="https://issues.apache.org/jira/browse/COUCHDB-2310">Reference</a></p>
 <p><a id='Utility-stuff-1'></a></p>
 <h2 id="utility-stuff">Utility stuff</h2>
 <p><a id='Couchzilla.relax' href='#Couchzilla.relax'>#</a>
