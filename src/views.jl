@@ -28,7 +28,7 @@ Returns a `Dict(...)` from the CouchDB response, of the type
 [API reference](https://docs.cloudant.com/creating_views.html)
 """
 function make_view(db::Database, ddoc::AbstractString, name::AbstractString, map::AbstractString; reduce::AbstractString = "")
-  data = Dict{AbstractString, Any}(
+  data = Dict(
     "views"    => Dict(name => Dict("map" => map)),
     "language" => "javascript"
   )
@@ -37,7 +37,7 @@ function make_view(db::Database, ddoc::AbstractString, name::AbstractString, map
     data["views"][name]["reduce"] = reduce
   end
          
-  Requests.json(put(endpoint(db.url, "_design/$ddoc"); json=data, cookies=db.client.cookies))
+  relax(put, endpoint(db.url, "_design/$ddoc"); json=data, cookies=db.client.cookies)
 end
 
 """
@@ -149,7 +149,7 @@ function query_view(db::Database, ddoc::AbstractString, name::AbstractString;
 
   url = endpoint(db.url, "_design/$ddoc/_view/$name")
   if length(keys) > 0
-    Requests.json(post(url; json=Dict("keys" => keys), cookies=db.client.cookies, query=query))
+    relax(post, url; json=Dict("keys" => keys), cookies=db.client.cookies, query=query)
   else
     relax(get, url; cookies=db.client.cookies, query=query)
   end
@@ -236,7 +236,7 @@ function alldocs(db::Database;
   end
 
   if length(keys) > 0
-    Requests.json(post(endpoint(db.url, "_all_docs"); json=Dict("keys" => keys), cookies=db.client.cookies, query=query))
+    relax(post, endpoint(db.url, "_all_docs"); json=Dict("keys" => keys), cookies=db.client.cookies, query=query)
   else
     relax(get, endpoint(db.url, "_all_docs"); cookies=db.client.cookies, query=query)
   end

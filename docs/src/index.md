@@ -4,7 +4,7 @@ CurrentModule = Couchzilla
 
 # Couchzilla
  
-Couchzilla – CouchDB access for Julians.
+Couchzilla – CouchDB/Cloudant access for Julians.
 
 ## Philosophy
 
@@ -36,7 +36,7 @@ Along similar lines, Couchzilla will return CouchDB's JSON-responses simply conv
 
 ## Getting Started
 
-Couchzilla defines two types, `Client` and `Database`. `Client` represents an authenticated 
+Couchzilla defines two types, [`Client`](@ref) and [`Database`](@ref). `Client` represents an authenticated 
 connection to the remote CouchDB _instance_. Using this you can perform database-level operations, 
 such as creating, listing and deleting databases. The Database immutable type represents a client
 that is connected to a specific database, allowing you to perform document-level operations.
@@ -45,108 +45,146 @@ Install the library using the normal Julia facilities `Pkg.add("Couchzilla")`.
 
 Let's load up the credentials from environment variables.
 
-     username = ENV["COUCH_USER"]
-     password = ENV["COUCH_PASS"]
-     host     = ENV["COUCH_HOST_URL"] # e.g. https://accountname.cloudant.com
+```@example intro
+using Couchzilla # hide
+importall Couchzilla # hide
+username = ENV["COUCH_USER"]
+password = ENV["COUCH_PASS"]
+host     = ENV["COUCH_HOST_URL"] # e.g. https://accountname.cloudant.com
+nothing; # hide
+```
 
-We can now create a client connection:
+We can now create a client connection, and use that to create a new database:
 
-    client = Client(username, password, host)
-
-Using the client we can create a database:
-
-    db, created = createdb(client; database="mynewdb")
+```@example intro
+dbname = "mynewdb"
+client = Client(username, password, host)
+db, created = createdb(client; database=dbname)
+nothing; # hide
+```
 
 If the database already existed, `created` will be set to `false` on return, and `true`
 means that the database was created.
 
-We can now add documents to the new database using `createdoc`:
+We can now add documents to the new database using [`createdoc`](@ref). It returns an array of 
+`Dict`s showing the `{id, rev}` tuples of the new documents:
 
-    createdoc(db; data=[
-        Dict("name"=>"adam", "data"=>"hello"),
-        Dict("name"=>"billy", "data"=>"world"),
-        Dict("name"=>"cecilia", "data"=>"authenticate"),
-        Dict("name"=>"davina", "data"=>"cloudant"),
-        Dict("name"=>"eric", "data"=>"blobbyblobbyblobby")
-    ])
+```@example intro
+result = createdoc(db; data=[
+    Dict("name" => "adam",    "data" => "hello"),
+    Dict("name" => "billy",   "data" => "world"),
+    Dict("name" => "cecilia", "data" => "authenticate"),
+    Dict("name" => "davina",  "data" => "cloudant"),
+    Dict("name" => "eric",    "data" => "blobbyblobbyblobby")
+])
+```
 
-It returns an array of `Dict`s showing the `{id, rev}` tuples of the new documents:
-
-    5-element Array{Any,1}:
-     Dict{UTF8String,Any}("ok"=>true,"rev"=>"1-783f91178091c10cce61c326473e8849","id"=>"6163490e3753b6461cd212ec1e496b56")
-     Dict{UTF8String,Any}("ok"=>true,"rev"=>"1-9ecba7e9a824a6fdcfb005c454fea12e","id"=>"6163490e3753b6461cd212ec1e496fb0")
-     Dict{UTF8String,Any}("ok"=>true,"rev"=>"1-e05530fc65101ed432c5ee457d327952","id"=>"6163490e3753b6461cd212ec1e497092")
-     Dict{UTF8String,Any}("ok"=>true,"rev"=>"1-446bb325003aa6a995bde4e7c3dd513f","id"=>"6163490e3753b6461cd212ec1e497f8f")
-     Dict{UTF8String,Any}("ok"=>true,"rev"=>"1-e1f2181b3b4d7fa285b4516eee02d287","id"=>"6163490e3753b6461cd212ec1e4984e2")
-
-This form of `createdoc` creates multiple documents using a single `HTTP POST` which is 
+This form of [`createdoc`](@ref) creates multiple documents using a single `HTTP POST` which is 
 the most efficient way of creating multiple new documents.
 
-We can read a document back using `readdoc`, hitting the CouchDB primary index:
+We can read a document back using [`readdoc`](@ref), hitting the CouchDB primary index. Note that 
+reading back a document you just created is normally bad practice, as it will sooner or 
+later fall foul of CouchDB's [eventual consistency](http://guide.couchdb.org/draft/consistency.html) 
+and give rise to sporadic, hard to troubleshoot errors. Having said that, let's do it 
+anyway, and hope for the best:
 
-    readdoc(db, "6163490e3753b6461cd212ec1e496b56")
+```@example intro
+id = result[2]["id"]
+readdoc(db, id)
+```
 
-which returns the winning revision for the given `id` as a `Dict`:
+returning the winning revision for the given `id` as a `Dict`.
 
-    Dict{UTF8String,Any} with 4 entries:
-      "_id"  => "6163490e3753b6461cd212ec1e496b56"
-      "_rev" => "1-783f91178091c10cce61c326473e8849"
-      "name" => "adam"
-      "data" => "hello"
+[Conflict handling](http://guide.couchdb.org/draft/conflicts.html) in CouchDB and eventual 
+consistency is beyond the scope of this documentation, but worth understanding fully before using 
+CouchDB in anger.
 
-In order to use the new Mango/Cloudant Query language to interact with the database
-we first need to create an index:
+## Query
 
-    createindex(db; fields=["name", "data"])
+`Mango` (also known as [Cloudant Query](https://docs.cloudant.com/cloudant_query.html)) is 
+a declarative query language inspired by [MongoDB](https://docs.mongodb.com/). It allows
+us to query the database in a (slightly) more ad-hoc fashion than using map reduce views.
 
-    Dict{UTF8String,Any} with 3 entries:
-      "name"   => "f519be04f7f80838b6a88811f75de4fb83d966dd"
-      "id"     => "_design/f519be04f7f80838b6a88811f75de4fb83d966dd"
-      "result" => "created"
+In order to use this feature we first need to set up the necessary indexes:
+
+```@example intro
+createindex(db; fields=["name", "data"])
+```
 
 We can now use this index to retrieve data:
 
-    query(db, q"name=davina")
-
-    Couchzilla.QueryResult([Dict{AbstractString,Any}(
-      "_rev"=>"1-4..3f",
-      "name"=>"davina",
-      "_id"=>"616..f8f",
-      "data"=>"cloudant")],"")
-
-The construct `r"..."` is a custom string literal type which takes a simplistic DSL 
+```@example intro
+query(db, q"name=davina")
+```
+ 
+The construct `q"..."` (see [`@q_str`](@ref)) is a custom string literal type which takes a simplistic DSL 
 expression which gets converted to the actual JSON-representation of a Mango selector.
-If you are familiar with Mango selectors, you can use the raw JSON expression if you
-prefer:
+If you are familiar with [Mango selectors](https://docs.cloudant.com/cloudant_query.html#selector-syntax), 
+you can use the raw JSON expression if you prefer:
 
-    query(db, Selector("{\"name\":{\"\$eq\":\"davina\"}}"))
+```@example intro
+query(db, Selector("{\"name\":{\"\$eq\":\"davina\"}}"))
+```
 
-You can also create secondary indexes, known as `views`. They are created
-using a map function written in Javascript. For example, to create a view
-on the `name` field, we could use the following:
+There are also coroutine versions of some of the functions that return data
+from views. If we had many results to process, we could use [`paged_query`](@ref)
+in a Julia Task:
 
-    make_view(db, "my_ddoc", "my_view", 
-    """
-    function(doc) {
-      if(doc && doc.name) {
-        emit(doc.name, 1);
-      }
-    }""")
+    for page in @task paged_query(db, q"name=davina"; pagesize=10)
+        # Do something with the page.docs array
+    end
 
-    Dict{UTF8String,Any} with 3 entries:
-      "ok"  => true
-      "rev" => "1-b950984b19bb1b8bb43513c9d5b235bc"
-      "id"  => "_design/my_ddoc
+This version uses the `limit` and `skip` parameters and issues an HTTP(S) request
+per page.
 
-To read from this view, use the `query_view` method:
+## Views
 
-    query_view(db, "my_ddoc", "my_view"; keys=["davina", "billy"])
+A powerful feature of CouchDB are [secondary indexes](http://docs.couchdb.org/en/1.6.1/couchapp/views/intro.html), 
+known as [views](http://guide.couchdb.org/draft/views.html). They are created using 
+a map function written most commonly in Javascript, and optionally a reduce part. For 
+example, to create a view on the `name` field, we use the following:
 
-    Dict{UTF8String,Any} with 3 entries:
-      "rows"       => Any[Dict{UTF8String,Any}("key"=>"davina","id"=>...)
-      "offset"     => 1
-      "total_rows" => 5
+```@example intro
+make_view(db, "my_ddoc", "my_view", 
+"""
+function(doc) {
+  if(doc && doc.name) {
+    emit(doc.name, 1);
+  }
+}""")
+```
 
+To read from this view, use the [`query_view`](@ref) method:
+
+```@example intro
+query_view(db, "my_ddoc", "my_view"; keys=["davina", "billy"])
+```
+
+## Using attachments
+
+CouchDB can store files alongside documents as attachments. This can be a convenient feature
+for many applications, but it has drawbacks, especially in terms of performance. If you find
+that you need to store large (say greater than a couple of meg) binary attachments, you should
+probably consider a dedicated, separate file store and only use CouchDB for metadata.
+
+To write an attachment, use [`put_attachment`](@ref), which expects an `{id, rev}` tuple referencing
+and existing document in the database and the path to the file holding the attachment:
+
+    data = createdoc(db, Dict("item" => "screenshot"))
+    result = put_attachment(db, data["id"], data["rev"], "test.png", "image/png", "data/test.png")
+
+In order to read the attachment, use [`get_attachment`](@ref), which returns an IO stream:
+
+    att = get_attachment(db, result["id"], "test.png"; rev=result["rev"])
+    open("data/fetched.png", "w") do f
+      write(f, att)
+    end
+
+If you want to delete a database, simply call [`deletedb`](@ref):
+
+```@example intro
+deletedb(client, dbname)
+```
 
 ## Client
 
@@ -161,6 +199,10 @@ Couchzilla.cookieauth!
 ```
 
 ## Database
+
+The Database type represents a client connection tied to a specific database name. This is 
+immutable, meaning that if you need to talk to several databases you need to create one Database
+type for each.
 
 ```@docs
 Couchzilla.Database
@@ -195,6 +237,12 @@ Couchzilla.deleteindex(db::Database; ddoc="", name="", indextype="")
 ```
 
 ## Attachments
+
+You can attach files to documents in CouchDB. This can occasionally be convenient,
+but using attachments has performance implications, especially when combined with 
+replication. See Cloudant's [docs](https://docs.cloudant.com/attachments.html) on 
+the subject.
+
 ```@docs
 Couchzilla.put_attachment(db::Database, id::AbstractString, rev::AbstractString, name::AbstractString, mimetype::AbstractString, file::AbstractString)
 Couchzilla.get_attachment(db::Database, id::AbstractString, name::AbstractString; rev::AbstractString = "")
@@ -202,8 +250,19 @@ Couchzilla.delete_attachment(db::Database, id::AbstractString, rev::AbstractStri
 ```
 
 ## Replication
+
+Unlike e.g. [PouchDB](https://pouchdb.com/), [CDTDatastore](https://github.com/cloudant/CDTDatastore) 
+and [sync-android](https://github.com/cloudant/sync-android), `Couchzilla` is not a replication library 
+in that it does not implement a local data store. However, you have access to all replication-related
+endpoints provided by CouchDB. The CouchDB replication algorithm is largely undocumented, but a good
+[write-up](https://github.com/couchbase/couchbase-lite-ios/wiki/Replication-Algorithm) can be found 
+in Couchbase's repo.
+
 ```@docs
 Couchzilla.changes
+Couchzilla.changes_streaming
+Couchzilla.revs_diff
+Couchzilla.bulk_get
 ```
 
 ## Utility stuff

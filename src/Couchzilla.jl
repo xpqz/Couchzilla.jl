@@ -54,6 +54,9 @@ The CouchDB API.
 ## Replication
 
 * `changes()`
+* `changes_streaming()`
+* `revs_diff()`
+* `bulk_get()`
 """
 module Couchzilla
 
@@ -75,9 +78,9 @@ include("tasks.jl")
 
 export Client, Database, HTTPException, QueryResult, Selector, @q_str
 export createdb, connect, dbinfo, listdbs, deletedb, createdoc, readdoc
-export updatedoc, deletedoc, alldocs, changes, query, createindex
+export updatedoc, deletedoc, alldocs, query, paged_query, createindex
 export and, or, nor, not, put_attachment, get_attachment, delete_attachment
 export make_view, query_view, listindexes, deleteindex
-export paged_query
+export revs_diff, changes, changes_streaming, bulk_get
 
 end # module

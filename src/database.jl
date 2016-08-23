@@ -50,7 +50,7 @@ so as to save on the HTTP overhead.
 """
 function bulkdocs(db::Database; data=[], options=Dict())
   post_url = endpoint(db.url, "_bulk_docs")
-  Requests.json(post(post_url; json=Dict("docs" => data), cookies=db.client.cookies, query=options))
+  relax(post, post_url; json=Dict("docs" => data), cookies=db.client.cookies, query=options)
 end
 
 """

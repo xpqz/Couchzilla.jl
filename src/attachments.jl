@@ -58,5 +58,5 @@ Delete an attachment.
 [API reference](https://docs.cloudant.com/attachments.html)
 """
 function delete_attachment(db::Database, id::AbstractString, rev::AbstractString, name::AbstractString)
-  Requests.json(delete(endpoint(db.url, "$id/$name"); cookies = db.client.cookies, query = Dict("rev" => rev)))
+  relax(delete, endpoint(db.url, "$id/$name"); cookies=db.client.cookies, query=Dict("rev" => rev))
 end

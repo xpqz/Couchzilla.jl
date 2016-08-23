@@ -5,10 +5,10 @@ using Base.Test
 
 username = ENV["COUCH_USER"]
 password = ENV["COUCH_PASS"]
-host     = ENV["COUCH_HOST"]
+host     = ENV["COUCH_HOST_URL"]
 
 database = "juliatest-$(Base.Random.uuid4())"
-cl = Client(username, password, "https://$host")
+cl = Client(username, password, host)
 db, created = createdb(cl, database=database)
 
 test_handler(r::Test.Success) = nothing
@@ -136,11 +136,35 @@ Test.with_handler(test_handler) do
 end
 
 Test.with_handler(test_handler) do
-  print("[  ] Changes ")
-  for ch in @task changes(db; limit=5)
-    print("*")
+  print("[  ] Streaming changes ")
+  count = 0
+  maxch = 5
+  for ch in @task changes_streaming(db; limit=maxch)
+    count += 1
   end
-  println("\r[OK] Changes ")
+  @test count == maxch + 1 # In stream mode, last item is the CouchDB "last_seq" so need to add 1.
+  println("\r[OK] Streaming changes")
+
+  print("[  ] Static changes ")
+  data = changes(db; limit=maxch)
+  @test maxch == length(data["results"]) # In static mode, "last_seq" is a key in the dict.
+  println("\r[OK] Static changes")
+
+  print("[  ] revs_diff ")
+  fakerev = "2-1f0e2f0d841ba6b7e3d735b870ebeb8c"
+  fakerevs = Dict(data["results"][1]["id"] => [data["results"][1]["changes"][1]["rev"], fakerev])
+  diff = revs_diff(db; data=fakerevs)
+  @test haskey(diff, data["results"][1]["id"])
+  @test diff[data["results"][1]["id"]]["missing"][1] == fakerev
+  println("\r[OK] revs_diff")
+
+  print("[  ] bulk_get (note: needs CouchDB2 or Cloudant DBNext) ")
+  fetchdata = [ 
+    Dict{UTF8String, UTF8String}("id" => data["results"][1]["id"], "rev" => data["results"][1]["changes"][1]["rev"]),
+  ]
+  response = bulk_get(db; data=fetchdata)
+  @test length(response["results"]) == 1
+  println("\r[OK] bulk_get (note: needs CouchDB2 or Cloudant DBNext)")
 end
 
 Test.with_handler(test_handler) do

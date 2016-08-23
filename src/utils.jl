@@ -23,11 +23,11 @@ end
 Makes an HTTP request with the relevant cookies and query strings
 and deserialises the response, assumed to be json.
 """
-function relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict())
+function relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict(), json=Dict())
   if cookies == nothing
     error("Not authenticated")
   end
-  response = fun(url_string; cookies=cookies, query=query, headers=headers)
+  response = fun(url_string; cookies=cookies, query=query, headers=headers, json=json)
   if response.status in 400:599
     request = requestfor(response)
     throw(HTTPException(response.status, Requests.json(response), string(request)))

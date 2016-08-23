@@ -78,7 +78,7 @@ function query{T<:AbstractString}(db::Database, selector::Selector;
     cquery["bookmark"] = bookmark
   end
 
-  result = Requests.json(post(endpoint(db.url, "_find"); json=cquery, cookies=db.client.cookies))
+  result = relax(post, endpoint(db.url, "_find"); json=cquery, cookies=db.client.cookies)
   QueryResult(result["docs"], haskey(result, "bookmark") ? result["bookmark"] : "")
 end
 
@@ -161,7 +161,7 @@ function createindex{T<:AbstractString}(db::Database;
     idxquery["type"] = "text"
   end
   
-  Requests.json(post(endpoint(db.url, "_index"); json=idxquery, cookies=db.client.cookies))
+  relax(post, endpoint(db.url, "_index"); json=idxquery, cookies=db.client.cookies)
 end
 
 """
