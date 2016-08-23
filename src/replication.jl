@@ -197,16 +197,16 @@ The `data` parameter is a list of `Dict`s with keys `id` and `rev`.
 
 ### Examples
 
-  result = revs_diff(db; data = [
-    Dict(
-      "id"  => "f6b40e2fdc017e7e4ec4fa88ae3a4950", 
-      "rev" => "2-1f0e2f0d841ba6b7e3d735b870ebeb8c"
-    ),
-    Dict(
-      "id"  => "2f8b7921cbcfde79fb2ff8079cada273", 
-      "rev" => "1-6c3ef2ba29b6631a01ce00f80b5b4ad3"
-    )    
-  ])
+    result = revs_diff(db; data = [
+      Dict(
+        "id"  => "f6b40e2fdc017e7e4ec4fa88ae3a4950", 
+        "rev" => "2-1f0e2f0d841ba6b7e3d735b870ebeb8c"
+      ),
+      Dict(
+        "id"  => "2f8b7921cbcfde79fb2ff8079cada273", 
+        "rev" => "1-6c3ef2ba29b6631a01ce00f80b5b4ad3"
+      )    
+    ])
 
 ### Returns
 
