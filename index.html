@@ -332,11 +332,11 @@ db, created = createdb(client; database=dbname)</code></pre>
 
 
 <pre class="codehilite"><code>5-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de960f5&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de97006&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de97d28&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de988db&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de9943f&quot;)</code></pre>
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ff9f8bc&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ffa0421&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ffa05eb&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ffa1411&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ffa2255&quot;)</code></pre>
 
 
 <p>This form of <a href=".#Couchzilla.createdoc"><code>createdoc</code></a> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
@@ -348,7 +348,7 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 4 entries:
   &quot;_rev&quot; =&gt; &quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;
   &quot;name&quot; =&gt; &quot;billy&quot;
-  &quot;_id&quot;  =&gt; &quot;97d3ea88fb77f656be8eb0d11de97006&quot;
+  &quot;_id&quot;  =&gt; &quot;3c955a5fca1e8f3b65606bc12ffa0421&quot;
   &quot;data&quot; =&gt; &quot;world&quot;</code></pre>
 
 
@@ -371,14 +371,14 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code class="language-julia">mango_query(db, q&quot;name=davina&quot;)</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de988db&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ffa1411&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>The construct <code>q"..."</code> (see <a href=".#Couchzilla.@q_str"><code>@q_str</code></a>) is a custom string literal type which takes a simplistic DSL  expression which gets converted to the actual JSON-representation of a Mango selector. If you are familiar with <a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">Mango selectors</a>,  you can use the raw JSON expression if you prefer:</p>
 <pre class="codehilite"><code class="language-julia">mango_query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de988db&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ffa1411&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>There are also coroutine versions of some of the functions that return data from views. If we had many results to process, we could use <a href=".#Couchzilla.paged_mango_query"><code>paged_mango_query</code></a> in a Julia Task:</p>
@@ -411,7 +411,7 @@ function(doc) {
 
 
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
-  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;97d3ea88fb77f…
+  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8…
   &quot;offset&quot;     =&gt; 1
   &quot;total_rows&quot; =&gt; 5</code></pre>
 
@@ -1204,12 +1204,26 @@ Dict(
 <p><a href="https://docs.cloudant.com/geo.html#querying-a-cloudant-geo-index">API reference</a></p>
 <p><a id='Utility-stuff-1'></a></p>
 <h2 id="utility-stuff">Utility stuff</h2>
+<p><a id='Couchzilla.retry_settings-Tuple{}' href='#Couchzilla.retry_settings-Tuple{}'>#</a>
+<strong><code>Couchzilla.retry_settings</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>retry_settings()</code></pre>
+
+
+<p>Return the current retry settings.</p>
+<p><a id='Couchzilla.retry_settings' href='#Couchzilla.retry_settings'>#</a>
+<strong><code>Couchzilla.retry_settings</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>retry_settings()</code></pre>
+
+
+<p>Return the current retry settings.</p>
 <p><a id='Couchzilla.relax' href='#Couchzilla.relax'>#</a>
 <strong><code>Couchzilla.relax</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict())</code></pre>
 
 
 <p>Makes an HTTP request with the relevant cookies and query strings and deserialises the response, assumed to be json.</p>
+<p>Cloudant implements request throttling based on reerved throughput capacity. Hitting a  capacity limit will return a 429 error ("Too many requests"). This is Cloudant-specific.</p>
+<p>This function can retry on 429 if this behaviour is enabled. See <code>retry_settings()</code>.</p>
 <p><a id='Couchzilla.endpoint' href='#Couchzilla.endpoint'>#</a>
 <strong><code>Couchzilla.endpoint</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>endpoint(uri::URI, path::AbstractString)</code></pre>
