@@ -230,6 +230,22 @@ If you want to delete a database, simply call [`deletedb`](@ref):
 deletedb(client, dbname)
 ```
 
+## Cloudant-specific extensions
+
+Cloudant pushes most of its stuff to upstream to [Apache CouchDB](http://couchdb.apache.org/). However, not everything Cloudant does makes sense for CouchDB, and once such example is throughput throttling. Cloudant, currently only in its Bluemix guise, prices its service in terms of provisioned throughput capacity for lookups, writes and queries. This means that you purchase a certain max number of requests per second, bucketed by type. This is similar in spirit to how other purveyors of database services price their services (e.g. [DynamoDB](https://aws.amazon.com/dynamodb/pricing/)). 
+
+When you hit capacity, Cloudant will return an error, signified by the HTTP status code 429 (`Too many requests`). This means that the request was not successful, and will need to be retried at a later stage. Couchzilla optionally gives you a way to deal with 429 errors:
+
+    retry_settings(;enabled=true, max_retries=5, delay_ms=10)
+
+This will enable the retrying of requests failed with a 429. This will try a request a maximum of 5 times, with a delay of 10 ms added cumulatively, plus a little bit of noise (randomly between 1 and 10 ms). This is a module-global setting, so will apply to all `Client`s created within the same `Julia` session.
+
+You can retrieve the current settings using:
+
+    retry_settings()
+
+Note that this behaviour is not enabled by default, and relying on it alone on a rate-capped cluster will only help with temporary transgressions – your own code must still handle the case where the max retries are exceeded.
+
 ## Client
 
 ```@docs
