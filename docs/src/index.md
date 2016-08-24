@@ -108,13 +108,13 @@ us to query the database in a (slightly) more ad-hoc fashion than using map redu
 In order to use this feature we first need to set up the necessary indexes:
 
 ```@example intro
-createindex(db; fields=["name", "data"])
+mango_index(db; fields=["name", "data"])
 ```
 
 We can now use this index to retrieve data:
 
 ```@example intro
-query(db, q"name=davina")
+mango_query(db, q"name=davina")
 ```
  
 The construct `q"..."` (see [`@q_str`](@ref)) is a custom string literal type which takes a simplistic DSL 
@@ -123,14 +123,14 @@ If you are familiar with [Mango selectors](https://docs.cloudant.com/cloudant_qu
 you can use the raw JSON expression if you prefer:
 
 ```@example intro
-query(db, Selector("{\"name\":{\"\$eq\":\"davina\"}}"))
+mango_query(db, Selector("{\"name\":{\"\$eq\":\"davina\"}}"))
 ```
 
 There are also coroutine versions of some of the functions that return data
-from views. If we had many results to process, we could use [`paged_query`](@ref)
+from views. If we had many results to process, we could use [`paged_mango_query`](@ref)
 in a Julia Task:
 
-    for page in @task paged_query(db, q"name=davina"; pagesize=10)
+    for page in @task paged_mango_query(db, q"name=davina"; pagesize=10)
         # Do something with the page.docs array
     end
 
@@ -145,7 +145,7 @@ a map function written most commonly in Javascript, and optionally a reduce part
 example, to create a view on the `name` field, we use the following:
 
 ```@example intro
-make_view(db, "my_ddoc", "my_view", 
+view_index(db, "my_ddoc", "my_view", 
 """
 function(doc) {
   if(doc && doc.name) {
@@ -154,10 +154,10 @@ function(doc) {
 }""")
 ```
 
-To read from this view, use the [`query_view`](@ref) method:
+To read from this view, use the [`view_query`](@ref) method:
 
 ```@example intro
-query_view(db, "my_ddoc", "my_view"; keys=["davina", "billy"])
+view_query(db, "my_ddoc", "my_view"; keys=["davina", "billy"])
 ```
 
 ## Using attachments
@@ -179,6 +179,50 @@ In order to read the attachment, use [`get_attachment`](@ref), which returns an 
     open("data/fetched.png", "w") do f
       write(f, att)
     end
+
+## Geospatial queries
+
+One of the fancier aspects of Cloudant is its geospatial capabilities, and Couchzilla
+provides access to this functionality. Using this it is possible to use Cloudant to 
+answer questions such as "show me all documents that fall within a given radius of a
+given point". A full description of this capability is beyond the scope of this 
+document, but Cloudant provides rich documentation on the [subject](https://docs.cloudant.com/geo.html).
+
+In order to try out the geospatial stuff using Couchzilla, we first need some data. 
+Cloudant provides an open database that you can replicate into your own account 
+[here](https://education.cloudant.com/crimes). It's a database of the locations of 
+reported crimes in the Boston area.
+
+Let's connect Couchzilla to a replica of this database, and run through the examples
+from Cloudant's geospatial tutorial [page](https://cloudant.com/using-cloudant-geospatial-tutorial/). 
+We can re-use the client from before:
+
+```@example intro
+geodb = connectdb(client; database="crimes")
+nothing; # hide
+```
+
+The database already contains the necessary geospatial indexes. Had this not been the case
+we could have indexed it using [`geo_index`](@ref).
+
+So let's list the first 20 crimes within a radius of 10,000m of the Boston State House:
+
+```@example intro
+result = geo_query(geodb, "geodd", "geoidx";
+  lat    = 42.357963,
+  lon    = -71.063991,
+  radius = 10000.0,
+  limit  = 200)
+result["rows"]
+```
+
+We can specify a polygon for the Commercial Street corridor, which should yield only two docs:
+
+```@example intro
+result = geo_query(geodb, "geodd", "geoidx";
+  g="POLYGON ((-71.0537124 42.3681995 0,-71.054399 42.3675178 0,-71.0522962 42.3667409 0,-71.051631 42.3659324 0,-71.051631 42.3621431 0,-71.0502148 42.3618577 0,-71.0505152 42.3660275 0,-71.0511589 42.3670263 0,-71.0537124 42.3681995 0))")
+result["rows"]
+```
 
 If you want to delete a database, simply call [`deletedb`](@ref):
 
@@ -216,8 +260,8 @@ Couchzilla.deletedoc(db::Database; id::AbstractString=nothing, rev::AbstractStri
 
 ## Views
 ```@docs
-Couchzilla.make_view(db::Database, ddoc::AbstractString, name::AbstractString, map::AbstractString; reduce::AbstractString = "")
-Couchzilla.query_view
+Couchzilla.view_index(db::Database, ddoc::AbstractString, name::AbstractString, map::AbstractString; reduce::AbstractString = "")
+Couchzilla.view_query
 Couchzilla.alldocs
 ```
 
@@ -229,11 +273,11 @@ Couchzilla.Selector(raw_json::AbstractString)
 Couchzilla.isempty
 Couchzilla.@q_str
 Couchzilla.QueryResult
-Couchzilla.query
-Couchzilla.paged_query
-Couchzilla.createindex
+Couchzilla.mango_query
+Couchzilla.paged_mango_query
+Couchzilla.mango_index
 Couchzilla.listindexes(db::Database)
-Couchzilla.deleteindex(db::Database; ddoc="", name="", indextype="")
+Couchzilla.mango_deleteindex(db::Database; ddoc="", name="", indextype="")
 ```
 
 ## Attachments
@@ -269,7 +313,7 @@ Couchzilla.bulk_get
 
 ```@docs
 Couchzilla.geo_index
-Couchzilla.geo_index_info
+Couchzilla.geo_indexinfo
 Couchzilla.geo_query
 ```
 

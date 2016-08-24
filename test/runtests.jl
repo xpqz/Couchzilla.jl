@@ -66,7 +66,7 @@ end
 
 Test.with_handler(test_handler) do
   print("[  ] Create a json Mango index ")
-  result = createindex(db; fields=["data", "data2"])
+  result = mango_index(db; fields=["data", "data2"])
   @test result["result"] == "created"
   println("\r[OK] Create a json Mango index")
   
@@ -86,23 +86,23 @@ Test.with_handler(test_handler) do
   println("\r[OK] Bulk load data")
     
   print("[  ] Simple Mango query (equality) ")
-  result = query(db, q"data = authenticate")
+  result = mango_query(db, q"data = authenticate")
   @test length(result.docs) == 2
   println("\r[OK] Simple Mango query (equality)")
   
   print("[  ] Compound Mango query (and) ")
-  result = query(db, and([q"data = world", q"data2 = vocabulary"]))
+  result = mango_query(db, and([q"data = world", q"data2 = vocabulary"]))
   @test length(result.docs) == 1
   @test result.docs[1]["name"] == "billy"
   println("\r[OK] Compound Mango query (and)")
   
   print("[  ] Compound Mango query (or) ")
-  result = query(db, or([q"data = world", q"data2 = region"]))
+  result = mango_query(db, or([q"data = world", q"data2 = region"]))
   @test length(result.docs) == 3
   println("\r[OK] Compound Mango query (or)")
   
   print("[  ] Create a text Mango index ")
-  textindex = createindex(db; fields=[
+  textindex = mango_index(db; fields=[
     Dict("name" => "cust",  "type" => "string"), 
     Dict("name" => "value", "type" => "string")
   ])
@@ -112,10 +112,10 @@ Test.with_handler(test_handler) do
   maxdoc = 102
   createdoc(db; data=[Dict("cust" => "john", "value" => "hello$x") for x=1:maxdoc])
   print("[  ] Mango query with multi-page return ")
-  result = query(db, q"cust=john")
+  result = mango_query(db, q"cust=john")
   count = length(result.docs)
   while length(result.docs) > 0
-    result = query(db, q"cust = john", bookmark=result.bookmark)
+    result = mango_query(db, q"cust = john", bookmark=result.bookmark)
     count += length(result.docs)
   end
   @test count == maxdoc
@@ -124,19 +124,19 @@ Test.with_handler(test_handler) do
   print("[  ] Multi-page Mango query as a Task ")
   createdoc(db; data=[Dict("data" => "paged", "data2" => "world$x") for x=1:maxdoc])
   total = 0
-  for page in @task paged_query(db, q"data = paged"; pagesize=10)
+  for page in @task paged_mango_query(db, q"data = paged"; pagesize=10)
     total += length(page.docs)
   end
   @test total == maxdoc
   println("\r[OK] Multi-page Mango query as a Task ")
 
-  print("[  ] List Mango indexes ")
+  print("[  ] List indexes ")
   result = listindexes(db)
   @test length(result["indexes"]) == 3
-  println("\r[OK] List Mango indexes")
+  println("\r[OK] List indexes")
   
   print("[  ] Delete Mango index ")
-  result = deleteindex(db; ddoc=textindex["id"], name=textindex["name"], indextype="text")
+  result = mango_deleteindex(db; ddoc=textindex["id"], name=textindex["name"], indextype="text")
   @test result["ok"] == true
   println("\r[OK] Delete Mango index")
 end
@@ -200,7 +200,7 @@ end
 
 Test.with_handler(test_handler) do
   print("[  ] Create a view ")
-  result = make_view(db, "my_ddoc", "my_view", 
+  result = view_index(db, "my_ddoc", "my_view", 
   """
   function(doc) {
     if(doc && doc.name) {
@@ -211,12 +211,12 @@ Test.with_handler(test_handler) do
   println("\r[OK] Create a view")
   
   print("[  ] Query view ")
-  result = query_view(db, "my_ddoc", "my_view"; include_docs=true, key="adam")
+  result = view_query(db, "my_ddoc", "my_view"; include_docs=true, key="adam")
   @test length(result["rows"]) == 1
   println("\r[OK] Query view")
   
   print("[  ] Query view (POST)")
-  result = query_view(db, "my_ddoc", "my_view"; keys=["adam", "billy"])
+  result = view_query(db, "my_ddoc", "my_view"; keys=["adam", "billy"])
   @test length(result["rows"]) == 2
   println("\r[OK] Query view (POST)")
 end
@@ -230,7 +230,7 @@ Test.with_handler(test_handler) do
   println("\r[OK] Create a geospatial index")
 
   print("[  ] Get geospatial index info ")
-  result = geo_index_info(db, "geodd", "geoidx")
+  result = geo_indexinfo(db, "geodd", "geoidx")
   @test haskey(result, "geo_index") == true
   println("\r[OK] Get geospatial index info")
 

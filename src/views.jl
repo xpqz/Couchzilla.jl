@@ -1,5 +1,5 @@
 """
-    result = make_view(db::Database, ddoc::AbstractString, name::AbstractString, map::AbstractString; 
+    result = view_index(db::Database, ddoc::AbstractString, name::AbstractString, map::AbstractString; 
       reduce::AbstractString = "")
 
 Create a secondary index.
@@ -13,7 +13,7 @@ reducer, e.g. `"_stats"`.
 
 ### Examples
 
-    result = make_view(db, "my_ddoc", "my_view", "function(doc){if(doc&&doc.name){emit(doc.name,1);}}")
+    result = view_index(db, "my_ddoc", "my_view", "function(doc){if(doc&&doc.name){emit(doc.name,1);}}")
     
 ### Returns
 
@@ -27,7 +27,7 @@ Returns a `Dict(...)` from the CouchDB response, of the type
 
 [API reference](https://docs.cloudant.com/creating_views.html)
 """
-function make_view(db::Database, ddoc::AbstractString, name::AbstractString, map::AbstractString; reduce::AbstractString = "")
+function view_index(db::Database, ddoc::AbstractString, name::AbstractString, map::AbstractString; reduce::AbstractString = "")
   data = Dict(
     "views"    => Dict(name => Dict("map" => map)),
     "language" => "javascript"
@@ -41,7 +41,7 @@ function make_view(db::Database, ddoc::AbstractString, name::AbstractString, map
 end
 
 """
-    result = query_view(db::Database, ddoc::AbstractString, name::AbstractString;
+    result = view_query(db::Database, ddoc::AbstractString, name::AbstractString;
       descending    = false,
       endkey        = "",
       include_docs  = false,
@@ -62,7 +62,7 @@ Query a secondary index.
 ### Examples
 
     # Query the view for a known key subset
-    result = query_view(db, "my_ddoc", "my_view"; keys=["adam", "billy"])
+    result = view_query(db, "my_ddoc", "my_view"; keys=["adam", "billy"])
 
 ### Returns
 
@@ -77,7 +77,7 @@ Query a secondary index.
 
 [API reference](https://docs.cloudant.com/using_views.html)
 """
-function query_view(db::Database, ddoc::AbstractString, name::AbstractString;
+function view_query(db::Database, ddoc::AbstractString, name::AbstractString;
   descending    = false,
   endkey        = "",
   include_docs  = false,

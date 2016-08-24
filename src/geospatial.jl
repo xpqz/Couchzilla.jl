@@ -59,13 +59,13 @@ function geo_index(db::Database, ddoc::AbstractString, name::AbstractString, ind
 end
 
 """
-    result = geo_index_info(db::Database, ddoc::AbstractString, name::AbstractString)
+    result = geo_indexinfo(db::Database, ddoc::AbstractString, name::AbstractString)
 
 Retrieve stats for a geospatial index.
 
 ### Examples
 
-    result = geo_index_info(db, "geodd", "geoidx")
+    result = geo_indexinfo(db, "geodd", "geoidx")
     
 ### Returns
 
@@ -82,7 +82,7 @@ Returns a `Dict(...)` from the CouchDB response, of the type
 
 [API reference](https://docs.cloudant.com/geo.html#obtaining-information-about-a-cloudant-geo-index)
 """
-function geo_index_info(db::Database, ddoc::AbstractString, name::AbstractString)
+function geo_indexinfo(db::Database, ddoc::AbstractString, name::AbstractString)
   relax(get, endpoint(db.url, "_design/$ddoc/_geo_info/$name"), cookies=db.client.cookies)
 end
 

@@ -1,5 +1,5 @@
 """
-    paged_query{T<:AbstractString}(db::Database, selector::Selector;
+    paged_mango_query{T<:AbstractString}(db::Database, selector::Selector;
       fields::Vector{T}          = Vector{AbstractString}(),
       sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
       pagesize                   = 100)
@@ -10,20 +10,20 @@ intermediate results. This is a wrapper around `query()` using the
 
 ### Examples
 
-    for page in @task paged_query(db, q"data = ..."; pagesize=10)
+    for page in @task paged_mango_query(db, q"data = ..."; pagesize=10)
       for doc in page.docs
         # ... 
       end
     end
 """
-function paged_query{T<:AbstractString}(db::Database, selector::Selector;
+function paged_mango_query{T<:AbstractString}(db::Database, selector::Selector;
   fields::Vector{T}          = Vector{AbstractString}(),
   sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
   pagesize                   = 100)
 
   skip = 0
   while true
-    result = query(db, selector; fields=fields, sort=sort, skip=skip, limit=pagesize)
+    result = mango_query(db, selector; fields=fields, sort=sort, skip=skip, limit=pagesize)
     skip += pagesize
     if length(result.docs) == 0
       break

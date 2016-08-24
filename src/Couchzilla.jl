@@ -34,21 +34,21 @@ The CouchDB API.
 
 ## Mango/Cloudant Query
 
-* `createindex()`
-* `query()`
+* `mango_index()`
+* `mango_query()`
+* `paged_mango_query()`
 * `listindexes()`
-* `deleteindex()`
+* `mango_deleteindex()`
 * `and()`
 * `or()`
 * `nor()`
 * `not()`
 * `@q_str()`
-* `paged_query()`
 
 ## Views
 
-* `make_view()`
-* `query_view()`
+* `view_index()`
+* `view_query()`
 * `alldocs()`
 
 ## Replication
@@ -57,6 +57,12 @@ The CouchDB API.
 * `changes_streaming()`
 * `revs_diff()`
 * `bulk_get()`
+
+## Geospatial
+
+* `geo_index()`
+* `geo_indexinfo()`
+* `geo_query()`
 """
 module Couchzilla
 
@@ -77,12 +83,14 @@ include("views.jl")
 include("tasks.jl")
 include("geospatial.jl")
 
-export Client, Database, HTTPException, QueryResult, Selector, @q_str
-export createdb, connectdb, dbinfo, listdbs, deletedb, createdoc, readdoc
-export updatedoc, deletedoc, alldocs, query, paged_query, createindex
-export and, or, nor, not, put_attachment, get_attachment, delete_attachment
-export make_view, query_view, listindexes, deleteindex
+export Client, Database, HTTPException 
+export createdb, connectdb, dbinfo, listdbs, deletedb
+export updatedoc, deletedoc, createdoc, readdoc
+export put_attachment, get_attachment, delete_attachment
+export QueryResult, Selector, @q_str, and, or, nor, not
+export mango_query, mango_index, listindexes, mango_deleteindex, paged_mango_query
+export view_index, view_query, alldocs
 export revs_diff, changes, changes_streaming, bulk_get
-export geo_index, geo_index_info, geo_query
+export geo_index, geo_indexinfo, geo_query
 
 end # module

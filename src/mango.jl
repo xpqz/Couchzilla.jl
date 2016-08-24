@@ -24,7 +24,7 @@ type QueryResult
 end
 
 """
-    result = query{T<:AbstractString}(db::Database, selector::Selector;
+    result = mango_query{T<:AbstractString}(db::Database, selector::Selector;
       fields::Vector{T}          = Vector{AbstractString}(),
       sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
       limit                      = 0,
@@ -42,7 +42,7 @@ Find all documents where "year" is greater than 2010, returning
 the fields `_id`, `_rev`, `year` and `title`, sorted in ascending order 
 on `year`. Set the page size to 10.
 
-    result = query(db, q"year > 2010";
+    result = mango_query(db, q"year > 2010";
       fields = ["_id", "_rev", "year", "title"],
       sort   = [Dict("year" => "asc")],
       limit  = 10)
@@ -54,7 +54,7 @@ on `year`. Set the page size to 10.
 * [API reference](https://docs.cloudant.com/cloudant_query.html)
 * [Cloudant Query blog post](https://cloudant.com/blog/cloudant-query-grows-up-to-handle-ad-hoc-queries/)
 """
-function query{T<:AbstractString}(db::Database, selector::Selector;
+function mango_query{T<:AbstractString}(db::Database, selector::Selector;
   fields::Vector{T}          = Vector{AbstractString}(),
   sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
   limit                      = 0,
@@ -83,7 +83,7 @@ function query{T<:AbstractString}(db::Database, selector::Selector;
 end
 
 """
-    result = createindex{T<:AbstractString}(db::Database; 
+    result = mango_index{T<:AbstractString}(db::Database; 
       name::T       = "",
       ddoc::T       = "",
       fields        = Vector{T}(), 
@@ -100,16 +100,16 @@ will be assumed to be `"text"` if the data in the `fields` array are `Dict`s.
 
 * Make a text index
 
-    result = createindex(db; ddoc="my-ddoc", fields=[Dict("name"=>"lastname", "type"=>"string")], 
+    result = mango_index(db; ddoc="my-ddoc", fields=[Dict("name"=>"lastname", "type"=>"string")], 
       default_field=Dict("analyzer" => "german", "enabled" => true))
 
 * Make a json index
 
-  result = createindex(db; fields=["data", "data2"])
+  result = mango_index(db; fields=["data", "data2"])
 
 ### Returns
 
-`createindex()` returns a `Dict(...)` version of the CouchDB response, of the type
+`mango_index()` returns a `Dict(...)` version of the CouchDB response, of the type
 
     Dict(
       "name"   => "e7d18f69aa0deaa1ffcdf8f705895b61515a6bf6",
@@ -119,7 +119,7 @@ will be assumed to be `"text"` if the data in the `fields` array are `Dict`s.
 
 [API reference](https://docs.cloudant.com/cloudant_query.html#creating-an-index)
 """
-function createindex{T<:AbstractString}(db::Database; 
+function mango_index{T<:AbstractString}(db::Database; 
   name::T       = "",
   ddoc::T       = "",
   fields        = Vector{T}(), 
@@ -167,9 +167,8 @@ end
 """
     result = listindexes(db::Database)
 
-List all existing indexes for the database. Note that this includes indexes not created 
-via the `createindex()` function, such as the primary index and secondary indexes created 
-as map-reduce views.
+List all existing indexes for the database. This includes views, mango and geo indexes in
+addition to the primary index.
 
 ### Returns
 
@@ -211,7 +210,7 @@ function listindexes(db::Database)
 end
 
 """
-    result = deleteindex(db::Database; ddoc="", name="", indextype="")
+    result = mango_deleteindex(db::Database; ddoc="", name="", indextype="")
     
 Delete a query index given its ddoc, index name and index type.
 
@@ -219,13 +218,13 @@ Indextype is either "text" or "json".
 
 ### Returns
 
-`deleteindex()` returns a `Dict(...)` version of the CouchDB response:
+`mango_deleteindex()` returns a `Dict(...)` version of the CouchDB response:
 
     Dict("ok" => true)
 
 [API reference](https://docs.cloudant.com/cloudant_query.html#deleting-an-index)
 """
-function deleteindex(db::Database; ddoc="", name="", indextype="")
+function mango_deleteindex(db::Database; ddoc="", name="", indextype="")
   if indextype ∉ ["json", "text"]
     error("Bad indextype: $indextype")
   end
