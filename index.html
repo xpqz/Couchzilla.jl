@@ -213,6 +213,12 @@
             </li>
           
             <li class="anchor">
+              <a title="Cloudant-specific extensions" href="#cloudant-specific-extensions">
+                Cloudant-specific extensions
+              </a>
+            </li>
+          
+            <li class="anchor">
               <a title="Client" href="#client">
                 Client
               </a>
@@ -332,11 +338,11 @@ db, created = createdb(client; database=dbname)</code></pre>
 
 
 <pre class="codehilite"><code>5-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ff9f8bc&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ffa0421&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ffa05eb&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ffa1411&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ffa2255&quot;)</code></pre>
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb893501782a0&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb893501787a0&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350178d63&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350179768&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350179955&quot;)</code></pre>
 
 
 <p>This form of <a href=".#Couchzilla.createdoc"><code>createdoc</code></a> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
@@ -348,7 +354,7 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 4 entries:
   &quot;_rev&quot; =&gt; &quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;
   &quot;name&quot; =&gt; &quot;billy&quot;
-  &quot;_id&quot;  =&gt; &quot;3c955a5fca1e8f3b65606bc12ffa0421&quot;
+  &quot;_id&quot;  =&gt; &quot;78891cd5ef4ae33d834fb893501787a0&quot;
   &quot;data&quot; =&gt; &quot;world&quot;</code></pre>
 
 
@@ -371,14 +377,14 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code class="language-julia">mango_query(db, q&quot;name=davina&quot;)</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ffa1411&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350179768&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>The construct <code>q"..."</code> (see <a href=".#Couchzilla.@q_str"><code>@q_str</code></a>) is a custom string literal type which takes a simplistic DSL  expression which gets converted to the actual JSON-representation of a Mango selector. If you are familiar with <a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">Mango selectors</a>,  you can use the raw JSON expression if you prefer:</p>
 <pre class="codehilite"><code class="language-julia">mango_query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12ffa1411&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;78891cd5ef4ae33d834fb89350179768&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>There are also coroutine versions of some of the functions that return data from views. If we had many results to process, we could use <a href=".#Couchzilla.paged_mango_query"><code>paged_mango_query</code></a> in a Julia Task:</p>
@@ -411,7 +417,7 @@ function(doc) {
 
 
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
-  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8…
+  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;78891cd5ef4ae…
   &quot;offset&quot;     =&gt; 1
   &quot;total_rows&quot; =&gt; 5</code></pre>
 
@@ -491,6 +497,19 @@ result[&quot;rows&quot;]</code></pre>
   &quot;ok&quot; =&gt; true</code></pre>
 
 
+<p><a id='Cloudant-specific-extensions-1'></a></p>
+<h2 id="cloudant-specific-extensions">Cloudant-specific extensions</h2>
+<p>Cloudant pushes most of its stuff to upstream to <a href="http://couchdb.apache.org/">Apache CouchDB</a>. However, not everything Cloudant does makes sense for CouchDB, and once such example is throughput throttling. Cloudant, currently only in its Bluemix guise, prices its service in terms of provisioned throughput capacity for lookups, writes and queries. This means that you purchase a certain max number of requests per second, bucketed by type. This is similar in spirit to how other purveyors of database services price their services (e.g. <a href="https://aws.amazon.com/dynamodb/pricing/">DynamoDB</a>). </p>
+<p>When you hit capacity, Cloudant will return an error, signified by the HTTP status code 429 (<code>Too many requests</code>). This means that the request was not successful, and will need to be retried at a later stage. Couchzilla optionally gives you a way to deal with 429 errors:</p>
+<pre class="codehilite"><code>retry_settings(;enabled=true, max_retries=5, delay_ms=10)</code></pre>
+
+
+<p>This will enable the retrying of requests failed with a 429. This will try a request a maximum of 5 times, with a delay of 10 ms added cumulatively, plus a little bit of noise (randomly between 1 and 10 ms). This is a module-global setting, so will apply to all <code>Client</code>s created within the same <code>Julia</code> session.</p>
+<p>You can retrieve the current settings using:</p>
+<pre class="codehilite"><code>retry_settings()</code></pre>
+
+
+<p>Note that this behaviour is not enabled by default, and relying on it alone on a rate-capped cluster will only help with temporary transgressions – your own code must still handle the case where the max retries are exceeded.</p>
 <p><a id='Client-1'></a></p>
 <h2 id="client">Client</h2>
 <p><a id='Couchzilla.Client' href='#Couchzilla.Client'>#</a>
