@@ -4,6 +4,8 @@ Couchzilla – CouchDB/Cloudant access for Julians.
 
 Documentation can be found on [http://xpqz.github.io/couchzilla](http://xpqz.github.io/couchzilla)
 
+The README here is a short extract from the main documentation; it may be out of date. 
+
 ## Getting Started
 
 Couchzilla defines two types, `Client` and `Database`. `Client` represents an authenticated 
@@ -67,7 +69,7 @@ which returns the winning revision for the given `id` as a `Dict`:
 In order to use the new Mango/Cloudant Query language to interact with the database
 we first need to create an index:
 
-    createindex(db; fields=["name", "data"])
+    mango_index(db; fields=["name", "data"])
 
     Dict{UTF8String,Any} with 3 entries:
       "name"   => "f519be04f7f80838b6a88811f75de4fb83d966dd"
@@ -76,7 +78,7 @@ we first need to create an index:
 
 We can now use this index to retrieve data:
 
-    query(db, q"name=davina")
+    mango_query(db, q"name=davina")
 
     Couchzilla.QueryResult([Dict{AbstractString,Any}(
       "_rev"=>"1-4..3f",
@@ -89,13 +91,13 @@ expression which gets converted to the actual JSON-representation of a Mango sel
 If you are familiar with Mango selectors, you can use the raw JSON expression if you
 prefer:
 
-    query(db, Selector("{\"name\":{\"\$eq\":\"davina\"}}"))
+    mango_query(db, Selector("{\"name\":{\"\$eq\":\"davina\"}}"))
 
 You can also create secondary indexes, known as `views`. They are created
 using a map function written in Javascript. For example, to create a view
 on the `name` field, we could use the following:
 
-    make_view(db, "my_ddoc", "my_view", 
+    view_index(db, "my_ddoc", "my_view", 
     """
     function(doc) {
       if(doc && doc.name) {
@@ -110,7 +112,7 @@ on the `name` field, we could use the following:
 
 To read from this view, use the `query_view` method:
 
-    query_view(db, "my_ddoc", "my_view"; keys=["davina", "billy"])
+    view_query(db, "my_ddoc", "my_view"; keys=["davina", "billy"])
 
     Dict{UTF8String,Any} with 3 entries:
       "rows"       => Any[Dict{UTF8String,Any}("key"=>"davina","id"=>...)
