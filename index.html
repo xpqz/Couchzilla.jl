@@ -332,11 +332,11 @@ db, created = createdb(client; database=dbname)</code></pre>
 
 
 <pre class="codehilite"><code>5-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fece4fa&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fecf24c&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fed01e7&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fed0b1e&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fed17e6&quot;)</code></pre>
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de960f5&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de97006&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de97d28&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de988db&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de9943f&quot;)</code></pre>
 
 
 <p>This form of <a href=".#Couchzilla.createdoc"><code>createdoc</code></a> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
@@ -348,7 +348,7 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 4 entries:
   &quot;_rev&quot; =&gt; &quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;
   &quot;name&quot; =&gt; &quot;billy&quot;
-  &quot;_id&quot;  =&gt; &quot;3c955a5fca1e8f3b65606bc12fecf24c&quot;
+  &quot;_id&quot;  =&gt; &quot;97d3ea88fb77f656be8eb0d11de97006&quot;
   &quot;data&quot; =&gt; &quot;world&quot;</code></pre>
 
 
@@ -358,7 +358,7 @@ readdoc(db, id)</code></pre>
 <h2 id="query">Query</h2>
 <p><code>Mango</code> (also known as <a href="https://docs.cloudant.com/cloudant_query.html">Cloudant Query</a>) is  a declarative query language inspired by <a href="https://docs.mongodb.com/">MongoDB</a>. It allows us to query the database in a (slightly) more ad-hoc fashion than using map reduce views.</p>
 <p>In order to use this feature we first need to set up the necessary indexes:</p>
-<pre class="codehilite"><code class="language-julia">createindex(db; fields=[&quot;name&quot;, &quot;data&quot;])</code></pre>
+<pre class="codehilite"><code class="language-julia">mango_index(db; fields=[&quot;name&quot;, &quot;data&quot;])</code></pre>
 
 
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
@@ -368,21 +368,21 @@ readdoc(db, id)</code></pre>
 
 
 <p>We can now use this index to retrieve data:</p>
-<pre class="codehilite"><code class="language-julia">query(db, q&quot;name=davina&quot;)</code></pre>
+<pre class="codehilite"><code class="language-julia">mango_query(db, q&quot;name=davina&quot;)</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fed0b1e&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de988db&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>The construct <code>q"..."</code> (see <a href=".#Couchzilla.@q_str"><code>@q_str</code></a>) is a custom string literal type which takes a simplistic DSL  expression which gets converted to the actual JSON-representation of a Mango selector. If you are familiar with <a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">Mango selectors</a>,  you can use the raw JSON expression if you prefer:</p>
-<pre class="codehilite"><code class="language-julia">query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
+<pre class="codehilite"><code class="language-julia">mango_query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;3c955a5fca1e8f3b65606bc12fed0b1e&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;97d3ea88fb77f656be8eb0d11de988db&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
-<p>There are also coroutine versions of some of the functions that return data from views. If we had many results to process, we could use <a href=".#Couchzilla.paged_query"><code>paged_query</code></a> in a Julia Task:</p>
-<pre class="codehilite"><code>for page in @task paged_query(db, q&quot;name=davina&quot;; pagesize=10)
+<p>There are also coroutine versions of some of the functions that return data from views. If we had many results to process, we could use <a href=".#Couchzilla.paged_mango_query"><code>paged_mango_query</code></a> in a Julia Task:</p>
+<pre class="codehilite"><code>for page in @task paged_mango_query(db, q&quot;name=davina&quot;; pagesize=10)
     # Do something with the page.docs array
 end</code></pre>
 
@@ -391,7 +391,7 @@ end</code></pre>
 <p><a id='Views-1'></a></p>
 <h2 id="views">Views</h2>
 <p>A powerful feature of CouchDB are <a href="http://docs.couchdb.org/en/1.6.1/couchapp/views/intro.html">secondary indexes</a>,  known as <a href="http://guide.couchdb.org/draft/views.html">views</a>. They are created using  a map function written most commonly in Javascript, and optionally a reduce part. For  example, to create a view on the <code>name</code> field, we use the following:</p>
-<pre class="codehilite"><code class="language-julia">make_view(db, &quot;my_ddoc&quot;, &quot;my_view&quot;,
+<pre class="codehilite"><code class="language-julia">view_index(db, &quot;my_ddoc&quot;, &quot;my_view&quot;,
 &quot;&quot;&quot;
 function(doc) {
   if(doc &amp;&amp; doc.name) {
@@ -406,12 +406,12 @@ function(doc) {
   &quot;id&quot;  =&gt; &quot;_design/my_ddoc&quot;</code></pre>
 
 
-<p>To read from this view, use the <a href=".#Couchzilla.query_view"><code>query_view</code></a> method:</p>
-<pre class="codehilite"><code class="language-julia">query_view(db, &quot;my_ddoc&quot;, &quot;my_view&quot;; keys=[&quot;davina&quot;, &quot;billy&quot;])</code></pre>
+<p>To read from this view, use the <a href=".#Couchzilla.view_query"><code>view_query</code></a> method:</p>
+<pre class="codehilite"><code class="language-julia">view_query(db, &quot;my_ddoc&quot;, &quot;my_view&quot;; keys=[&quot;davina&quot;, &quot;billy&quot;])</code></pre>
 
 
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
-  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;3c955a5fca1e8…
+  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;97d3ea88fb77f…
   &quot;offset&quot;     =&gt; 1
   &quot;total_rows&quot; =&gt; 5</code></pre>
 
@@ -433,7 +433,7 @@ end</code></pre>
 
 <p><a id='Geospatial-queries-1'></a></p>
 <h2 id="geospatial-queries">Geospatial queries</h2>
-<p>One of the fancier aspects of Cloudant is its geospatial capabilities, and Couchzilla provides access to this functionality. Using this it is possible to use Cloudant to  answer questions such as "show me all documents that fall within a given radius of a given point". A full description of this capability is beyond the scope of this  document, but Cloudand provides rich documentation on the <a href="https://docs.cloudant.com/geo.html">subject</a>.</p>
+<p>One of the fancier aspects of Cloudant is its geospatial capabilities, and Couchzilla provides access to this functionality. Using this it is possible to use Cloudant to  answer questions such as "show me all documents that fall within a given radius of a given point". A full description of this capability is beyond the scope of this  document, but Cloudant provides rich documentation on the <a href="https://docs.cloudant.com/geo.html">subject</a>.</p>
 <p>In order to try out the geospatial stuff using Couchzilla, we first need some data.  Cloudant provides an open database that you can replicate into your own account  <a href="https://education.cloudant.com/crimes">here</a>. It's a database of the locations of  reported crimes in the Boston area.</p>
 <p>Let's connect Couchzilla to a replica of this database, and run through the examples from Cloudant's geospatial tutorial <a href="https://cloudant.com/using-cloudant-geospatial-tutorial/">page</a>.  We can re-use the client from before:</p>
 <pre class="codehilite"><code class="language-julia">geodb = connectdb(client; database=&quot;crimes&quot;)</code></pre>
@@ -630,9 +630,9 @@ db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs">API reference</a></p>
 <p><a id='Views-2'></a></p>
 <h2 id="views_1">Views</h2>
-<p><a id='Couchzilla.make_view-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}' href='#Couchzilla.make_view-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}'>#</a>
-<strong><code>Couchzilla.make_view</code></strong> &mdash; <em>Method</em>.</p>
-<pre class="codehilite"><code>result = make_view(db::Database, ddoc::AbstractString, name::AbstractString, map::AbstractString; 
+<p><a id='Couchzilla.view_index-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}' href='#Couchzilla.view_index-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}'>#</a>
+<strong><code>Couchzilla.view_index</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = view_index(db::Database, ddoc::AbstractString, name::AbstractString, map::AbstractString; 
   reduce::AbstractString = &quot;&quot;)</code></pre>
 
 
@@ -640,7 +640,7 @@ db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
 <p>The <code>map</code> is a string containing a map function in Javascript. Currently, <code>make_view</code>  can only create a single view per design document.</p>
 <p>The optional <code>reduce</code> parameter is a string containing either a custom Javascript reducer (best avoided for performance reasons) or the name of a built-in Erlang  reducer, e.g. <code>"_stats"</code>.</p>
 <p><strong>Examples</strong></p>
-<pre class="codehilite"><code>result = make_view(db, &quot;my_ddoc&quot;, &quot;my_view&quot;, &quot;function(doc){if(doc&amp;&amp;doc.name){emit(doc.name,1);}}&quot;)</code></pre>
+<pre class="codehilite"><code>result = view_index(db, &quot;my_ddoc&quot;, &quot;my_view&quot;, &quot;function(doc){if(doc&amp;&amp;doc.name){emit(doc.name,1);}}&quot;)</code></pre>
 
 
 <p><strong>Returns</strong></p>
@@ -653,9 +653,9 @@ db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
 
 
 <p><a href="https://docs.cloudant.com/creating_views.html">API reference</a></p>
-<p><a id='Couchzilla.query_view' href='#Couchzilla.query_view'>#</a>
-<strong><code>Couchzilla.query_view</code></strong> &mdash; <em>Function</em>.</p>
-<pre class="codehilite"><code>result = query_view(db::Database, ddoc::AbstractString, name::AbstractString;
+<p><a id='Couchzilla.view_query' href='#Couchzilla.view_query'>#</a>
+<strong><code>Couchzilla.view_query</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>result = view_query(db::Database, ddoc::AbstractString, name::AbstractString;
   descending    = false,
   endkey        = &quot;&quot;,
   include_docs  = false,
@@ -675,7 +675,7 @@ db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
 <p>Query a secondary index.</p>
 <p><strong>Examples</strong></p>
 <pre class="codehilite"><code># Query the view for a known key subset
-result = query_view(db, &quot;my_ddoc&quot;, &quot;my_view&quot;; keys=[&quot;adam&quot;, &quot;billy&quot;])</code></pre>
+result = view_query(db, &quot;my_ddoc&quot;, &quot;my_view&quot;; keys=[&quot;adam&quot;, &quot;billy&quot;])</code></pre>
 
 
 <p><strong>Returns</strong></p>
@@ -792,9 +792,9 @@ end</code></pre>
 
 <p>Returned by <code>query(...)</code>.</p>
 <p><code>bookmark</code> is only relevant when querying indexes of type <code>text</code>.</p>
-<p><a id='Couchzilla.query' href='#Couchzilla.query'>#</a>
-<strong><code>Couchzilla.query</code></strong> &mdash; <em>Function</em>.</p>
-<pre class="codehilite"><code>result = query{T&lt;:AbstractString}(db::Database, selector::Selector;
+<p><a id='Couchzilla.mango_query' href='#Couchzilla.mango_query'>#</a>
+<strong><code>Couchzilla.mango_query</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>result = mango_query{T&lt;:AbstractString}(db::Database, selector::Selector;
   fields::Vector{T}          = Vector{AbstractString}(),
   sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
   limit                      = 0,
@@ -806,7 +806,7 @@ end</code></pre>
 <p>See the <code>Selector</code> type and the associated <code>q"..."</code> custom string literal which implements a simplified DSL for writing selectors.</p>
 <p><strong>Examples</strong></p>
 <p>Find all documents where "year" is greater than 2010, returning  the fields <code>_id</code>, <code>_rev</code>, <code>year</code> and <code>title</code>, sorted in ascending order  on <code>year</code>. Set the page size to 10.</p>
-<pre class="codehilite"><code>result = query(db, q&quot;year &gt; 2010&quot;;
+<pre class="codehilite"><code>result = mango_query(db, q&quot;year &gt; 2010&quot;;
   fields = [&quot;_id&quot;, &quot;_rev&quot;, &quot;year&quot;, &quot;title&quot;],
   sort   = [Dict(&quot;year&quot; =&gt; &quot;asc&quot;)],
   limit  = 10)</code></pre>
@@ -820,9 +820,9 @@ end</code></pre>
 <li><a href="https://docs.cloudant.com/cloudant_query.html">API reference</a></li>
 <li><a href="https://cloudant.com/blog/cloudant-query-grows-up-to-handle-ad-hoc-queries/">Cloudant Query blog post</a></li>
 </ul>
-<p><a id='Couchzilla.paged_query' href='#Couchzilla.paged_query'>#</a>
-<strong><code>Couchzilla.paged_query</code></strong> &mdash; <em>Function</em>.</p>
-<pre class="codehilite"><code>paged_query{T&lt;:AbstractString}(db::Database, selector::Selector;
+<p><a id='Couchzilla.paged_mango_query' href='#Couchzilla.paged_mango_query'>#</a>
+<strong><code>Couchzilla.paged_mango_query</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>paged_mango_query{T&lt;:AbstractString}(db::Database, selector::Selector;
   fields::Vector{T}          = Vector{AbstractString}(),
   sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
   pagesize                   = 100)</code></pre>
@@ -830,16 +830,16 @@ end</code></pre>
 
 <p>Perform multiple HTTP requests against a JSON-type index producing the  intermediate results. This is a wrapper around <code>query()</code> using the  <code>skip</code> and <code>limit</code> parameters.</p>
 <p><strong>Examples</strong></p>
-<pre class="codehilite"><code>for page in @task paged_query(db, q&quot;data = ...&quot;; pagesize=10)
+<pre class="codehilite"><code>for page in @task paged_mango_query(db, q&quot;data = ...&quot;; pagesize=10)
   for doc in page.docs
     # ... 
   end
 end</code></pre>
 
 
-<p><a id='Couchzilla.createindex' href='#Couchzilla.createindex'>#</a>
-<strong><code>Couchzilla.createindex</code></strong> &mdash; <em>Function</em>.</p>
-<pre class="codehilite"><code>result = createindex{T&lt;:AbstractString}(db::Database; 
+<p><a id='Couchzilla.mango_index' href='#Couchzilla.mango_index'>#</a>
+<strong><code>Couchzilla.mango_index</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>result = mango_index{T&lt;:AbstractString}(db::Database; 
   name::T       = &quot;&quot;,
   ddoc::T       = &quot;&quot;,
   fields        = Vector{T}(), 
@@ -853,16 +853,16 @@ end</code></pre>
 <ul>
 <li>Make a text index</li>
 </ul>
-<pre class="codehilite"><code>result = createindex(db; ddoc=&quot;my-ddoc&quot;, fields=[Dict(&quot;name&quot;=&gt;&quot;lastname&quot;, &quot;type&quot;=&gt;&quot;string&quot;)], 
+<pre class="codehilite"><code>result = mango_index(db; ddoc=&quot;my-ddoc&quot;, fields=[Dict(&quot;name&quot;=&gt;&quot;lastname&quot;, &quot;type&quot;=&gt;&quot;string&quot;)], 
   default_field=Dict(&quot;analyzer&quot; =&gt; &quot;german&quot;, &quot;enabled&quot; =&gt; true))</code></pre>
 
 
 <ul>
 <li>Make a json index</li>
 </ul>
-<p>result = createindex(db; fields=["data", "data2"])</p>
+<p>result = mango_index(db; fields=["data", "data2"])</p>
 <p><strong>Returns</strong></p>
-<p><code>createindex()</code> returns a <code>Dict(...)</code> version of the CouchDB response, of the type</p>
+<p><code>mango_index()</code> returns a <code>Dict(...)</code> version of the CouchDB response, of the type</p>
 <pre class="codehilite"><code>Dict(
   &quot;name&quot;   =&gt; &quot;e7d18f69aa0deaa1ffcdf8f705895b61515a6bf6&quot;,
   &quot;id&quot;     =&gt; &quot;_design/e7d18f69aa0deaa1ffcdf8f705895b61515a6bf6&quot;,
@@ -876,7 +876,7 @@ end</code></pre>
 <pre class="codehilite"><code>result = listindexes(db::Database)</code></pre>
 
 
-<p>List all existing indexes for the database. Note that this includes indexes not created  via the <code>createindex()</code> function, such as the primary index and secondary indexes created  as map-reduce views.</p>
+<p>List all existing indexes for the database. This includes views, mango and geo indexes in addition to the primary index.</p>
 <p><strong>Returns</strong></p>
 <p><code>listindexes()</code> returns a <code>Dict(...)</code> version of the CouchDB response:</p>
 <pre class="codehilite"><code>Dict(
@@ -910,15 +910,15 @@ end</code></pre>
 
 
 <p><a href="https://docs.cloudant.com/cloudant_query.html#list-all-cloudant-query-indexes">API reference</a></p>
-<p><a id='Couchzilla.deleteindex-Tuple{Couchzilla.Database}' href='#Couchzilla.deleteindex-Tuple{Couchzilla.Database}'>#</a>
-<strong><code>Couchzilla.deleteindex</code></strong> &mdash; <em>Method</em>.</p>
-<pre class="codehilite"><code>result = deleteindex(db::Database; ddoc=&quot;&quot;, name=&quot;&quot;, indextype=&quot;&quot;)</code></pre>
+<p><a id='Couchzilla.mango_deleteindex-Tuple{Couchzilla.Database}' href='#Couchzilla.mango_deleteindex-Tuple{Couchzilla.Database}'>#</a>
+<strong><code>Couchzilla.mango_deleteindex</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = mango_deleteindex(db::Database; ddoc=&quot;&quot;, name=&quot;&quot;, indextype=&quot;&quot;)</code></pre>
 
 
 <p>Delete a query index given its ddoc, index name and index type.</p>
 <p>Indextype is either "text" or "json".</p>
 <p><strong>Returns</strong></p>
-<p><code>deleteindex()</code> returns a <code>Dict(...)</code> version of the CouchDB response:</p>
+<p><code>mango_deleteindex()</code> returns a <code>Dict(...)</code> version of the CouchDB response:</p>
 <pre class="codehilite"><code>Dict(&quot;ok&quot; =&gt; true)</code></pre>
 
 
@@ -1114,14 +1114,14 @@ Dict(
 
 
 <p><a href="https://docs.cloudant.com/geo.html">API reference</a></p>
-<p><a id='Couchzilla.geo_index_info' href='#Couchzilla.geo_index_info'>#</a>
-<strong><code>Couchzilla.geo_index_info</code></strong> &mdash; <em>Function</em>.</p>
-<pre class="codehilite"><code>result = geo_index_info(db::Database, ddoc::AbstractString, name::AbstractString)</code></pre>
+<p><a id='Couchzilla.geo_indexinfo' href='#Couchzilla.geo_indexinfo'>#</a>
+<strong><code>Couchzilla.geo_indexinfo</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>result = geo_indexinfo(db::Database, ddoc::AbstractString, name::AbstractString)</code></pre>
 
 
 <p>Retrieve stats for a geospatial index.</p>
 <p><strong>Examples</strong></p>
-<pre class="codehilite"><code>result = geo_index_info(db, &quot;geodd&quot;, &quot;geoidx&quot;)</code></pre>
+<pre class="codehilite"><code>result = geo_indexinfo(db, &quot;geodd&quot;, &quot;geoidx&quot;)</code></pre>
 
 
 <p><strong>Returns</strong></p>
