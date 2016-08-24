@@ -319,6 +319,8 @@ Couchzilla.geo_query
 
 ## Utility stuff
 ```@docs
+Couchzilla.retry_settings(;enabled=false, max_retries=5, delay_ms=10)
+Couchzilla.retry_settings
 Couchzilla.relax
 Couchzilla.endpoint
 ```
