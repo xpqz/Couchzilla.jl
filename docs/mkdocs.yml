@@ -1,5 +1,5 @@
 site_name:           Couchzilla
-repo_url:            https://github.com/xpqz/couchzilla
+repo_url:            https://github.com/xpqz/Couchzilla.jl.git
 site_description:    A client library for CouchDB/Cloudant in Julia
 site_author:         Stefan Kruger
 theme:               material
