@@ -9,6 +9,6 @@ julia:
 notifications:
   email: false
 
-script:
-  - julia -e 'Pkg.clone(pwd())'
-  - julia -e 'Pkg.test("Couchzilla",coverage=true)'
+# script:
+#   - julia -e 'Pkg.clone(pwd())'
+#   - julia -e 'Pkg.test("Couchzilla",coverage=true)'
