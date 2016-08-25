@@ -2,6 +2,7 @@
 
 export COUCH_USER='mycouchusername'
 export COUCH_PASS='mycouchpass'
-export COUCH_HOST='mycouchusername.cloudant.com'
+export COUCH_HOST_URL='https://mycouchusername.cloudant.com'
+export COUCH_GEO_DATABASE='mygeodatabasename'
 
 $@
