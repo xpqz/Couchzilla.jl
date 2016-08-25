@@ -1,5 +1,7 @@
 # Couchzilla
 
+[![Build Status](https://travis-ci.org/xpqz/Couchzilla.jl.svg?branch=master)](https://travis-ci.org/xpqz/Couchzilla.jl)
+
 Couchzilla – CouchDB/Cloudant access for Julians.
 
 Documentation can be found on [http://xpqz.github.io/couchzilla](http://xpqz.github.io/couchzilla)
