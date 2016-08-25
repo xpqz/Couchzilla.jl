@@ -11,5 +11,5 @@ notifications:
 # uncomment the following lines to override the default test script
 script:
 #  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia -e 'Pkg.clone(pwd())'
-  - julia -e 'Pkg.test("Couchzilla",coverage=true)'
+  - julia -e 'Pkg.clone(pwd());'
+  - julia -e 'cd(Pkg.dir(pwd())); Pkg.test("Couchzilla", coverage=true)'
