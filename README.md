@@ -4,7 +4,7 @@
 
 Couchzilla – CouchDB/Cloudant access for Julians.
 
-Documentation can be found on [http://xpqz.github.io/couchzilla](http://xpqz.github.io/couchzilla)
+Documentation can be found on [http://xpqz.github.io/Couchzilla.jl](http://xpqz.github.io/Couchzilla.jl)
 
 The README here is a short extract from the main documentation; it may be out of date. 
 
