@@ -78,6 +78,7 @@ function relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict(), j
     if response.status == 429 && settings["enabled"]
       tries += 1
       if tries > settings["max_retries"]
+        request = requestfor(response)
         throw(HTTPException(response.status, Requests.json(response), string(request)))
       end
       sleep((tries * settings["delay_ms"] + rand(1:10))/1000.0)
