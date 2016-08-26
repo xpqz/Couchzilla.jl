@@ -177,25 +177,24 @@ end
   Test.with_handler(test_handler) do
     print("[  ] Upload attachment (blob mode) ")
     data = createdoc(db, Dict("item" => "screenshot"))
-    result = put_attachment(db, data["id"], data["rev"], "runtests.jl", "text/plain", "test/runtests.jl")
+    result = put_attachment(db, data["id"], data["rev"], "test.png", "image/png", "../data/test.png")
     @test result["ok"] == true
     println("\r[OK] Upload attachment (blob mode)")
     
     print("[  ] Retrieve attachment (blob mode) ")
-    att = get_attachment(db, result["id"], "runtests.jl"; rev=result["rev"])
-    open("tmpfile.jl", "w") do f
+    att = get_attachment(db, result["id"], "test.png"; rev=result["rev"])
+    open("../data/fetched.png", "w") do f
       write(f, att)
     end
     
-    # md5_fetched = chomp(readall(`md5 -q data/fetched.png`))
-    # md5_orig = chomp(readall(`md5 -q data/test.png`))
-    # @test md5_fetched == md5_orig
-    # rm("data/fetched.png")
-    rm("tmpfile.jl")
+    md5_fetched = chomp(readall(`md5 -q data/fetched.png`))
+    md5_orig = chomp(readall(`md5 -q data/test.png`))
+    @test md5_fetched == md5_orig
+    rm("data/fetched.png")
     println("\r[OK] Retrieve attachment (blob mode)")
     
     print("[  ] Delete attachment (blob mode) ")
-    result = delete_attachment(db, result["id"], result["rev"], "runtests.jl")
+    result = delete_attachment(db, result["id"], result["rev"], "test.png")
     @test result["ok"] == true
     println("\r[OK] Delete attachment (blob mode)")
   end
