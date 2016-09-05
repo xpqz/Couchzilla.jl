@@ -236,7 +236,7 @@ Cloudant pushes most of its stuff to upstream to [Apache CouchDB](http://couchdb
 
 When you hit capacity, Cloudant will return an error, signified by the HTTP status code 429 (`Too many requests`). This means that the request was not successful, and will need to be retried at a later stage. Couchzilla optionally gives you a way to deal with 429 errors:
 
-    retry_settings(;enabled=true, max_retries=5, delay_ms=10)
+    retry_settings!(;enabled=true, max_retries=5, delay_ms=10)
 
 This will enable the retrying of requests failed with a 429. This will try a request a maximum of 5 times, with a delay of 10 ms added cumulatively, plus a little bit of noise (randomly between 1 and 10 ms). This is a module-global setting, so will apply to all `Client`s created within the same `Julia` session.
 
@@ -335,7 +335,7 @@ Couchzilla.geo_query
 
 ## Utility stuff
 ```@docs
-Couchzilla.retry_settings(;enabled=false, max_retries=5, delay_ms=10)
+Couchzilla.retry_settings!(;enabled=false, max_retries=5, delay_ms=10)
 Couchzilla.retry_settings
 Couchzilla.relax
 Couchzilla.endpoint

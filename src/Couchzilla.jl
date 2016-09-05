@@ -96,6 +96,6 @@ export mango_query, mango_index, listindexes, mango_deleteindex, paged_mango_que
 export view_index, view_query, alldocs
 export revs_diff, changes, changes_streaming, bulk_get
 export geo_index, geo_indexinfo, geo_query
-export retry_settings
+export retry_settings, retry_settings!
 
 end # module

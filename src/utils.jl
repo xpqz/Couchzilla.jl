@@ -3,7 +3,7 @@ settings = Dict(
 )
 
 """
-    retry_settings(;enabled=false, max_retries=5, delay_ms=10)
+    retry_settings!(;enabled=false, max_retries=5, delay_ms=10)
 
 Set parameters for retrying requests failed with a 429: Too Many Requests.
 This is Cloudant-specific, but safe to leave enabled if using CouchDB, as
@@ -19,7 +19,7 @@ Note: it is not sufficient to rely on this behaviour on a rate-limited Cloudant 
 as persistently hitting the limits can only be fixed by moving to higher reserved 
 throughput capacity. For this reason this is disabled by default.
 """
-function retry_settings(;enabled=false, max_retries=5, delay_ms=10)
+function retry_settings!(;enabled=false, max_retries=5, delay_ms=10)
   settings["retry"] = Dict(
     "enabled"     => enabled, 
     "max_retries" => max_retries, 
@@ -79,7 +79,8 @@ function relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict(), j
       tries += 1
       if tries > settings["max_retries"]
         request = requestfor(response)
-        throw(HTTPException(response.status, Requests.json(response), string(request)))
+        throw(HTTPException(response.status, Requests.json(response), string(request) * "\n" * string(headers(request)) * 
+          "\n" * Requests.json(request)))
       end
       sleep((tries * settings["delay_ms"] + rand(1:10))/1000.0)
       continue

@@ -50,7 +50,6 @@ end
       group         = false,
       group_level   = 0,
       reduce        = true,
-      stale         = false,
       key           = "",
       keys          = [],
       limit         = 0,
@@ -86,7 +85,6 @@ function view_query(db::Database, ddoc::AbstractString, name::AbstractString;
   group         = false,
   group_level   = 0,
   reduce        = true,
-  stale         = false,
   key           = "",
   keys          = [],
   limit         = 0,
@@ -114,11 +112,7 @@ function view_query(db::Database, ddoc::AbstractString, name::AbstractString;
   if !reduce
     query["reduce"] = false
   end
-  
-  if stale
-    query["stale"] = true
-  end
-  
+    
   if group_level > 0
     query["group_level"] = group_level
   end

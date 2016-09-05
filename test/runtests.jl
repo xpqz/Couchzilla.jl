@@ -53,6 +53,21 @@ Test.with_handler(test_handler) do
   @test doc["item"] == "flange"
   println("\r[OK] Read new doc by {id, rev} (note: bad idea usually)")
 
+  print("[  ] Read doc with exotic params ")
+  doc = readdoc(db, data["id"]; 
+    rev=data["rev"], 
+    conflicts=true, 
+    attachments=true, 
+    att_encoding_info=true, 
+    latest=true, 
+    meta=true, 
+    deleted_conflicts=true,
+    revs=true,
+    revs_info=true)
+  @test haskey(doc, "item")
+  @test doc["item"] == "flange"
+  println("\r[OK] Read doc with exotic params")
+
   print("[  ] Reading doc by id and bad rev should fail ")
   @test_throws HTTPException readdoc(db, data["id"]; rev="3-63453748494907")
   println("\r[OK] Reading doc by id and bad rev should fail")
@@ -89,6 +104,11 @@ Test.with_handler(test_handler) do
   result = mango_query(db, q"data = authenticate")
   @test length(result.docs) == 2
   println("\r[OK] Simple Mango query (equality)")
+
+  print("[  ] Selector from raw json ")
+  mango_query(db, Selector("{\"data\":{\"\$eq\":\"authenticate\"}}"))
+  @test length(result.docs) == 2
+  println("\r[OK] Selector from raw json")
   
   print("[  ] Compound Mango query (and) ")
   result = mango_query(db, and([q"data = world", q"data2 = vocabulary"]))
@@ -139,6 +159,15 @@ Test.with_handler(test_handler) do
   result = mango_deleteindex(db; ddoc=textindex["id"], name=textindex["name"], indextype="text")
   @test result["ok"] == true
   println("\r[OK] Delete Mango index")
+
+  print("[  ] Delete Mango index with bad index type ")
+  @test_throws ErrorException mango_deleteindex(db; ddoc=textindex["id"], name=textindex["name"], indextype="book")
+  println("\r[OK] Delete Mango index with bad index type")
+
+  print("[  ] Delete Mango index with no name ")
+  @test_throws ErrorException mango_deleteindex(db; ddoc=textindex["id"], indextype="json")
+  println("\r[OK] Delete Mango index with no name")
+
 end
 
 Test.with_handler(test_handler) do
@@ -201,6 +230,45 @@ end
 #end
 
 Test.with_handler(test_handler) do
+  print("[  ] alldocs: all ")
+  result1 = alldocs(db; 
+    descending    = true,
+    endkey        = "",
+    include_docs  = true,
+    conflicts     = true,
+    inclusive_end = true)
+  @test result1["total_rows"] == 214
+  println("\r[OK] alldocs: all")
+
+  print("[  ] alldocs: limit & skip ")
+  result2 = alldocs(db; 
+    limit = 5,
+    skip  = 2)
+  @test length(result2["rows"]) == 5
+  println("\r[OK] alldocs: limit & skip")
+
+  print("[  ] alldocs: single key ")
+  result3 = alldocs(db; key=result2["rows"][1]["key"])
+  @test length(result3["rows"]) == 1
+  println("\r[OK] alldocs: single key")
+
+  print("[  ] alldocs: key set ")
+  result4 = alldocs(db; keys=[result2["rows"][1]["key"], result2["rows"][2]["key"]])
+  @test length(result4["rows"]) == 2
+  println("\r[OK] alldocs: key set")
+
+  print("[  ] alldocs: start & endkey ")
+  result5 = alldocs(db; startkey=result2["rows"][1]["key"], endkey=result2["rows"][2]["key"])
+  @test length(result5["rows"]) == 2
+  println("\r[OK] alldocs: start & endkey")
+
+  print("[  ] alldocs: start & endkey without inclusive_end ")
+  result6 = alldocs(db; startkey=result2["rows"][1]["key"], endkey=result2["rows"][2]["key"], inclusive_end=false)
+  @test length(result6["rows"]) == 1
+  println("\r[OK] alldocs: start & endkey without inclusive_end")
+end
+
+Test.with_handler(test_handler) do
   print("[  ] Create a view ")
   result = view_index(db, "my_ddoc", "my_view", 
   """
@@ -213,7 +281,7 @@ Test.with_handler(test_handler) do
   println("\r[OK] Create a view")
   
   print("[  ] Query view ")
-  result = view_query(db, "my_ddoc", "my_view"; include_docs=true, key="adam")
+  result = view_query(db, "my_ddoc", "my_view"; include_docs=true, descending=true, conflicts=true, key="adam")
   @test length(result["rows"]) == 1
   println("\r[OK] Query view")
   
@@ -221,6 +289,19 @@ Test.with_handler(test_handler) do
   result = view_query(db, "my_ddoc", "my_view"; keys=["adam", "billy"])
   @test length(result["rows"]) == 2
   println("\r[OK] Query view (POST)")
+
+  print("[  ] Query view (POST + skip)")
+  result = view_query(db, "my_ddoc", "my_view"; keys=["adam", "billy"], skip=1)
+  @test length(result["rows"]) == 1
+  println("\r[OK] Query view (POST + skip)")
+end
+
+Test.with_handler(test_handler) do
+  print("[  ] Retry settings ")
+  retry_settings!(enabled=true)
+  settings = retry_settings()
+  @test settings["enabled"] == true
+  println("\r[OK] Retry settings")
 end
 
 Test.with_handler(test_handler) do
