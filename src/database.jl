@@ -75,7 +75,7 @@ Bulk create a set of new documents via the CouchDB `_bulk_docs` endpoint.
 
 [API reference](http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs)
 """
-function createdoc(db::Database; data=[Dict()])
+function createdoc(db::Database; data = Vector{Dict{Any, Any}}())
   if length(data) == 0
     error("No data given")
   end
@@ -93,13 +93,13 @@ end
       deleted_conflicts = false,
       latest            = false,
       meta              = false,
-      open_revs         = [],
       revs              = false,
       revs_info         = false)
 
 Fetch a document by `id`.
 
-For a description of the parameters, see reference below.
+For a description of the parameters, see reference below. Note: no support for the 
+`open_revs` parameter – this returns multipart/mixed.
 
 [API reference](http://docs.couchdb.org/en/1.6.1/api/document/common.html#get--db-docid)
 """
@@ -112,7 +112,6 @@ function readdoc(db::Database, id::AbstractString;
   deleted_conflicts = false,
   latest            = false,
   meta              = false,
-  open_revs         = [],
   revs              = false,
   revs_info         = false)
 
@@ -156,10 +155,6 @@ function readdoc(db::Database, id::AbstractString;
 
   if length(atts_since) > 0
     query["atts_since"] = atts_since
-  end
-
-  if length(open_revs) > 0
-    query["open_revs"] = open_revs
   end
 
   relax(get, endpoint(db.url, id); cookies=db.client.cookies, query=query)

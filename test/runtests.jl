@@ -19,11 +19,13 @@ db, created = createdb(cl, database=database)
 
 test_handler(r::Test.Success) = nothing
 function test_handler(r::Test.Failure)
+  println("[OK] Deleting test database on failure")
   deletedb(cl, database)
   error("Test failed: $(r.expr)")
 end
 
 function test_handler(r::Test.Error)
+  println("[OK] Deleting test database on failure")
   deletedb(cl, database)
   rethrow(r)
 end
@@ -32,6 +34,16 @@ Test.with_handler(test_handler) do
   print("[  ] Create test database: $database")
   @test created == true
   println("\r[OK] Create test database: $database")
+
+  print("[  ] DBInfo ")
+  result = dbinfo(cl, database)
+  @test result["doc_count"] == 0
+  println("\r[OK] DBInfo")
+
+  print("[  ] List dbs ")
+  result = listdbs(cl)
+  @test database ∈ result
+  println("\r[OK] List dbs")
 end
 
 Test.with_handler(test_handler) do
@@ -47,15 +59,17 @@ Test.with_handler(test_handler) do
   @test haskey(data, "rev")
   println("\r[OK] Create new doc")
 
+  print("[  ] Create new doc with empty body should fail ")
+  @test_throws ErrorException createdoc(db)
+  println("\r[OK] Create new doc with empty body should fail")
+
   print("[  ] Read new doc by {id, rev} (note: bad idea usually) ")
   doc = readdoc(db, data["id"]; rev=data["rev"])
   @test haskey(doc, "item")
   @test doc["item"] == "flange"
   println("\r[OK] Read new doc by {id, rev} (note: bad idea usually)")
-
   print("[  ] Read doc with exotic params ")
   doc = readdoc(db, data["id"]; 
-    rev=data["rev"], 
     conflicts=true, 
     attachments=true, 
     att_encoding_info=true, 
@@ -63,7 +77,8 @@ Test.with_handler(test_handler) do
     meta=true, 
     deleted_conflicts=true,
     revs=true,
-    revs_info=true)
+    revs_info=true
+  )
   @test haskey(doc, "item")
   @test doc["item"] == "flange"
   println("\r[OK] Read doc with exotic params")
@@ -77,6 +92,11 @@ Test.with_handler(test_handler) do
   @test haskey(doc, "rev")
   @test contains(doc["rev"], "2-")
   println("\r[OK] Update existing doc")
+
+  print("[  ] Delete doc ")
+  newdoc = deletedoc(db; id=doc["id"], rev=doc["rev"])
+  @test newdoc["ok"] == true
+  println("\r[OK] Delete doc")
 end
 
 Test.with_handler(test_handler) do
@@ -237,7 +257,7 @@ Test.with_handler(test_handler) do
     include_docs  = true,
     conflicts     = true,
     inclusive_end = true)
-  @test result1["total_rows"] == 214
+  @test result1["total_rows"] > 200
   println("\r[OK] alldocs: all")
 
   print("[  ] alldocs: limit & skip ")
