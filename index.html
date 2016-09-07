@@ -338,11 +338,11 @@ db, created = createdb(client; database=dbname)</code></pre>
 
 
 <pre class="codehilite"><code>5-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;ae45fc9ecec2a894905dac1e94274c36&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;ae45fc9ecec2a894905dac1e94275aac&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;ae45fc9ecec2a894905dac1e94275d75&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;ae45fc9ecec2a894905dac1e94276012&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;ae45fc9ecec2a894905dac1e9427662f&quot;)</code></pre>
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bbfdaa&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bc0907&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bc1262&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bc2004&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bc2744&quot;)</code></pre>
 
 
 <p>This form of <a href=".#Couchzilla.createdoc"><code>createdoc</code></a> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
@@ -354,7 +354,7 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 4 entries:
   &quot;_rev&quot; =&gt; &quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;
   &quot;name&quot; =&gt; &quot;billy&quot;
-  &quot;_id&quot;  =&gt; &quot;ae45fc9ecec2a894905dac1e94275aac&quot;
+  &quot;_id&quot;  =&gt; &quot;6914ec0968966bbe22f1edf219bc0907&quot;
   &quot;data&quot; =&gt; &quot;world&quot;</code></pre>
 
 
@@ -377,14 +377,14 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code class="language-julia">mango_query(db, q&quot;name=davina&quot;)</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;ae45fc9ecec2a894905dac1e94276012&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bc2004&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>The construct <code>q"..."</code> (see <a href=".#Couchzilla.@q_str"><code>@q_str</code></a>) is a custom string literal type which takes a simplistic DSL  expression which gets converted to the actual JSON-representation of a Mango selector. If you are familiar with <a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">Mango selectors</a>,  you can use the raw JSON expression if you prefer:</p>
 <pre class="codehilite"><code class="language-julia">mango_query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;ae45fc9ecec2a894905dac1e94276012&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bc2004&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>There are also coroutine versions of some of the functions that return data from views. If we had many results to process, we could use <a href=".#Couchzilla.paged_mango_query"><code>paged_mango_query</code></a> in a Julia Task:</p>
@@ -417,7 +417,7 @@ function(doc) {
 
 
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
-  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;ae45fc9ecec2a…
+  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966…
   &quot;offset&quot;     =&gt; 1
   &quot;total_rows&quot; =&gt; 5</code></pre>
 
@@ -620,17 +620,20 @@ db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
   attachments       = false, 
   att_encoding_info = false,
   atts_since        = [],
+  open_revs         = [],
   conflicts         = false,
   deleted_conflicts = false,
   latest            = false,
   meta              = false,
-  open_revs         = [],
   revs              = false,
   revs_info         = false)</code></pre>
 
 
 <p>Fetch a document by <code>id</code>.</p>
-<p>For a description of the parameters, see reference below.</p>
+<p>For a description of the parameters, see reference below. To use the <code>open_revs</code> parameter as <code>all</code>, use</p>
+<pre class="codehilite"><code>result = readdoc(db, id; open_revs=[&quot;all&quot;])</code></pre>
+
+
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/document/common.html#get--db-docid">API reference</a></p>
 <p><a id='Couchzilla.updatedoc-Tuple{Couchzilla.Database}' href='#Couchzilla.updatedoc-Tuple{Couchzilla.Database}'>#</a>
 <strong><code>Couchzilla.updatedoc</code></strong> &mdash; <em>Method</em>.</p>
