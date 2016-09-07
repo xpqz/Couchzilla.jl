@@ -89,6 +89,7 @@ end
       attachments       = false, 
       att_encoding_info = false,
       atts_since        = [],
+      open_revs         = [],
       conflicts         = false,
       deleted_conflicts = false,
       latest            = false,
@@ -98,8 +99,9 @@ end
 
 Fetch a document by `id`.
 
-For a description of the parameters, see reference below. Note: no support for the 
-`open_revs` parameter – this returns multipart/mixed.
+For a description of the parameters, see reference below. To use the `open_revs` parameter as `all`, use
+
+    result = readdoc(db, id; open_revs=["all"])
 
 [API reference](http://docs.couchdb.org/en/1.6.1/api/document/common.html#get--db-docid)
 """
@@ -108,6 +110,7 @@ function readdoc(db::Database, id::AbstractString;
   attachments       = false, 
   att_encoding_info = false,
   atts_since        = [],
+  open_revs         = [],
   conflicts         = false,
   deleted_conflicts = false,
   latest            = false,
@@ -116,6 +119,7 @@ function readdoc(db::Database, id::AbstractString;
   revs_info         = false)
 
   query::Dict{AbstractString, Any} = Dict()
+  headers::Dict{AbstractString, Any} = Dict("Accept" => "application/json")
 
   if attachments
     query["attachments"] = true
@@ -157,7 +161,15 @@ function readdoc(db::Database, id::AbstractString;
     query["atts_since"] = atts_since
   end
 
-  relax(get, endpoint(db.url, id); cookies=db.client.cookies, query=query)
+  if length(open_revs) > 0
+    if length(open_revs) == 1 && open_revs[1] == "all"
+      query["open_revs"] = "all"
+    else
+      query["open_revs"] = JSON.json(open_revs)
+    end
+  end
+
+  relax(get, endpoint(db.url, id); cookies=db.client.cookies, query=query, headers=headers)
 end
 
 """

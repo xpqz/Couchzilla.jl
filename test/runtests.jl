@@ -19,7 +19,7 @@ db, created = createdb(cl, database=database)
 
 test_handler(r::Test.Success) = nothing
 function test_handler(r::Test.Failure)
-  println("[OK] Deleting test database on failure")
+  println("\n[OK] Deleting test database on failure")
   deletedb(cl, database)
   error("Test failed: $(r.expr)")
 end
@@ -69,7 +69,8 @@ Test.with_handler(test_handler) do
   @test doc["item"] == "flange"
   println("\r[OK] Read new doc by {id, rev} (note: bad idea usually)")
   print("[  ] Read doc with exotic params ")
-  doc = readdoc(db, data["id"]; 
+  docs = readdoc(db, data["id"]; 
+    open_revs=[data["rev"]],
     conflicts=true, 
     attachments=true, 
     att_encoding_info=true, 
@@ -79,9 +80,18 @@ Test.with_handler(test_handler) do
     revs=true,
     revs_info=true
   )
+   
+  doc = docs[1]["ok"]
   @test haskey(doc, "item")
   @test doc["item"] == "flange"
   println("\r[OK] Read doc with exotic params")
+
+  print("[  ] Read doc with all open revs ")
+  docs = readdoc(db, data["id"]; open_revs=["all"])
+  doc = docs[1]["ok"]
+  @test haskey(doc, "item")
+  @test doc["item"] == "flange"
+  println("\r[OK] Read doc with all open revs")
 
   print("[  ] Reading doc by id and bad rev should fail ")
   @test_throws HTTPException readdoc(db, data["id"]; rev="3-63453748494907")
