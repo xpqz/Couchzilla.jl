@@ -108,7 +108,7 @@ us to query the database in a (slightly) more ad-hoc fashion than using map redu
 In order to use this feature we first need to set up the necessary indexes:
 
 ```@example intro
-mango_index(db; fields=["name", "data"])
+mango_index(db, ["name", "data"])
 ```
 
 We can now use this index to retrieve data:

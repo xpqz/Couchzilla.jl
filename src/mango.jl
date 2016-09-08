@@ -83,29 +83,30 @@ function mango_query{T<:AbstractString}(db::Database, selector::Selector;
 end
 
 """
-    result = mango_index{T<:AbstractString}(db::Database; 
+    result = mango_index{T<:AbstractString}(db::Database, fields::AbstractArray; 
       name::T       = "",
-      ddoc::T       = "",
-      fields        = Vector{T}(), 
+      ddoc::T       = "", 
       selector      = Selector(),
       default_field = Dict{UTF8String, Any}("analyzer" => "standard", "enabled" => true))
 
 Create a Mango index. 
 
-All `kw` parameters are optional, but note that not giving a `fields` argument will
-result in all fields being indexed which is very costly. Defaults to type `"json"` and
-will be assumed to be `"text"` if the data in the `fields` array are `Dict`s.
+All `kw` parameters are optional. The fields spec is mandatory for JSON-type indexes. For a 
+text index, if you give an empty vector as the fields, it will index every field, which is
+occasionally convenient, but a significant performance drain. The index type will defaults to 
+type `"json"` and will be assumed to be `"text"` if the data in the `fields` array are `Dict`s. 
+Note that the `text` index type is a Cloudant-only feature.
 
 ### Examples
 
-* Make a text index
+* Make a text index (Cloudant only)
 
-    result = mango_index(db; ddoc="my-ddoc", fields=[Dict("name"=>"lastname", "type"=>"string")], 
+    result = mango_index(db, [Dict("name"=>"lastname", "type"=>"string")]; ddoc="my-ddoc",
       default_field=Dict("analyzer" => "german", "enabled" => true))
 
 * Make a json index
 
-  result = mango_index(db; fields=["data", "data2"])
+  result = mango_index(db, ["data", "data2"])
 
 ### Returns
 
@@ -119,16 +120,21 @@ will be assumed to be `"text"` if the data in the `fields` array are `Dict`s.
 
 [API reference](https://docs.cloudant.com/cloudant_query.html#creating-an-index)
 """
-function mango_index{T<:AbstractString}(db::Database; 
+function mango_index{T<:AbstractString}(db::Database, fields::AbstractArray; 
   name::T       = "",
-  ddoc::T       = "",
-  fields        = Vector{T}(), 
+  ddoc::T       = "", 
   selector      = Selector(),
   default_field = Dict{UTF8String, Any}("analyzer" => "standard", "enabled" => true))
+
+  idxquery = fields == [] ? Dict{T, Any}("index" => Dict{T, Any}()) : Dict{T, Any}("index" => Dict{T, Any}("fields" => fields))
 
   indextype = "json"
   if length(fields) > 0 && isa(fields[1], Associative)
     indextype = "text"
+  end
+
+  if !isempty(selector)
+    idxquery["selector"] = selector
   end
 
   if indextype == "json" && !isempty(selector)
@@ -139,14 +145,8 @@ function mango_index{T<:AbstractString}(db::Database;
     error("Indextype 'json' requires a fields specification.")
   end
   
-  idxquery = fields == [] ? Dict{T, Any}("index" => Dict{T, Any}()) : Dict{T, Any}("index" => Dict{T, Any}("fields" => fields))
-  
   if indextype == "text"
     idxquery["index"]["default_field"] = default_field
-  end
-  
-  if !isempty(selector)
-    idxquery["selector"] = selector
   end
   
   if name != ""

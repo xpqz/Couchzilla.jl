@@ -18,14 +18,15 @@ cl = Client(username, password, host)
 db, created = createdb(cl, database=database)
 
 test_handler(r::Test.Success) = nothing
+
 function test_handler(r::Test.Failure)
-  println("\n[OK] Deleting test database on failure")
+  println("\n[INFO] Deleting test database on failure")
   deletedb(cl, database)
   error("Test failed: $(r.expr)")
 end
 
 function test_handler(r::Test.Error)
-  println("[OK] Deleting test database on failure")
+  println("\n[INFO] Deleting test database on failure")
   deletedb(cl, database)
   rethrow(r)
 end
@@ -73,6 +74,7 @@ Test.with_handler(test_handler) do
     open_revs=[data["rev"]],
     conflicts=true, 
     attachments=true, 
+    atts_since=[data["rev"]],
     att_encoding_info=true, 
     latest=true, 
     meta=true, 
@@ -111,10 +113,14 @@ end
 
 Test.with_handler(test_handler) do
   print("[  ] Create a json Mango index ")
-  result = mango_index(db; fields=["data", "data2"])
+  result = mango_index(db, ["data", "data2"])
   @test result["result"] == "created"
   println("\r[OK] Create a json Mango index")
-  
+
+  print("[  ] Create a json Mango index with a selector should fail ")
+  @test_throws ErrorException mango_index(db, ["data", "data2"]; selector=q"data = bob")
+  println("\r[OK] Create a json Mango index with a selector should fail")
+
   print("[  ] Bulk load data ")
   data=[
       Dict("name"=>"adam",    "data"=>"hello",              "data2" => "television"),
@@ -152,7 +158,7 @@ Test.with_handler(test_handler) do
   println("\r[OK] Compound Mango query (or)")
   
   print("[  ] Create a text Mango index ")
-  textindex = mango_index(db; fields=[
+  textindex = mango_index(db, [
     Dict("name" => "cust",  "type" => "string"), 
     Dict("name" => "value", "type" => "string")
   ])
@@ -359,11 +365,66 @@ Test.with_handler(test_handler) do
     @test length(result["rows"]) == 200
     println("\r[OK] Radius geospatial query")
 
+    print("[  ] Elliptic geospatial query ")
+    result = geo_query(geodb, "geodd", "geoidx";
+      lat    = 42.357963,
+      lon    = -71.063991,
+      rangex = 100.0,
+      rangey = 500.0,
+      limit  = 1)
+
+    @test length(result["rows"]) == 1
+    println("\r[OK] Elliptic geospatial query")
+
     print("[  ] Polygon geospatial query ")
     result = geo_query(geodb, "geodd", "geoidx";
       g="POLYGON ((-71.0537124 42.3681995 0,-71.054399 42.3675178 0,-71.0522962 42.3667409 0,-71.051631 42.3659324 0,-71.051631 42.3621431 0,-71.0502148 42.3618577 0,-71.0505152 42.3660275 0,-71.0511589 42.3670263 0,-71.0537124 42.3681995 0))")
     @test length(result["rows"]) == 2
     println("\r[OK] Polygon geospatial query")
+
+    print("[  ] Radius geospatial query with skip, legacy format and stale=true")
+    result = geo_query(geodb, "geodd", "geoidx";
+      skip   = 100,
+      format = "legacy",
+      nearest = true,
+      stale  = true,
+      lat    = 42.357963,
+      lon    = -71.063991,
+      radius = 10000.0,
+      limit  = 200)
+    @test result["type"] == "FeatureCollection"
+    println("\r[OK] Radius geospatial query with skip, legacy format and stale=true")
+
+    print("[  ] Radius geospatial query with bookmark")
+    result = geo_query(geodb, "geodd", "geoidx";
+      skip   = 100,
+      format = "legacy",
+      nearest = true,
+      stale  = true,
+      lat    = 42.357963,
+      lon    = -71.063991,
+      radius = 10000.0,
+      limit  = 200,
+      bookmark = result["bookmark"])
+    @test result["type"] == "FeatureCollection"
+    println("\r[OK] Radius geospatial query with bookmark")
+
+    print("[  ] Geospatial query with unknown format should fail ")
+    @test_throws ErrorException geo_query(geodb, "geodd", "geoidx";
+      format = "never-heard-of-it",
+      lat    = 42.357963,
+      lon    = -71.063991,
+      radius = 10000.0)
+    println("\r[OK] Geospatial query with unknown format should fail")
+
+    print("[  ] Geospatial query with unknown relation should fail ")
+    @test_throws ErrorException geo_query(geodb, "geodd", "geoidx";
+      relation = "never-heard-of-it",
+      lat    = 42.357963,
+      lon    = -71.063991,
+      radius = 10000.0)
+    println("\r[OK] Geospatial query with unknown relation should fail")
+
   else 
     println("** Skipping geospatial query tests")
     println("** Replicate https://education.cloudant.com/crimes and set the variable COUCH_GEO_DATABASE")

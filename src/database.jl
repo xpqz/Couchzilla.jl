@@ -158,7 +158,7 @@ function readdoc(db::Database, id::AbstractString;
   end
 
   if length(atts_since) > 0
-    query["atts_since"] = atts_since
+    query["atts_since"] = JSON.json(atts_since)
   end
 
   if length(open_revs) > 0
