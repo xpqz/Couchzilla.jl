@@ -338,11 +338,11 @@ db, created = createdb(client; database=dbname)</code></pre>
 
 
 <pre class="codehilite"><code>5-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bbfdaa&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bc0907&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bc1262&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bc2004&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bc2744&quot;)</code></pre>
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219fe98a5&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219fea256&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219feb12d&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219feb584&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219feb696&quot;)</code></pre>
 
 
 <p>This form of <a href=".#Couchzilla.createdoc"><code>createdoc</code></a> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
@@ -354,7 +354,7 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 4 entries:
   &quot;_rev&quot; =&gt; &quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;
   &quot;name&quot; =&gt; &quot;billy&quot;
-  &quot;_id&quot;  =&gt; &quot;6914ec0968966bbe22f1edf219bc0907&quot;
+  &quot;_id&quot;  =&gt; &quot;6914ec0968966bbe22f1edf219fea256&quot;
   &quot;data&quot; =&gt; &quot;world&quot;</code></pre>
 
 
@@ -364,7 +364,7 @@ readdoc(db, id)</code></pre>
 <h2 id="query">Query</h2>
 <p><code>Mango</code> (also known as <a href="https://docs.cloudant.com/cloudant_query.html">Cloudant Query</a>) is  a declarative query language inspired by <a href="https://docs.mongodb.com/">MongoDB</a>. It allows us to query the database in a (slightly) more ad-hoc fashion than using map reduce views.</p>
 <p>In order to use this feature we first need to set up the necessary indexes:</p>
-<pre class="codehilite"><code class="language-julia">mango_index(db; fields=[&quot;name&quot;, &quot;data&quot;])</code></pre>
+<pre class="codehilite"><code class="language-julia">mango_index(db, [&quot;name&quot;, &quot;data&quot;])</code></pre>
 
 
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
@@ -377,14 +377,14 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code class="language-julia">mango_query(db, q&quot;name=davina&quot;)</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bc2004&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219feb584&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>The construct <code>q"..."</code> (see <a href=".#Couchzilla.@q_str"><code>@q_str</code></a>) is a custom string literal type which takes a simplistic DSL  expression which gets converted to the actual JSON-representation of a Mango selector. If you are familiar with <a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">Mango selectors</a>,  you can use the raw JSON expression if you prefer:</p>
 <pre class="codehilite"><code class="language-julia">mango_query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219bc2004&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;6914ec0968966bbe22f1edf219feb584&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>There are also coroutine versions of some of the functions that return data from views. If we had many results to process, we could use <a href=".#Couchzilla.paged_mango_query"><code>paged_mango_query</code></a> in a Julia Task:</p>
@@ -860,28 +860,27 @@ end</code></pre>
 
 <p><a id='Couchzilla.mango_index' href='#Couchzilla.mango_index'>#</a>
 <strong><code>Couchzilla.mango_index</code></strong> &mdash; <em>Function</em>.</p>
-<pre class="codehilite"><code>result = mango_index{T&lt;:AbstractString}(db::Database; 
+<pre class="codehilite"><code>result = mango_index{T&lt;:AbstractString}(db::Database, fields::AbstractArray; 
   name::T       = &quot;&quot;,
-  ddoc::T       = &quot;&quot;,
-  fields        = Vector{T}(), 
+  ddoc::T       = &quot;&quot;, 
   selector      = Selector(),
   default_field = Dict{UTF8String, Any}(&quot;analyzer&quot; =&gt; &quot;standard&quot;, &quot;enabled&quot; =&gt; true))</code></pre>
 
 
 <p>Create a Mango index. </p>
-<p>All <code>kw</code> parameters are optional, but note that not giving a <code>fields</code> argument will result in all fields being indexed which is very costly. Defaults to type <code>"json"</code> and will be assumed to be <code>"text"</code> if the data in the <code>fields</code> array are <code>Dict</code>s.</p>
+<p>All <code>kw</code> parameters are optional. The fields spec is mandatory for JSON-type indexes. For a  text index, if you give an empty vector as the fields, it will index every field, which is occasionally convenient, but a significant performance drain. The index type will defaults to  type <code>"json"</code> and will be assumed to be <code>"text"</code> if the data in the <code>fields</code> array are <code>Dict</code>s.  Note that the <code>text</code> index type is a Cloudant-only feature.</p>
 <p><strong>Examples</strong></p>
 <ul>
-<li>Make a text index</li>
+<li>Make a text index (Cloudant only)</li>
 </ul>
-<pre class="codehilite"><code>result = mango_index(db; ddoc=&quot;my-ddoc&quot;, fields=[Dict(&quot;name&quot;=&gt;&quot;lastname&quot;, &quot;type&quot;=&gt;&quot;string&quot;)], 
+<pre class="codehilite"><code>result = mango_index(db, [Dict(&quot;name&quot;=&gt;&quot;lastname&quot;, &quot;type&quot;=&gt;&quot;string&quot;)]; ddoc=&quot;my-ddoc&quot;,
   default_field=Dict(&quot;analyzer&quot; =&gt; &quot;german&quot;, &quot;enabled&quot; =&gt; true))</code></pre>
 
 
 <ul>
 <li>Make a json index</li>
 </ul>
-<p>result = mango_index(db; fields=["data", "data2"])</p>
+<p>result = mango_index(db, ["data", "data2"])</p>
 <p><strong>Returns</strong></p>
 <p><code>mango_index()</code> returns a <code>Dict(...)</code> version of the CouchDB response, of the type</p>
 <pre class="codehilite"><code>Dict(
