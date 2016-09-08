@@ -141,8 +141,13 @@ Test.with_handler(test_handler) do
   @test length(result.docs) == 2
   println("\r[OK] Simple Mango query (equality)")
 
+   print("[  ] Simple Mango query (negation) ")
+  result = mango_query(db, not(q"data = authenticate"))
+  @test length(result.docs) == 5
+  println("\r[OK] Simple Mango query (negation)")
+
   print("[  ] Selector from raw json ")
-  mango_query(db, Selector("{\"data\":{\"\$eq\":\"authenticate\"}}"))
+  result = mango_query(db, Selector("{\"data\":{\"\$eq\":\"authenticate\"}}"))
   @test length(result.docs) == 2
   println("\r[OK] Selector from raw json")
   
@@ -217,7 +222,7 @@ Test.with_handler(test_handler) do
   println("\r[OK] Streaming changes")
 
   print("[  ] Static changes ")
-  data = changes(db; limit=maxch)
+  data = changes(db; limit=maxch, conflicts=true, include_docs=true, attachments=true, att_encoding_info=true)
   @test maxch == length(data["results"]) # In static mode, "last_seq" is a key in the dict.
   println("\r[OK] Static changes")
 
@@ -305,7 +310,7 @@ Test.with_handler(test_handler) do
 end
 
 Test.with_handler(test_handler) do
-  print("[  ] Create a view ")
+  print("[  ] Create a map view ")
   result = view_index(db, "my_ddoc", "my_view", 
   """
   function(doc) {
@@ -314,7 +319,18 @@ Test.with_handler(test_handler) do
     }
   }""")
   @test result["ok"] == true
-  println("\r[OK] Create a view")
+  println("\r[OK] Create a map view")
+
+  print("[  ] Create a map-reduce view ")
+  result = view_index(db, "my_ddoc2", "my_view2", 
+  """
+  function(doc) {
+    if(doc && doc.data) {
+      emit(doc.data, 1);
+    }
+  }"""; reduce="_stats")
+  @test result["ok"] == true
+  println("\r[OK] Create a map-reduce view")
   
   print("[  ] Query view ")
   result = view_query(db, "my_ddoc", "my_view"; include_docs=true, descending=true, conflicts=true, key="adam")
@@ -327,9 +343,19 @@ Test.with_handler(test_handler) do
   println("\r[OK] Query view (POST)")
 
   print("[  ] Query view (POST + skip)")
-  result = view_query(db, "my_ddoc", "my_view"; keys=["adam", "billy"], skip=1)
+  result = view_query(db, "my_ddoc", "my_view"; keys=["adam", "billy"], skip=1, limit=1)
   @test length(result["rows"]) == 1
   println("\r[OK] Query view (POST + skip)")
+
+  print("[  ] Query view (startkey, endkey)")
+  result = view_query(db, "my_ddoc", "my_view"; startkey="adam", endkey="billy", inclusive_end=false)
+  @test length(result["rows"]) == 1
+  println("\r[OK] Query view (startkey, endkey)")
+
+  print("[  ] Query view reduce")
+  result = view_query(db, "my_ddoc2", "my_view2"; key="adam", group=true, group_level=2)
+  @test haskey(result, "rows")
+  println("\r[OK] Query view reduce")
 end
 
 Test.with_handler(test_handler) do
