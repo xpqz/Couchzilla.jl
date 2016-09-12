@@ -5,8 +5,8 @@
       url
       cookies
 
-      Client(username::AbstractString, password::AbstractString, urlstr::AbstractString) = 
-        cookieauth!(new(username, password, URI(urlstr)))
+      Client(username::AbstractString, password::AbstractString, urlstr::AbstractString; auth=true) = 
+        cookieauth!(new(URI(urlstr)), username, password, auth)
     end
 
 The Client type represents an authenticated connection to a remote CouchDB/Cloudant instance.
@@ -15,22 +15,27 @@ type Client
   url
   cookies
 
-  Client(username::AbstractString, password::AbstractString, urlstr::AbstractString) = 
-    cookieauth!(new(URI(urlstr)), username, password)
+  Client(username::AbstractString, password::AbstractString, urlstr::AbstractString; auth=true) = 
+    cookieauth!(new(URI(urlstr)), username, password, auth)
 end
 
 """
-    cookieauth!(client::Client, username, password) 
+    cookieauth!(client::Client, username, password, auth=true) 
 
 Private. Hits the `_session` endpoint to obtain a session cookie
-that is used to authenticate subsequent requests.
+that is used to authenticate subsequent requests. If `auth` is set to 
+false, this does nothing.
 
 [API reference](https://docs.cloudant.com/authentication.html#cookie-authentication)
 """
-function cookieauth!(client::Client, username, password)
-  response = post(endpoint(client.url, "_session"); 
-    data=Dict("name" => username, "password" => password))
-  client.cookies = cookies(response)
+function cookieauth!(client::Client, username, password, auth::Bool=true)
+  if auth
+    response = post(endpoint(client.url, "_session"); 
+      data=Dict("name" => username, "password" => password))
+    client.cookies = cookies(response)
+  else 
+    client.cookies = ""
+  end
   client
 end
 

@@ -42,6 +42,7 @@ end
       status
       response
       request
+      message
     end
 
 HTTP error exception, thrown by `relax()`.
@@ -50,10 +51,11 @@ immutable HTTPException <: Exception
   status
   response
   request
+  message
 end
 
 function Base.show(io::IO, err::HTTPException)
-  print(io, "HTTPException - status: $(err.status) request: $(err.request) response: $(err.response)")
+  print(io, "HTTPException - status: $(err.status) request: $(err.request) response: $(err.response) message: $(err.message)")
 end
 
 """
@@ -63,24 +65,23 @@ Makes an HTTP request with the relevant cookies and query strings
 and deserialises the response, assumed to be json.
 
 Cloudant implements request throttling based on reerved throughput capacity. Hitting a 
-capacity limit will return a 429 error ("Too many requests"). This is Cloudant-specific.
+capacity limit will return a 429 error (Too many requests). This is Cloudant-specific.
 
 This function can retry on 429 if this behaviour is enabled. See `retry_settings()`.
 """
 function relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict(), json=Dict())
-  if cookies == nothing
-    error("Not authenticated")
-  end
+  # if cookies == nothing
+  #   error("Not authenticated")
+  # end
   settings = retry_settings()
   tries = 0
   while true
-    response = fun(url_string; cookies=cookies, query=query, headers=headers, json=json)
+    response = cookies == "" ? fun(url_string; query=query, headers=headers, json=json) : fun(url_string; cookies=cookies, query=query, headers=headers, json=json)
     if response.status == 429 && settings["enabled"]
       tries += 1
       if tries > settings["max_retries"]
         request = requestfor(response)
-        throw(HTTPException(response.status, Requests.json(response), string(request) * "\n" * string(headers(request)) * 
-          "\n" * Requests.json(request)))
+        throw(HTTPException(response.status, "Too many requests", "request", "max retries reached"))
       end
       sleep((tries * settings["delay_ms"] + rand(1:10))/1000.0)
       continue
@@ -88,7 +89,7 @@ function relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict(), j
 
     if response.status in 400:599
       request = requestfor(response)
-      throw(HTTPException(response.status, Requests.json(response), string(request)))
+      throw(HTTPException(response.status, Requests.json(response), string(request), ""))
     else
       return Requests.json(response)
     end
