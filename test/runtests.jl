@@ -113,13 +113,17 @@ end
 
 Test.with_handler(test_handler) do
   print("[  ] Create a json Mango index ")
-  result = mango_index(db, ["data", "data2"])
+  result = mango_index(db, ["data", "data2"]; name="myindex", ddoc="mangoddoc")
   @test result["result"] == "created"
   println("\r[OK] Create a json Mango index")
 
   print("[  ] Create a json Mango index with a selector should fail ")
   @test_throws ErrorException mango_index(db, ["data", "data2"]; selector=q"data = bob")
   println("\r[OK] Create a json Mango index with a selector should fail")
+
+  print("[  ] Create a json Mango index without fields should fail ")
+  @test_throws ErrorException mango_index(db, [])
+  println("\r[OK] Create a json Mango index without fields should fail")
 
   print("[  ] Bulk load data ")
   data=[
@@ -137,7 +141,7 @@ Test.with_handler(test_handler) do
   println("\r[OK] Bulk load data")
     
   print("[  ] Simple Mango query (equality) ")
-  result = mango_query(db, q"data = authenticate")
+  result = mango_query(db, q"data = authenticate"; fields=["name", "data2"])
   @test length(result.docs) == 2
   println("\r[OK] Simple Mango query (equality)")
 
@@ -225,6 +229,11 @@ Test.with_handler(test_handler) do
   data = changes(db; limit=maxch, conflicts=true, include_docs=true, attachments=true, att_encoding_info=true)
   @test maxch == length(data["results"]) # In static mode, "last_seq" is a key in the dict.
   println("\r[OK] Static changes")
+
+  print("[  ] Filtered changes ")
+  data = changes(db; doc_ids=[data["results"][1]["id"], data["results"][2]["id"], data["results"][3]["id"]])
+  @test length(data["results"]) == 3 
+  println("\r[OK] Filtered changes")
 
   print("[  ] revs_diff ")
   fakerev = "2-1f0e2f0d841ba6b7e3d735b870ebeb8c"
@@ -337,25 +346,30 @@ Test.with_handler(test_handler) do
   @test length(result["rows"]) == 1
   println("\r[OK] Query view")
   
-  print("[  ] Query view (POST)")
+  print("[  ] Query view (POST) ")
   result = view_query(db, "my_ddoc", "my_view"; keys=["adam", "billy"])
   @test length(result["rows"]) == 2
   println("\r[OK] Query view (POST)")
 
-  print("[  ] Query view (POST + skip)")
+  print("[  ] Query view (POST + skip) ")
   result = view_query(db, "my_ddoc", "my_view"; keys=["adam", "billy"], skip=1, limit=1)
   @test length(result["rows"]) == 1
   println("\r[OK] Query view (POST + skip)")
 
-  print("[  ] Query view (startkey, endkey)")
+  print("[  ] Query view (startkey, endkey) ")
   result = view_query(db, "my_ddoc", "my_view"; startkey="adam", endkey="billy", inclusive_end=false)
   @test length(result["rows"]) == 1
   println("\r[OK] Query view (startkey, endkey)")
 
-  print("[  ] Query view reduce")
+  print("[  ] Query view reduce ")
   result = view_query(db, "my_ddoc2", "my_view2"; key="adam", group=true, group_level=2)
   @test haskey(result, "rows")
   println("\r[OK] Query view reduce")
+
+  print("[  ] Query view reduce off ")
+  result = view_query(db, "my_ddoc2", "my_view2"; key="adam", reduce=false)
+  @test haskey(result, "rows")
+  println("\r[OK] Query view reduce off")
 end
 
 Test.with_handler(test_handler) do

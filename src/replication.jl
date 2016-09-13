@@ -1,22 +1,17 @@
 # The CouchDB replication API
 
 function opts(;
-  doc_ids = [],
   conflicts = false,
   descending = false,
   include_docs = false,
   attachments = false,
   att_encoding_info = false,
-  last_event_id = 0,
   limit = 0,
   feed = "normal",
   timeout = -1,
   since = "")
 
   query = Dict{UTF8String, Any}()
-  if length(doc_ids) > 0
-    query["doc_ids"] = doc_ids
-  end
   if conflicts && include_docs # conflicts only relevant if include_docs is true
     query["conflicts"] = true
   end
@@ -28,9 +23,6 @@ function opts(;
   end
   if att_encoding_info
     query["att_encoding_info"] = true
-  end
-  if last_event_id != 0
-    query["last-event-id"] = last_event_id
   end
   if since != ""
     query["since"] = since
@@ -56,15 +48,15 @@ end
       include_docs = false,
       attachments = false,
       att_encoding_info = false,
-      last-event-id = 0,
-      limit = 0
+      limit = 0,
       since = 0)
 
 Query the CouchDB changes feed, line by line. This is a co-routine. 
-Note that the last item produced will always  be the CouchDB `last_seq` 
+Note that the last item produced will always be the CouchDB `last_seq` 
 entry.
 
-This is a co-routine. Filtering options not supported.
+This is a co-routine. Note that the CouchDB parameter `last-event-id` is 
+not supported. Use `since` to achieve the same thing.
 
 ### Examples
 
@@ -91,15 +83,22 @@ function changes_streaming(db::Database;
   include_docs = false,
   attachments = false,
   att_encoding_info = false,
-  last_event_id = 0,
   limit = 0,
   since = 0)
 
-  query = opts(doc_ids=doc_ids, conflicts=conflicts, descending=descending, 
-    include_docs=include_docs, attachments=attachments, att_encoding_info=att_encoding_info,
-    last_event_id=last_event_id, limit=limit, since=since, feed="continuous", timeout=0)
+  query = opts(conflicts=conflicts, descending=descending, include_docs=include_docs, 
+    attachments=attachments, att_encoding_info=att_encoding_info, limit=limit, 
+    since=since, feed="continuous", timeout=0)
 
-  stream = Requests.get_streaming(endpoint(db.url, "_changes"); cookies=db.client.cookies, query=query)
+  body = Dict{Any, Any}()
+  method = Requests.get_streaming
+  if length(doc_ids) > 0
+    query["filter"] = "_doc_ids"
+    body = Dict("doc_ids" => doc_ids)
+    method = Requests.post_streaming
+  end
+
+  stream = method(endpoint(db.url, "_changes"); cookies=db.client.cookies, query=query, json=body)
   while true
     line = strip(readline(stream))
     if length(line) > 0 && line[1] == '{'
@@ -119,16 +118,19 @@ end
       include_docs = false,
       attachments = false,
       att_encoding_info = false,
-      last-event-id = 0,
-      limit = 0
+      limit = 0,
       since = 0)
 
-Query the CouchDB changes feed, returned as a big `Dict`. Normal mode only. Filtering options not
-supported.
+Query the CouchDB changes feed, returned as a big `Dict`. Normal (batch) mode only - for streaming, see
+`changes_streaming()`.
+
+Note that the CouchDB parameter `last-event-id` is not supported. Use `since` to achieve the same
+thing.
 
 ### Examples
 
     results = changes(db; include_docs=true, since=0)
+    filtered = changes(db; doc_ids=["25806e48920b4a35b3c9d9f23c16c821", "644464774951c32fad7243ac8c9745ad"])
 
 [API reference](http://docs.couchdb.org/en/1.6.1/api/database/changes.html)
 """
@@ -139,15 +141,21 @@ function changes(db::Database;
   include_docs = false,
   attachments = false,
   att_encoding_info = false,
-  last_event_id = 0,
   limit = 0,
   since = 0)
 
-  query = opts(doc_ids=doc_ids, conflicts=conflicts, descending=descending, 
-    include_docs=include_docs, attachments=attachments, att_encoding_info=att_encoding_info,
-    last_event_id=last_event_id, limit=limit, since=since)
+  query = opts(conflicts=conflicts, descending=descending, include_docs=include_docs, 
+    attachments=attachments, att_encoding_info=att_encoding_info, limit=limit, since=since)
 
-  relax(get, endpoint(db.url, "_changes"); cookies=db.client.cookies, query=query)
+  method = get
+  body = Dict{Any, Any}()
+  if length(doc_ids) > 0
+    method = post
+    body = Dict("doc_ids" => doc_ids)
+    query["filter"] = "_doc_ids"
+  end
+
+  relax(method, endpoint(db.url, "_changes"); cookies=db.client.cookies, query=query, json=body)
 end
 
 """

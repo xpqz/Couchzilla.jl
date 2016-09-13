@@ -55,30 +55,30 @@ on `year`. Set the page size to 10.
 * [Cloudant Query blog post](https://cloudant.com/blog/cloudant-query-grows-up-to-handle-ad-hoc-queries/)
 """
 function mango_query{T<:AbstractString}(db::Database, selector::Selector;
-  fields::Vector{T}          = Vector{AbstractString}(),
+  fields                     = [],
   sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
   limit                      = 0,
   skip                       = 0,
   bookmark                   = "")
 
-  cquery = Dict{UTF8String, Any}("selector" => selector.dict, "skip" => skip)
+  body = Dict{UTF8String, Any}("selector" => selector.dict, "skip" => skip)
   if length(fields) > 0
-    cquery["fields"] = fields
+    body["fields"] = fields
   end
 
   if length(sort) > 0
-    cquery["sort"] = sort
+    body["sort"] = sort
   end
   
   if limit > 0
-    cquery["limit"] = limit
+    body["limit"] = limit
   end
   
   if bookmark != ""
-    cquery["bookmark"] = bookmark
+    body["bookmark"] = bookmark
   end
 
-  result = relax(post, endpoint(db.url, "_find"); json=cquery, cookies=db.client.cookies)
+  result = relax(post, endpoint(db.url, "_find"); json=body, cookies=db.client.cookies)
   QueryResult(result["docs"], haskey(result, "bookmark") ? result["bookmark"] : "")
 end
 
