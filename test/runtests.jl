@@ -509,6 +509,14 @@ Test.with_handler(test_handler) do
   result3 = get_permissions(db)
   @test haskey(result3, "cloudant") && haskey(result3["cloudant"], api_key)
   println("\r[OK] View permissions")
+
+  print("[  ] Delete API key ")
+  @test delete_api_key(db, api_key)
+  println("\r[OK] Delete API key")
+
+   print("[  ] Delete non-existing API key ")
+  @test delete_api_key(db, "NOSUCHKEY") == false
+  println("\r[OK] Delete non-existing API key")
 end
 
 print("[  ] Delete test database: $database ")

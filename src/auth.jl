@@ -48,7 +48,8 @@ Remove an existing API key. Note: this is Cloudant-specific. This is implemented
 function delete_api_key(db::Database, key::AbstractString)
   current = get_permissions(db)
   if haskey(current, "cloudant") && haskey(current["cloudant"], key)
-    set_permissions(db, delete!(current["cloudant"], key))
+    delete!(current["cloudant"], key)
+    set_permissions(db, current)
     return true
   end
   false
