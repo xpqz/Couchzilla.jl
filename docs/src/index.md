@@ -34,6 +34,19 @@ is represented as
 
 Along similar lines, Couchzilla will return CouchDB's JSON-responses simply converted as-is.
 
+## CouchDB vs Cloudant
+
+[IBM Cloudant](http://cloudant.com) offers a clustered version of CouchDB as a service. What started out as 
+a fork has with version 2.0 och CouchDB now largely come back togther, and Cloudant now does (nearly) all 
+its work directly in the Apache CouchDB repos. However, some features of Cloudant makes no sense in the CouchDB
+context, so there are still some differences. Couchzilla tries to cover both bases, but makes no attempt to
+hide Cloudant-only functionality when using CouchDB.
+
+The main differences are:
+
+1. Text indexes - Cloudant integrates with Lucene. CouchDB only has json indexes in its Mango implementation.
+2. Rate capping - as Cloudant sells its service in terms of provisioned throughput capacity, Cloudant will occasionally throw a 429 error indicating that the cap has been 
+
 ## Getting Started
 
 Couchzilla defines two types, [`Client`](@ref) and [`Database`](@ref). `Client` represents an authenticated 
@@ -159,6 +172,10 @@ To read from this view, use the [`view_query`](@ref) method:
 ```@example intro
 view_query(db, "my_ddoc", "my_view"; keys=["davina", "billy"])
 ```
+
+Cloudant has an interactive tool for trying out Mango Query which is a useful resource:
+
+[Cloudant Query demo](https://docs.cloudant.com/try.html#requestType=cq&predefinedQuery=year2010ascending)
 
 ## Using attachments
 

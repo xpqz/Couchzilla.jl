@@ -15,7 +15,7 @@ end
 database = "juliatest-$(Base.Random.uuid4())"
 geo_database = "crimes"
 cl = Client(username, password, host)
-db, created = createdb(cl, database=database)
+db, created = createdb(cl; database=database)
 
 test_handler(r::Test.Success) = nothing
 
@@ -488,7 +488,30 @@ Test.with_handler(test_handler) do
   end
 end
 
+Test.with_handler(test_handler) do
+  print("[  ] Make api key ")
+  result = make_api_key(cl)
+  @test result["ok"] == true
+  println("\r[OK] Make api key")
+
+  api_key = result["key"]
+
+  print("[  ] Set permissions ")
+  result2 = set_permissions(db, Dict("cloudant" => Dict(api_key => ["_reader", "_writer"])))
+  @test result2["ok"] == true
+  println("\r[OK] Set permissions")
+
+  print("[  ] Set permissions with no data should fail ")
+  @test_throws ErrorException set_permissions(db, Dict())
+  println("\r[OK] Set permissions with no data should fail")
+
+  print("[  ] View permissions ")
+  result3 = get_permissions(db)
+  @test haskey(result3, "cloudant") && haskey(result3["cloudant"], api_key)
+  println("\r[OK] View permissions")
+end
+
 print("[  ] Delete test database: $database ")
-result = deletedb(cl, database)
-@test result["ok"] == true
+# result = deletedb(cl, database)
+# @test result["ok"] == true
 println("\r[OK] Delete test database: $database")

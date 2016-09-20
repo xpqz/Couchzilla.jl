@@ -58,15 +58,23 @@ The CouchDB API.
 * `revs_diff()`
 * `bulk_get()`
 
-## Geospatial
+## Geospatial (Cloudant only)
 
 * `geo_index()`
 * `geo_indexinfo()`
 * `geo_query()`
 
-## utils
+## Auth (Cloudant only)
+
+* `get_permissions()`
+* `set_permissions()`
+* `make_api_key()`
+* `delete_api_key()`
+
+## utils (Cloudant only)
 
 * `retry_settings()`
+* `retry_settings!()`
 """
 module Couchzilla
 
@@ -86,6 +94,7 @@ include("replication.jl")
 include("views.jl")
 include("tasks.jl")
 include("geospatial.jl")
+include("auth.jl")
 
 export Client, Database, HTTPException 
 export createdb, connectdb, dbinfo, listdbs, deletedb
@@ -97,5 +106,6 @@ export view_index, view_query, alldocs
 export revs_diff, changes, changes_streaming, bulk_get
 export geo_index, geo_indexinfo, geo_query
 export retry_settings, retry_settings!
+export get_permissions, set_permissions, make_api_key, delete_api_key
 
 end # module
