@@ -16,11 +16,21 @@ Modify permissions. Note: this is Cloudant-specific.
 
 [API reference](https://docs.cloudant.com/authorization.html#modifying-permissions)
 """
-function set_permissions(db::Database, data::Dict)
-  if length(data) == 0
-    error("No data provided")
+function set_permissions(db::Database, current::Dict=Dict{AbstractString, Any}(); key="", roles=[])
+  if key != "" && length(roles) == 0
+    error("No roles provided for key")
   end
-  relax(put, endpoint(db.client.url, "_api/v2/db/$(db.name)/_security"); json=data, cookies=db.client.cookies)
+  if !haskey(current, "cloudant") && key == ""
+    error("Expected a non-empty permissions dict or a non-empty key")
+  end
+
+  if !haskey(current, "cloudant")
+    current["cloudant"] = Dict(key => roles)
+  else
+    current["cloudant"][key] = roles
+  end
+
+  relax(put, endpoint(db.client.url, "_api/v2/db/$(db.name)/_security"); json=current, cookies=db.client.cookies)
 end
 
 """

@@ -45,7 +45,9 @@ hide Cloudant-only functionality when using CouchDB.
 The main differences are:
 
 1. Text indexes - Cloudant integrates with Lucene. CouchDB only has json indexes in its Mango implementation.
-2. Rate capping - as Cloudant sells its service in terms of provisioned throughput capacity, Cloudant will occasionally throw a 429 error indicating that the cap has been 
+2. Rate capping - as Cloudant sells its service in terms of provisioned throughput capacity, Cloudant will occasionally throw a 429 error indicating that the cap has been hit.
+3. API keys – Cloudant has a separate auth system distinct from CouchDB's `_users` database.
+4. Geospatial indexes – Cloudant has sophisticated geospatial capabilities which are not present in CouchDB.
 
 ## Getting Started
 
@@ -247,7 +249,7 @@ If you want to delete a database, simply call [`deletedb`](@ref):
 deletedb(client, dbname)
 ```
 
-## Cloudant-specific extensions
+## Handling Cloudant's rate capping
 
 Cloudant pushes most of its stuff to upstream to [Apache CouchDB](http://couchdb.apache.org/). However, not everything Cloudant does makes sense for CouchDB, and once such example is throughput throttling. Cloudant, currently only in its Bluemix guise, prices its service in terms of provisioned throughput capacity for lookups, writes and queries. This means that you purchase a certain max number of requests per second, bucketed by type. This is similar in spirit to how other purveyors of database services price their services (e.g. [DynamoDB](https://aws.amazon.com/dynamodb/pricing/)). 
 
@@ -262,6 +264,30 @@ You can retrieve the current settings using:
     retry_settings()
 
 Note that this behaviour is not enabled by default, and relying on it alone on a rate-capped cluster will only help with temporary transgressions – your own code must still handle the case where the max retries are exceeded.
+
+## Using Cloudant's API keys for auth
+
+Cloudant has an auth system distinct from the CouchDB traditional style based on the `_users` database. By using API keys you can grant and revoke a client application's access. API keys have roles attached to them, a combination of `_admin`, `_reader`, `_writer`, `_replicator` and `_creator`. It's not quite as straight-forward as it may seem. `_reader` grants read-only access. TODO
+
+In order to use the API key system, you need two steps:
+
+1. Create the key using
+
+    data = make_api_key(client::Client)
+
+2. Assign key to a database, with the appropriate roles
+
+    result = set_permissions(db, Dict("cloudant" => Dict(data["key"] => ["_reader", "_writer"])))
+
+3. Create a new client connection using the new key
+
+    api_client = Client(data["key"], data["password"], host)
+
+4. Create a database connection using the new client
+
+    api_db = connectdb(api_client, "dbname")
+
+There is one gotcha here that you need to be aware of. API keys are created on a central Cloudant admin cluster, and then replicated back to the one you're using. This means that running through the four steps above may occasionally fail to authenticate (step 3) for a good few minutes whilst the update percolates through. It helps to treat API keys as something to be created up front, rather than on the fly.
 
 ## Client
 

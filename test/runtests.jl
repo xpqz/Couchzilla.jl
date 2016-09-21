@@ -497,18 +497,27 @@ Test.with_handler(test_handler) do
   api_key = result["key"]
 
   print("[  ] Set permissions ")
-  result2 = set_permissions(db, Dict("cloudant" => Dict(api_key => ["_reader", "_writer"])))
-  @test result2["ok"] == true
+  result = set_permissions(db; key=api_key, roles=["_reader", "_writer"])
+  @test result["ok"] == true
   println("\r[OK] Set permissions")
 
-  print("[  ] Set permissions with no data should fail ")
-  @test_throws ErrorException set_permissions(db, Dict())
-  println("\r[OK] Set permissions with no data should fail")
+  print("[  ] Set permissions with no permissions should fail ")
+  @test_throws ErrorException set_permissions(db)
+  println("\r[OK] Set permissions with no permissions should fail")
+
+  print("[  ] Set permissions with no roles should fail ")
+  @test_throws ErrorException set_permissions(db; key=api_key)
+  println("\r[OK] Set permissions with no roles should fail")
 
   print("[  ] View permissions ")
-  result3 = get_permissions(db)
-  @test haskey(result3, "cloudant") && haskey(result3["cloudant"], api_key)
+  permissions = get_permissions(db)
+  @test haskey(permissions, "cloudant") && haskey(permissions["cloudant"], api_key)
   println("\r[OK] View permissions")
+
+  print("[  ] Modify existing permissions ")
+  result = set_permissions(db, permissions; key=api_key, roles=["_reader"])
+  @test result["ok"] == true
+  println("\r[OK] Modify existing permissions")
 
   print("[  ] Delete API key ")
   @test delete_api_key(db, api_key)
