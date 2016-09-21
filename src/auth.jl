@@ -10,7 +10,7 @@ function get_permissions(db::Database)
 end
 
 """
-    result = set_permissions(db::Database; data=Dict{Any, Any}())
+    result = set_permissions(db::Database, current::Dict=Dict{AbstractString, Any}(); key="", roles=[])
 
 Modify permissions. Note: this is Cloudant-specific.
 

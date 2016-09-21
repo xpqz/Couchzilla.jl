@@ -277,7 +277,8 @@ In order to use the API key system, you need two steps:
 
 2. Assign key to a database, with the appropriate roles
 
-    result = set_permissions(db, Dict("cloudant" => Dict(data["key"] => ["_reader", "_writer"])))
+    current = get_permissions(db)
+    result = set_permissions(db, current; key=data["key"], roles=["_reader", "_writer"])
 
 3. Create a new client connection using the new key
 
@@ -374,6 +375,14 @@ Couchzilla.bulk_get
 Couchzilla.geo_index
 Couchzilla.geo_indexinfo
 Couchzilla.geo_query
+```
+
+## Auth
+```@docs
+Couchzilla.get_permissions
+Couchzilla.set_permissions
+Couchzilla.make_api_key
+Couchzilla.delete_api_key
 ```
 
 ## Utility stuff
