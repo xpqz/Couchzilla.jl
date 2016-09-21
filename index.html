@@ -183,6 +183,12 @@
             </li>
           
             <li class="anchor">
+              <a title="CouchDB vs Cloudant" href="#couchdb-vs-cloudant">
+                CouchDB vs Cloudant
+              </a>
+            </li>
+          
+            <li class="anchor">
               <a title="Getting Started" href="#getting-started">
                 Getting Started
               </a>
@@ -213,8 +219,14 @@
             </li>
           
             <li class="anchor">
-              <a title="Cloudant-specific extensions" href="#cloudant-specific-extensions">
-                Cloudant-specific extensions
+              <a title="Handling Cloudant's rate capping" href="#handling-cloudants-rate-capping">
+                Handling Cloudant's rate capping
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="Using Cloudant's API keys for auth" href="#using-cloudants-api-keys-for-auth">
+                Using Cloudant's API keys for auth
               </a>
             </li>
           
@@ -257,6 +269,12 @@
             <li class="anchor">
               <a title="Geospatial" href="#geospatial">
                 Geospatial
+              </a>
+            </li>
+          
+            <li class="anchor">
+              <a title="Auth" href="#auth">
+                Auth
               </a>
             </li>
           
@@ -310,6 +328,16 @@
 
 
 <p>Along similar lines, Couchzilla will return CouchDB's JSON-responses simply converted as-is.</p>
+<p><a id='CouchDB-vs-Cloudant-1'></a></p>
+<h2 id="couchdb-vs-cloudant">CouchDB vs Cloudant</h2>
+<p><a href="http://cloudant.com">IBM Cloudant</a> offers a clustered version of CouchDB as a service. What started out as  a fork has with version 2.0 och CouchDB now largely come back togther, and Cloudant now does (nearly) all  its work directly in the Apache CouchDB repos. However, some features of Cloudant makes no sense in the CouchDB context, so there are still some differences. Couchzilla tries to cover both bases, but makes no attempt to hide Cloudant-only functionality when using CouchDB.</p>
+<p>The main differences are:</p>
+<ol>
+<li>Text indexes - Cloudant integrates with Lucene. CouchDB only has json indexes in its Mango implementation.</li>
+<li>Rate capping - as Cloudant sells its service in terms of provisioned throughput capacity, Cloudant will occasionally throw a 429 error indicating that the cap has been hit.</li>
+<li>API keys – Cloudant has a separate auth system distinct from CouchDB's <code>_users</code> database.</li>
+<li>Geospatial indexes – Cloudant has sophisticated geospatial capabilities which are not present in CouchDB.</li>
+</ol>
 <p><a id='Getting-Started-1'></a></p>
 <h2 id="getting-started">Getting Started</h2>
 <p>Couchzilla defines two types, <a href=".#Couchzilla.Client"><code>Client</code></a> and <a href=".#Couchzilla.Database"><code>Database</code></a>. <code>Client</code> represents an authenticated  connection to the remote CouchDB <em>instance</em>. Using this you can perform database-level operations,  such as creating, listing and deleting databases. The Database immutable type represents a client that is connected to a specific database, allowing you to perform document-level operations.</p>
@@ -338,11 +366,11 @@ db, created = createdb(client; database=dbname)</code></pre>
 
 
 <pre class="codehilite"><code>5-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;3045d6d316b29421a22fb60a1710bc57&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;3045d6d316b29421a22fb60a1710cb07&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;3045d6d316b29421a22fb60a1710d17a&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;3045d6d316b29421a22fb60a1710d8ff&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;3045d6d316b29421a22fb60a1710dee2&quot;)</code></pre>
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbcaf7&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbd1c9&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbd86b&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbe4a1&quot;)
+ Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbe512&quot;)</code></pre>
 
 
 <p>This form of <a href=".#Couchzilla.createdoc"><code>createdoc</code></a> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
@@ -354,7 +382,7 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 4 entries:
   &quot;_rev&quot; =&gt; &quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;
   &quot;name&quot; =&gt; &quot;billy&quot;
-  &quot;_id&quot;  =&gt; &quot;3045d6d316b29421a22fb60a1710cb07&quot;
+  &quot;_id&quot;  =&gt; &quot;f69f9ab463df533613838e9a64cbd1c9&quot;
   &quot;data&quot; =&gt; &quot;world&quot;</code></pre>
 
 
@@ -377,14 +405,14 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code class="language-julia">mango_query(db, q&quot;name=davina&quot;)</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;3045d6d316b29421a22fb60a1710d8ff&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbe4a1&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>The construct <code>q"..."</code> (see <a href=".#Couchzilla.@q_str"><code>@q_str</code></a>) is a custom string literal type which takes a simplistic DSL  expression which gets converted to the actual JSON-representation of a Mango selector. If you are familiar with <a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">Mango selectors</a>,  you can use the raw JSON expression if you prefer:</p>
 <pre class="codehilite"><code class="language-julia">mango_query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;3045d6d316b29421a22fb60a1710d8ff&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbe4a1&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
 
 
 <p>There are also coroutine versions of some of the functions that return data from views. If we had many results to process, we could use <a href=".#Couchzilla.paged_mango_query"><code>paged_mango_query</code></a> in a Julia Task:</p>
@@ -417,11 +445,13 @@ function(doc) {
 
 
 <pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
-  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;3045d6d316b29…
+  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;f69f9ab463df5…
   &quot;offset&quot;     =&gt; 1
   &quot;total_rows&quot; =&gt; 5</code></pre>
 
 
+<p>Cloudant has an interactive tool for trying out Mango Query which is a useful resource:</p>
+<p><a href="https://docs.cloudant.com/try.html#requestType=cq&amp;predefinedQuery=year2010ascending">Cloudant Query demo</a></p>
 <p><a id='Using-attachments-1'></a></p>
 <h2 id="using-attachments">Using attachments</h2>
 <p>CouchDB can store files alongside documents as attachments. This can be a convenient feature for many applications, but it has drawbacks, especially in terms of performance. If you find that you need to store large (say greater than a couple of meg) binary attachments, you should probably consider a dedicated, separate file store and only use CouchDB for metadata.</p>
@@ -497,8 +527,8 @@ result[&quot;rows&quot;]</code></pre>
   &quot;ok&quot; =&gt; true</code></pre>
 
 
-<p><a id='Cloudant-specific-extensions-1'></a></p>
-<h2 id="cloudant-specific-extensions">Cloudant-specific extensions</h2>
+<p><a id='Handling-Cloudant's-rate-capping-1'></a></p>
+<h2 id="handling-cloudants-rate-capping">Handling Cloudant's rate capping</h2>
 <p>Cloudant pushes most of its stuff to upstream to <a href="http://couchdb.apache.org/">Apache CouchDB</a>. However, not everything Cloudant does makes sense for CouchDB, and once such example is throughput throttling. Cloudant, currently only in its Bluemix guise, prices its service in terms of provisioned throughput capacity for lookups, writes and queries. This means that you purchase a certain max number of requests per second, bucketed by type. This is similar in spirit to how other purveyors of database services price their services (e.g. <a href="https://aws.amazon.com/dynamodb/pricing/">DynamoDB</a>). </p>
 <p>When you hit capacity, Cloudant will return an error, signified by the HTTP status code 429 (<code>Too many requests</code>). This means that the request was not successful, and will need to be retried at a later stage. Couchzilla optionally gives you a way to deal with 429 errors:</p>
 <pre class="codehilite"><code>retry_settings!(;enabled=true, max_retries=5, delay_ms=10)</code></pre>
@@ -510,6 +540,36 @@ result[&quot;rows&quot;]</code></pre>
 
 
 <p>Note that this behaviour is not enabled by default, and relying on it alone on a rate-capped cluster will only help with temporary transgressions – your own code must still handle the case where the max retries are exceeded.</p>
+<p><a id='Using-Cloudant's-API-keys-for-auth-1'></a></p>
+<h2 id="using-cloudants-api-keys-for-auth">Using Cloudant's API keys for auth</h2>
+<p>Cloudant has an auth system distinct from the CouchDB traditional style based on the <code>_users</code> database. By using API keys you can grant and revoke a client application's access. API keys have roles attached to them, a combination of <code>_admin</code>, <code>_reader</code>, <code>_writer</code>, <code>_replicator</code> and <code>_creator</code>. It's not quite as straight-forward as it may seem. <code>_reader</code> grants read-only access. TODO</p>
+<p>In order to use the API key system, you need two steps:</p>
+<ol>
+<li>Create the key using</li>
+</ol>
+<pre class="codehilite"><code>data = make_api_key(client::Client)</code></pre>
+
+
+<ol>
+<li>Assign key to a database, with the appropriate roles</li>
+</ol>
+<pre class="codehilite"><code>current = get_permissions(db)
+result = set_permissions(db, current; key=data[&quot;key&quot;], roles=[&quot;_reader&quot;, &quot;_writer&quot;])</code></pre>
+
+
+<ol>
+<li>Create a new client connection using the new key</li>
+</ol>
+<pre class="codehilite"><code>api_client = Client(data[&quot;key&quot;], data[&quot;password&quot;], host)</code></pre>
+
+
+<ol>
+<li>Create a database connection using the new client</li>
+</ol>
+<pre class="codehilite"><code>api_db = connectdb(api_client, &quot;dbname&quot;)</code></pre>
+
+
+<p>There is one gotcha here that you need to be aware of. API keys are created on a central Cloudant admin cluster, and then replicated back to the one you're using. This means that running through the four steps above may occasionally fail to authenticate (step 3) for a good few minutes whilst the update percolates through. It helps to treat API keys as something to be created up front, rather than on the fly.</p>
 <p><a id='Client-1'></a></p>
 <h2 id="client">Client</h2>
 <p><a id='Couchzilla.Client' href='#Couchzilla.Client'>#</a>
@@ -1222,6 +1282,37 @@ Dict(
 
 
 <p><a href="https://docs.cloudant.com/geo.html#querying-a-cloudant-geo-index">API reference</a></p>
+<p><a id='Auth-1'></a></p>
+<h2 id="auth">Auth</h2>
+<p><a id='Couchzilla.get_permissions' href='#Couchzilla.get_permissions'>#</a>
+<strong><code>Couchzilla.get_permissions</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>data = get_permissions(db::Database)</code></pre>
+
+
+<p>Fetch all current permissions. Note: this is Cloudant-specific.</p>
+<p><a href="https://docs.cloudant.com/authorization.html#viewing-permissions">API reference</a></p>
+<p><a id='Couchzilla.set_permissions' href='#Couchzilla.set_permissions'>#</a>
+<strong><code>Couchzilla.set_permissions</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>result = set_permissions(db::Database, current::Dict=Dict{AbstractString, Any}(); key=&quot;&quot;, roles=[])</code></pre>
+
+
+<p>Modify permissions. Note: this is Cloudant-specific.</p>
+<p><a href="https://docs.cloudant.com/authorization.html#modifying-permissions">API reference</a></p>
+<p><a id='Couchzilla.make_api_key' href='#Couchzilla.make_api_key'>#</a>
+<strong><code>Couchzilla.make_api_key</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>data = make_api_key(client::Client)</code></pre>
+
+
+<p>Generate a new API key. Note: this is Cloudant-specific.</p>
+<p>Note also that API keys take a long time to propagate around a cluster. It's unsafe to rely on a newly created key to be immediately available. The reason for this is that Cloudant keeps its auth-related documents centrally, and replicate out to all clusters. </p>
+<p><a href="https://docs.cloudant.com/authorization.html#creating-api-keys">API reference</a></p>
+<p><a id='Couchzilla.delete_api_key' href='#Couchzilla.delete_api_key'>#</a>
+<strong><code>Couchzilla.delete_api_key</code></strong> &mdash; <em>Function</em>.</p>
+<pre class="codehilite"><code>result = delete_api_key(db::Database, key::AbstractString)</code></pre>
+
+
+<p>Remove an existing API key. Note: this is Cloudant-specific. This is implemented via <code>set_permissions()</code>.</p>
+<p><a href="https://docs.cloudant.com/authorization.html#deleting-api-keys">API reference</a></p>
 <p><a id='Utility-stuff-1'></a></p>
 <h2 id="utility-stuff">Utility stuff</h2>
 <p><a id='Couchzilla.retry_settings!-Tuple{}' href='#Couchzilla.retry_settings!-Tuple{}'>#</a>
