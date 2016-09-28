@@ -20,7 +20,7 @@ Write an attachment to an existing document. Attachment read from a file.
 function put_attachment(db::Database, id::AbstractString, rev::AbstractString, name::AbstractString, mimetype::AbstractString, file::AbstractString)
   open(file) do f
     Requests.json(put(endpoint(db.url, "$id/$name"); 
-      data    = base64encode(readbytes(f)), 
+      data    = base64encode(read(f)), 
       cookies = db.client.cookies, 
       headers = Dict("Content-Type" => mimetype), 
       query   = Dict("rev" => rev)))

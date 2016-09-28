@@ -1,4 +1,4 @@
-relations = Dict{UTF8String, Bool}(
+relations = Dict{String, Bool}(
   "contains"           => true,
   "contains_properly"  => true,
   "covered_by"         => true,
@@ -11,14 +11,14 @@ relations = Dict{UTF8String, Bool}(
   "within"             => true
 )
 
-formats = Dict{UTF8String, Bool}(
+formats = Dict{String, Bool}(
   "legacy"                   => true,
   "geojson"                  => true,
   "view"                     => true,
   "application/vnd.geo+json" => true
 )
 
-# WKT = Dict{UTF8String, Bool}(
+# WKT = Dict{String, Bool}(
 #   "point"              => true,
 #   "linestring"         => true,
 #   "polygon"            => true,
@@ -174,7 +174,7 @@ function geo_query(db::Database, ddoc::AbstractString, name::AbstractString;
   stale = false,
   g::AbstractString = "") # We really need GeoJSON to do this properly
 
-  query::Dict{UTF8String, Any} = Dict()
+  query::Dict{String, Any} = Dict()
 
   if lat != -360.0
     query["lat"] = lat

@@ -11,7 +11,7 @@ function opts(;
   timeout = -1,
   since = "")
 
-  query = Dict{UTF8String, Any}()
+  query = Dict{String, Any}()
   if conflicts && include_docs # conflicts only relevant if include_docs is true
     query["conflicts"] = true
   end

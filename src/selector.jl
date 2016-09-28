@@ -82,7 +82,7 @@ For more information on the actual Selector syntax, see link below.
 """
 macro q_str(data)
   quote
-    operators = Dict{UTF8String, UTF8String}(
+    operators = Dict{String, String}(
       "=="  => "\$eq",
       "="   => "\$eq",
       "!="  => "\$ne",

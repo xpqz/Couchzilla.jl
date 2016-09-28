@@ -91,7 +91,7 @@ function view_query(db::Database, ddoc::AbstractString, name::AbstractString;
   skip          = 0,
   startkey      = "")
 
-  query::Dict{UTF8String, Any} = Dict()
+  query::Dict{String, Any} = Dict()
 
   if descending
     query["descending"] = true
@@ -191,7 +191,7 @@ function alldocs(db::Database;
   skip          = 0,
   startkey      = "")
 
-  query::Dict{UTF8String, Any} = Dict()
+  query::Dict{String, Any} = Dict()
 
   if descending
     query["descending"] = true

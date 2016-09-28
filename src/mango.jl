@@ -61,7 +61,7 @@ function mango_query{T<:AbstractString}(db::Database, selector::Selector;
   skip                       = 0,
   bookmark                   = "")
 
-  body = Dict{UTF8String, Any}("selector" => selector.dict, "skip" => skip)
+  body = Dict{String, Any}("selector" => selector.dict, "skip" => skip)
   if length(fields) > 0
     body["fields"] = fields
   end
@@ -87,7 +87,7 @@ end
       name::T       = "",
       ddoc::T       = "", 
       selector      = Selector(),
-      default_field = Dict{UTF8String, Any}("analyzer" => "standard", "enabled" => true))
+      default_field = Dict{String, Any}("analyzer" => "standard", "enabled" => true))
 
 Create a Mango index. 
 
@@ -124,7 +124,7 @@ function mango_index{T<:AbstractString}(db::Database, fields::AbstractArray;
   name::T       = "",
   ddoc::T       = "", 
   selector      = Selector(),
-  default_field = Dict{UTF8String, Any}("analyzer" => "standard", "enabled" => true))
+  default_field = Dict{String, Any}("analyzer" => "standard", "enabled" => true))
 
   idxquery = fields == [] ? Dict{T, Any}("index" => Dict{T, Any}()) : Dict{T, Any}("index" => Dict{T, Any}("fields" => fields))
 
