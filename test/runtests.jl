@@ -15,7 +15,11 @@ end
 database = "juliatest-$(Base.Random.uuid4())"
 geo_database = "crimes"
 cl = Client(username, password, host)
-db, created = createdb(cl; database=database)
+db, created = createdb(cl, database)
+
+function testname(name::AbstractString)
+  "\n\033[1m$name\033[0m" # Shell escape for bold text
+end
 
 try
   include("db_meta_tests.jl")

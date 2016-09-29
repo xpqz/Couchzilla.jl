@@ -20,7 +20,7 @@ type Client
 end
 
 """
-    cookieauth!(client::Client, username, password, auth=true) 
+    cookieauth!(client::Client, username::AbstractString, password::AbstractString, auth::Bool=true) 
 
 Private. Hits the `_session` endpoint to obtain a session cookie
 that is used to authenticate subsequent requests. If `auth` is set to 
@@ -28,7 +28,7 @@ false, this does nothing.
 
 [API reference](https://docs.cloudant.com/authentication.html#cookie-authentication)
 """
-function cookieauth!(client::Client, username, password, auth::Bool=true)
+function cookieauth!(client::Client, username::AbstractString, password::AbstractString, auth::Bool=true)
   if auth
     response = post(endpoint(client.url, "_session"); 
       data=Dict("name" => username, "password" => password))
@@ -40,7 +40,7 @@ function cookieauth!(client::Client, username, password, auth::Bool=true)
 end
 
 """
-    db = connectdb(client::Client; database::AbstractString=nothing)
+    db = connectdb(client::Client, database::AbstractString)
 
 Return an immutable Database reference.
 
@@ -49,12 +49,12 @@ If you need to operate on a different database, you need to create a new
 Database reference. `connectdb(...)` does not check that the chosen remote 
 database exists.
 """
-function connectdb(client::Client; database::AbstractString=nothing) 
+function connectdb(client::Client, database::AbstractString)
   Database(client, database)
 end
 
 """
-    db, created = createdb(client::Client; database::AbstractString=nothing)
+    db, created = createdb(client::Client, database::AbstractString)
 
 Create a new database on the remote end called `dbname`. Return an immutable 
 Database reference to this newly created db, and a boolean which is true if 
@@ -62,7 +62,7 @@ a database was created, false if it already existed.
 
 [API reference](http://docs.couchdb.org/en/1.6.1/CouchDB/database/common.html#put--db)
 """
-function createdb(client::Client; database::AbstractString=nothing)
+function createdb(client::Client, database::AbstractString)
   db = Database(client, database)
   created = false
   try 

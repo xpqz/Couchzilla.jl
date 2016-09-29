@@ -1,11 +1,12 @@
 @testset "Meta" begin
-  print("\nMeta tests\n[  ] DBInfo ")
+  println(testname("Meta tests"))
+  print("  [  ] DBInfo ")
   result = dbinfo(cl, database)
   @test result["doc_count"] == 0
-  println("\r[OK] DBInfo")
+  println("\r  [OK] DBInfo")
 
-  print("[  ] List dbs ")
+  print("  [  ] List dbs ")
   result = listdbs(cl)
   @test database ∈ result
-  println("\r[OK] List dbs")
+  println("\r  [OK] List dbs")
 end
