@@ -351,12 +351,12 @@ host     = ENV[&quot;COUCH_HOST_URL&quot;] # e.g. https://accountname.cloudant.c
 <p>We can now create a client connection, and use that to create a new database:</p>
 <pre class="codehilite"><code class="language-julia">dbname = &quot;mynewdb&quot;
 client = Client(username, password, host)
-db, created = createdb(client; database=dbname)</code></pre>
+db, created = createdb(client, dbname)</code></pre>
 
 
 <p>If the database already existed, <code>created</code> will be set to <code>false</code> on return, and <code>true</code> means that the database was created.</p>
-<p>We can now add documents to the new database using <a href=".#Couchzilla.createdoc"><code>createdoc</code></a>. It returns an array of  <code>Dict</code>s showing the <code>{id, rev}</code> tuples of the new documents:</p>
-<pre class="codehilite"><code class="language-julia">result = createdoc(db; data=[
+<p>We can now add documents to the new database using <a href=".#Couchzilla.createdoc-Tuple{Couchzilla.Database,Dict}"><code>createdoc</code></a>. It returns an array of  <code>Dict</code>s showing the <code>{id, rev}</code> tuples of the new documents:</p>
+<pre class="codehilite"><code class="language-julia">result = createdoc(db, [
     Dict(&quot;name&quot; =&gt; &quot;adam&quot;,    &quot;data&quot; =&gt; &quot;hello&quot;),
     Dict(&quot;name&quot; =&gt; &quot;billy&quot;,   &quot;data&quot; =&gt; &quot;world&quot;),
     Dict(&quot;name&quot; =&gt; &quot;cecilia&quot;, &quot;data&quot; =&gt; &quot;authenticate&quot;),
@@ -366,23 +366,23 @@ db, created = createdb(client; database=dbname)</code></pre>
 
 
 <pre class="codehilite"><code>5-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-783f91178091c10cce61c326473e8849&quot;,&quot;id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbcaf7&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;,&quot;id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbd1c9&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e05530fc65101ed432c5ee457d327952&quot;,&quot;id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbd86b&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbe4a1&quot;)
- Dict{UTF8String,Any}(&quot;ok&quot;=&gt;true,&quot;rev&quot;=&gt;&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;,&quot;id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbe512&quot;)</code></pre>
+ Dict{String,Any}(Pair{String,Any}(&quot;ok&quot;,true),Pair{String,Any}(&quot;rev&quot;,&quot;1-783f91178091c10cce61c326473e8849&quot;),Pair{String,Any}(&quot;id&quot;,&quot;93790b75ed6a59e5002cb0eddb78b42d&quot;))
+ Dict{String,Any}(Pair{String,Any}(&quot;ok&quot;,true),Pair{String,Any}(&quot;rev&quot;,&quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;),Pair{String,Any}(&quot;id&quot;,&quot;93790b75ed6a59e5002cb0eddb78b69c&quot;))
+ Dict{String,Any}(Pair{String,Any}(&quot;ok&quot;,true),Pair{String,Any}(&quot;rev&quot;,&quot;1-e05530fc65101ed432c5ee457d327952&quot;),Pair{String,Any}(&quot;id&quot;,&quot;93790b75ed6a59e5002cb0eddb78c304&quot;))
+ Dict{String,Any}(Pair{String,Any}(&quot;ok&quot;,true),Pair{String,Any}(&quot;rev&quot;,&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;),Pair{String,Any}(&quot;id&quot;,&quot;93790b75ed6a59e5002cb0eddb78c867&quot;))
+ Dict{String,Any}(Pair{String,Any}(&quot;ok&quot;,true),Pair{String,Any}(&quot;rev&quot;,&quot;1-e1f2181b3b4d7fa285b4516eee02d287&quot;),Pair{String,Any}(&quot;id&quot;,&quot;93790b75ed6a59e5002cb0eddb78c8a1&quot;))</code></pre>
 
 
-<p>This form of <a href=".#Couchzilla.createdoc"><code>createdoc</code></a> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
+<p>This form of <a href=".#Couchzilla.createdoc-Tuple{Couchzilla.Database,Dict}"><code>createdoc</code></a> creates multiple documents using a single <code>HTTP POST</code> which is  the most efficient way of creating multiple new documents.</p>
 <p>We can read a document back using <a href=".#Couchzilla.readdoc-Tuple{Couchzilla.Database,AbstractString}"><code>readdoc</code></a>, hitting the CouchDB primary index. Note that  reading back a document you just created is normally bad practice, as it will sooner or  later fall foul of CouchDB's <a href="http://guide.couchdb.org/draft/consistency.html">eventual consistency</a>  and give rise to sporadic, hard to troubleshoot errors. Having said that, let's do it  anyway, and hope for the best:</p>
 <pre class="codehilite"><code class="language-julia">id = result[2][&quot;id&quot;]
 readdoc(db, id)</code></pre>
 
 
-<pre class="codehilite"><code>Dict{UTF8String,Any} with 4 entries:
+<pre class="codehilite"><code>Dict{String,Any} with 4 entries:
   &quot;_rev&quot; =&gt; &quot;1-9ecba7e9a824a6fdcfb005c454fea12e&quot;
   &quot;name&quot; =&gt; &quot;billy&quot;
-  &quot;_id&quot;  =&gt; &quot;f69f9ab463df533613838e9a64cbd1c9&quot;
+  &quot;_id&quot;  =&gt; &quot;93790b75ed6a59e5002cb0eddb78b69c&quot;
   &quot;data&quot; =&gt; &quot;world&quot;</code></pre>
 
 
@@ -395,7 +395,7 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code class="language-julia">mango_index(db, [&quot;name&quot;, &quot;data&quot;])</code></pre>
 
 
-<pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
+<pre class="codehilite"><code>Dict{String,Any} with 3 entries:
   &quot;name&quot;   =&gt; &quot;f519be04f7f80838b6a88811f75de4fb83d966dd&quot;
   &quot;id&quot;     =&gt; &quot;_design/f519be04f7f80838b6a88811f75de4fb83d966dd&quot;
   &quot;result&quot; =&gt; &quot;created&quot;</code></pre>
@@ -405,14 +405,14 @@ readdoc(db, id)</code></pre>
 <pre class="codehilite"><code class="language-julia">mango_query(db, q&quot;name=davina&quot;)</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbe4a1&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult(Dict{AbstractString,Any}[Dict{AbstractString,Any}(Pair{AbstractString,Any}(&quot;_rev&quot;,&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;),Pair{AbstractString,Any}(&quot;name&quot;,&quot;davina&quot;),Pair{AbstractString,Any}(&quot;_id&quot;,&quot;93790b75ed6a59e5002cb0eddb78c867&quot;),Pair{AbstractString,Any}(&quot;data&quot;,&quot;cloudant&quot;))],&quot;&quot;)</code></pre>
 
 
 <p>The construct <code>q"..."</code> (see <a href=".#Couchzilla.@q_str"><code>@q_str</code></a>) is a custom string literal type which takes a simplistic DSL  expression which gets converted to the actual JSON-representation of a Mango selector. If you are familiar with <a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">Mango selectors</a>,  you can use the raw JSON expression if you prefer:</p>
 <pre class="codehilite"><code class="language-julia">mango_query(db, Selector(&quot;{\&quot;name\&quot;:{\&quot;\$eq\&quot;:\&quot;davina\&quot;}}&quot;))</code></pre>
 
 
-<pre class="codehilite"><code>Couchzilla.QueryResult([Dict{AbstractString,Any}(&quot;_rev&quot;=&gt;&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;,&quot;name&quot;=&gt;&quot;davina&quot;,&quot;_id&quot;=&gt;&quot;f69f9ab463df533613838e9a64cbe4a1&quot;,&quot;data&quot;=&gt;&quot;cloudant&quot;)],&quot;&quot;)</code></pre>
+<pre class="codehilite"><code>Couchzilla.QueryResult(Dict{AbstractString,Any}[Dict{AbstractString,Any}(Pair{AbstractString,Any}(&quot;_rev&quot;,&quot;1-446bb325003aa6a995bde4e7c3dd513f&quot;),Pair{AbstractString,Any}(&quot;name&quot;,&quot;davina&quot;),Pair{AbstractString,Any}(&quot;_id&quot;,&quot;93790b75ed6a59e5002cb0eddb78c867&quot;),Pair{AbstractString,Any}(&quot;data&quot;,&quot;cloudant&quot;))],&quot;&quot;)</code></pre>
 
 
 <p>There are also coroutine versions of some of the functions that return data from views. If we had many results to process, we could use <a href=".#Couchzilla.paged_mango_query"><code>paged_mango_query</code></a> in a Julia Task:</p>
@@ -434,7 +434,7 @@ function(doc) {
 }&quot;&quot;&quot;)</code></pre>
 
 
-<pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
+<pre class="codehilite"><code>Dict{String,Any} with 3 entries:
   &quot;ok&quot;  =&gt; true
   &quot;rev&quot; =&gt; &quot;1-b950984b19bb1b8bb43513c9d5b235bc&quot;
   &quot;id&quot;  =&gt; &quot;_design/my_ddoc&quot;</code></pre>
@@ -444,8 +444,8 @@ function(doc) {
 <pre class="codehilite"><code class="language-julia">view_query(db, &quot;my_ddoc&quot;, &quot;my_view&quot;; keys=[&quot;davina&quot;, &quot;billy&quot;])</code></pre>
 
 
-<pre class="codehilite"><code>Dict{UTF8String,Any} with 3 entries:
-  &quot;rows&quot;       =&gt; Any[Dict{UTF8String,Any}(&quot;key&quot;=&gt;&quot;davina&quot;,&quot;id&quot;=&gt;&quot;f69f9ab463df5…
+<pre class="codehilite"><code>Dict{String,Any} with 3 entries:
+  &quot;rows&quot;       =&gt; Any[Dict{String,Any}(Pair{String,Any}(&quot;key&quot;,&quot;davina&quot;),Pair{St…
   &quot;offset&quot;     =&gt; 1
   &quot;total_rows&quot; =&gt; 5</code></pre>
 
@@ -472,7 +472,7 @@ end</code></pre>
 <p>One of the fancier aspects of Cloudant is its geospatial capabilities, and Couchzilla provides access to this functionality. Using this it is possible to use Cloudant to  answer questions such as "show me all documents that fall within a given radius of a given point". A full description of this capability is beyond the scope of this  document, but Cloudant provides rich documentation on the <a href="https://docs.cloudant.com/geo.html">subject</a>.</p>
 <p>In order to try out the geospatial stuff using Couchzilla, we first need some data.  Cloudant provides an open database that you can replicate into your own account  <a href="https://education.cloudant.com/crimes">here</a>. It's a database of the locations of  reported crimes in the Boston area.</p>
 <p>Let's connect Couchzilla to a replica of this database, and run through the examples from Cloudant's geospatial tutorial <a href="https://cloudant.com/using-cloudant-geospatial-tutorial/">page</a>.  We can re-use the client from before:</p>
-<pre class="codehilite"><code class="language-julia">geodb = connectdb(client; database=&quot;crimes&quot;)</code></pre>
+<pre class="codehilite"><code class="language-julia">geodb = connectdb(client, &quot;crimes&quot;)</code></pre>
 
 
 <p>The database already contains the necessary geospatial indexes. Had this not been the case we could have indexed it using <a href=".#Couchzilla.geo_index"><code>geo_index</code></a>.</p>
@@ -486,26 +486,26 @@ result[&quot;rows&quot;]</code></pre>
 
 
 <pre class="codehilite"><code>200-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-caa129c6e0c9e7667cd401675859da2a&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38fcf2b&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.06659956,42.35930134],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-e7c7eb51c49d7e5fab38b33b19542106&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38c548a&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.06455956,42.36115135],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-de437f29d19bb55a495693fa40975962&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38b22cc&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05998657,42.36164815],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-4c4650e64d0cc0bb01e32a0b5aca2802&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e3917804&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05998657,42.36164815],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-e557e2555201054b924f618299cb9b64&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e392e828&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05998657,42.36164815],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-86261a0030776d68d98f805afec21c94&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38a779d&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.0587,42.3594],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-0892e7f4eb551df2453e9a11b274e190&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38d6b78&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.0587,42.3594],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-4ce963293c1810c3fc8fe606e9345e8e&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38ee226&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.0587,42.3594],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-816e850ff5ec2249993675fd568b2e9c&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e3927629&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.0587,42.3594],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-59e512ec186a17dc3e94a3f1d7c13392&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e392867d&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.0587,42.3594],&quot;type&quot;=&gt;&quot;Point&quot;))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-caa129c6e0c9e7667cd401675859da2a&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38fcf2b&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.0666,42.3593]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-e7c7eb51c49d7e5fab38b33b19542106&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38c548a&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.0646,42.3612]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-de437f29d19bb55a495693fa40975962&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38b22cc&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.06,42.3616]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-4c4650e64d0cc0bb01e32a0b5aca2802&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e3917804&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.06,42.3616]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-e557e2555201054b924f618299cb9b64&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e392e828&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.06,42.3616]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-86261a0030776d68d98f805afec21c94&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38a779d&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.0587,42.3594]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-0892e7f4eb551df2453e9a11b274e190&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38d6b78&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.0587,42.3594]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-4ce963293c1810c3fc8fe606e9345e8e&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38ee226&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.0587,42.3594]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-816e850ff5ec2249993675fd568b2e9c&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e3927629&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.0587,42.3594]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-59e512ec186a17dc3e94a3f1d7c13392&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e392867d&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.0587,42.3594]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
  ⋮
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-be45124918034417ce77adbd99d3d54f&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38c8ead&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.13312909,42.36337538],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-e17545f877d7fc1442abe71557ec44c8&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e391c876&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.10727955,42.30375135],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-50e1dd9b9ad194f90a0fb4f9001d1b43&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e3929889&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05512457,42.28895136],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-f8407a2467b8fea166aa451994de75da&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38b682a&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.07728456,42.28963636],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-459aadf6156187de8c11ecce3b5f1f28&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38afe98&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05007094,42.28966431],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-1d1c012db58954c6d799646e0e009728&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38b0d38&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.04731414,42.29018867],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-21dea1eb417bff225b4932acbe983314&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38c9b44&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.10965455,42.30423135],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-edd6492692311118baaa8cbb980ef1c5&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38d51e7&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.13410611,42.34900151],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-13144e283f47d611d62d9f11d94161be&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e39168d7&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.13495453,42.35041635],&quot;type&quot;=&gt;&quot;Point&quot;))</code></pre>
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-be45124918034417ce77adbd99d3d54f&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38c8ead&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.1331,42.3634]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-e17545f877d7fc1442abe71557ec44c8&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e391c876&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.1073,42.3038]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-50e1dd9b9ad194f90a0fb4f9001d1b43&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e3929889&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.0551,42.289]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-f8407a2467b8fea166aa451994de75da&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38b682a&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.0773,42.2896]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-459aadf6156187de8c11ecce3b5f1f28&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38afe98&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.0501,42.2897]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-1d1c012db58954c6d799646e0e009728&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38b0d38&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.0473,42.2902]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-21dea1eb417bff225b4932acbe983314&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38c9b44&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.1097,42.3042]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-edd6492692311118baaa8cbb980ef1c5&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38d51e7&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.1341,42.349]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-13144e283f47d611d62d9f11d94161be&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e39168d7&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.135,42.3504]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))</code></pre>
 
 
 <p>We can specify a polygon for the Commercial Street corridor, which should yield only two docs:</p>
@@ -515,15 +515,15 @@ result[&quot;rows&quot;]</code></pre>
 
 
 <pre class="codehilite"><code>2-element Array{Any,1}:
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-f0551b24741f182c5944621f87f9ac76&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e38d6349&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05107956,42.36510634],&quot;type&quot;=&gt;&quot;Point&quot;))
- Dict{UTF8String,Any}(&quot;rev&quot;=&gt;&quot;1-8a9f1673b2b15232bbbb956a7f3b5397&quot;,&quot;id&quot;=&gt;&quot;79f14b64c57461584b152123e3924516&quot;,&quot;geometry&quot;=&gt;Dict{UTF8String,Any}(&quot;coordinates&quot;=&gt;Any[-71.05204477,42.36674199],&quot;type&quot;=&gt;&quot;Point&quot;))</code></pre>
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-f0551b24741f182c5944621f87f9ac76&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e38d6349&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.0511,42.3651]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))
+ Dict{String,Any}(Pair{String,Any}(&quot;rev&quot;,&quot;1-8a9f1673b2b15232bbbb956a7f3b5397&quot;),Pair{String,Any}(&quot;id&quot;,&quot;79f14b64c57461584b152123e3924516&quot;),Pair{String,Any}(&quot;geometry&quot;,Dict{String,Any}(Pair{String,Any}(&quot;coordinates&quot;,Any[-71.052,42.3667]),Pair{String,Any}(&quot;type&quot;,&quot;Point&quot;))))</code></pre>
 
 
 <p>If you want to delete a database, simply call <a href=".#Couchzilla.deletedb-Tuple{Couchzilla.Client,AbstractString}"><code>deletedb</code></a>:</p>
 <pre class="codehilite"><code class="language-julia">deletedb(client, dbname)</code></pre>
 
 
-<pre class="codehilite"><code>Dict{UTF8String,Any} with 1 entry:
+<pre class="codehilite"><code>Dict{String,Any} with 1 entry:
   &quot;ok&quot; =&gt; true</code></pre>
 
 
@@ -545,30 +545,17 @@ result[&quot;rows&quot;]</code></pre>
 <p>Cloudant has an auth system distinct from the CouchDB traditional style based on the <code>_users</code> database. By using API keys you can grant and revoke a client application's access. API keys have roles attached to them, a combination of <code>_admin</code>, <code>_reader</code>, <code>_writer</code>, <code>_replicator</code> and <code>_creator</code>. It's not quite as straight-forward as it may seem. <code>_reader</code> grants read-only access. TODO</p>
 <p>In order to use the API key system, you need two steps:</p>
 <ol>
-<li>Create the key using</li>
+<li>
+<p>Create the key using</p>
+<p>data = make_api_key(client::Client)
+2. Assign key to a database, with the appropriate roles</p>
+<p>current = get_permissions(db)  result = set_permissions(db, current; key=data["key"], roles=["_reader", "_writer"])
+3. Create a new client connection using the new key</p>
+<p>api_client = Client(data["key"], data["password"], host)
+4. Create a database connection using the new client</p>
+<p>api_db = connectdb(api_client, "dbname")</p>
+</li>
 </ol>
-<pre class="codehilite"><code>data = make_api_key(client::Client)</code></pre>
-
-
-<ol>
-<li>Assign key to a database, with the appropriate roles</li>
-</ol>
-<pre class="codehilite"><code>current = get_permissions(db)
-result = set_permissions(db, current; key=data[&quot;key&quot;], roles=[&quot;_reader&quot;, &quot;_writer&quot;])</code></pre>
-
-
-<ol>
-<li>Create a new client connection using the new key</li>
-</ol>
-<pre class="codehilite"><code>api_client = Client(data[&quot;key&quot;], data[&quot;password&quot;], host)</code></pre>
-
-
-<ol>
-<li>Create a database connection using the new client</li>
-</ol>
-<pre class="codehilite"><code>api_db = connectdb(api_client, &quot;dbname&quot;)</code></pre>
-
-
 <p>There is one gotcha here that you need to be aware of. API keys are created on a central Cloudant admin cluster, and then replicated back to the one you're using. This means that running through the four steps above may occasionally fail to authenticate (step 3) for a good few minutes whilst the update percolates through. It helps to treat API keys as something to be created up front, rather than on the fly.</p>
 <p><a id='Client-1'></a></p>
 <h2 id="client">Client</h2>
@@ -584,20 +571,23 @@ end</code></pre>
 
 
 <p>The Client type represents an authenticated connection to a remote CouchDB/Cloudant instance.</p>
-<p><a id='Couchzilla.connectdb-Tuple{Couchzilla.Client}' href='#Couchzilla.connectdb-Tuple{Couchzilla.Client}'>#</a>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/client.jl#L3-L13' class='documenter-source'>source</a><br></p>
+<p><a id='Couchzilla.connectdb-Tuple{Couchzilla.Client,AbstractString}' href='#Couchzilla.connectdb-Tuple{Couchzilla.Client,AbstractString}'>#</a>
 <strong><code>Couchzilla.connectdb</code></strong> &mdash; <em>Method</em>.</p>
-<pre class="codehilite"><code>db = connectdb(client::Client; database::AbstractString=nothing)</code></pre>
+<pre class="codehilite"><code>db = connectdb(client::Client, database::AbstractString)</code></pre>
 
 
 <p>Return an immutable Database reference.</p>
 <p>Subsequent database-level operations will operate on the chosen database.  If you need to operate on a different database, you need to create a new  Database reference. <code>connectdb(...)</code> does not check that the chosen remote  database exists.</p>
-<p><a id='Couchzilla.createdb-Tuple{Couchzilla.Client}' href='#Couchzilla.createdb-Tuple{Couchzilla.Client}'>#</a>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/client.jl#L42-L51' class='documenter-source'>source</a><br></p>
+<p><a id='Couchzilla.createdb-Tuple{Couchzilla.Client,AbstractString}' href='#Couchzilla.createdb-Tuple{Couchzilla.Client,AbstractString}'>#</a>
 <strong><code>Couchzilla.createdb</code></strong> &mdash; <em>Method</em>.</p>
-<pre class="codehilite"><code>db, created = createdb(client::Client; database::AbstractString=nothing)</code></pre>
+<pre class="codehilite"><code>db, created = createdb(client::Client, database::AbstractString)</code></pre>
 
 
 <p>Create a new database on the remote end called <code>dbname</code>. Return an immutable  Database reference to this newly created db, and a boolean which is true if  a database was created, false if it already existed.</p>
 <p><a href="http://docs.couchdb.org/en/1.6.1/CouchDB/database/common.html#put--db">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/client.jl#L56-L64' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.dbinfo-Tuple{Couchzilla.Client,AbstractString}' href='#Couchzilla.dbinfo-Tuple{Couchzilla.Client,AbstractString}'>#</a>
 <strong><code>Couchzilla.dbinfo</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>info = dbinfo(client::Client, name::AbstractString)</code></pre>
@@ -605,6 +595,7 @@ end</code></pre>
 
 <p>Return the meta data about the <code>dbname</code> database.</p>
 <p><a href="http://docs.couchdb.org/en/1.6.1/CouchDB/database/common.html#get--db">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/client.jl#L82-L88' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.listdbs-Tuple{Couchzilla.Client}' href='#Couchzilla.listdbs-Tuple{Couchzilla.Client}'>#</a>
 <strong><code>Couchzilla.listdbs</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>dblist = listdbs(client::Client)</code></pre>
@@ -612,6 +603,7 @@ end</code></pre>
 
 <p>Return a list of all databases under the authenticated user.</p>
 <p><a href="http://docs.couchdb.org/en/1.6.1/CouchDB/server/common.html#all-dbs">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/client.jl#L93-L99' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.deletedb-Tuple{Couchzilla.Client,AbstractString}' href='#Couchzilla.deletedb-Tuple{Couchzilla.Client,AbstractString}'>#</a>
 <strong><code>Couchzilla.deletedb</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>result = deletedb(client::Client, name::AbstractString)</code></pre>
@@ -619,13 +611,15 @@ end</code></pre>
 
 <p>Delete the named database.</p>
 <p><a href="http://docs.couchdb.org/en/1.6.1/CouchDB/database/common.html?#delete--db">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/client.jl#L104-L110' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.cookieauth!' href='#Couchzilla.cookieauth!'>#</a>
 <strong><code>Couchzilla.cookieauth!</code></strong> &mdash; <em>Function</em>.</p>
-<pre class="codehilite"><code>cookieauth!(client::Client, username, password, auth=true)</code></pre>
+<pre class="codehilite"><code>cookieauth!(client::Client, username::AbstractString, password::AbstractString, auth::Bool=true)</code></pre>
 
 
 <p>Private. Hits the <code>_session</code> endpoint to obtain a session cookie that is used to authenticate subsequent requests. If <code>auth</code> is set to  false, this does nothing.</p>
 <p><a href="https://docs.cloudant.com/authentication.html#cookie-authentication">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/client.jl#L22-L30' class='documenter-source'>source</a><br></p>
 <p><a id='Database-1'></a></p>
 <h2 id="database">Database</h2>
 <p>The Database type represents a client connection tied to a specific database name. This is  immutable, meaning that if you need to talk to several databases you need to create one Database type for each.</p>
@@ -650,7 +644,8 @@ db = connectdb(client; database=&quot;mydb&quot;)
 db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
 
 
-<p><a id='Couchzilla.bulkdocs-Tuple{Couchzilla.Database}' href='#Couchzilla.bulkdocs-Tuple{Couchzilla.Database}'>#</a>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/database.jl#L12-L32' class='documenter-source'>source</a><br></p>
+<p><a id='Couchzilla.bulkdocs-Tuple{Couchzilla.Database,AbstractArray}' href='#Couchzilla.bulkdocs-Tuple{Couchzilla.Database,AbstractArray}'>#</a>
 <strong><code>Couchzilla.bulkdocs</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>result = bulkdocs(db::Database; data=[], options=Dict())</code></pre>
 
@@ -658,21 +653,24 @@ db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
 <p>Raw _bulk_docs.</p>
 <p>This is a function primarily intended for internal use, but can be used directly to create, update or delete documents in bulk, so as to save on the HTTP overhead.</p>
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs">API reference</a></p>
-<p><a id='Couchzilla.createdoc' href='#Couchzilla.createdoc'>#</a>
-<strong><code>Couchzilla.createdoc</code></strong> &mdash; <em>Function</em>.</p>
-<pre class="codehilite"><code>result = createdoc(db::Database; body=Dict())</code></pre>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/database.jl#L42-L52' class='documenter-source'>source</a><br></p>
+<p><a id='Couchzilla.createdoc-Tuple{Couchzilla.Database,Dict}' href='#Couchzilla.createdoc-Tuple{Couchzilla.Database,Dict}'>#</a>
+<strong><code>Couchzilla.createdoc</code></strong> &mdash; <em>Method</em>.</p>
+<pre class="codehilite"><code>result = createdoc(db::Database, body::Dict)</code></pre>
 
 
-<p>Create a new document.</p>
+<p>Create one new document.</p>
 <p>Note that this is implemented via the <code>_bulk_docs</code> endpoint, rather  than a <code>POST</code> to the <code>/{DB}</code>.</p>
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs">API reference</a></p>
-<p><a id='Couchzilla.createdoc-Tuple{Couchzilla.Database}' href='#Couchzilla.createdoc-Tuple{Couchzilla.Database}'>#</a>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/database.jl#L58-L67' class='documenter-source'>source</a><br></p>
+<p><a id='Couchzilla.createdoc-Tuple{Couchzilla.Database,AbstractArray}' href='#Couchzilla.createdoc-Tuple{Couchzilla.Database,AbstractArray}'>#</a>
 <strong><code>Couchzilla.createdoc</code></strong> &mdash; <em>Method</em>.</p>
-<pre class="codehilite"><code>result = createdoc(db::Database; data=[Dict()])</code></pre>
+<pre class="codehilite"><code>result = createdoc(db::Database, data::AbstractArray</code></pre>
 
 
 <p>Bulk create a set of new documents via the CouchDB <code>_bulk_docs</code> endpoint.</p>
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/database.jl#L76-L82' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.readdoc-Tuple{Couchzilla.Database,AbstractString}' href='#Couchzilla.readdoc-Tuple{Couchzilla.Database,AbstractString}'>#</a>
 <strong><code>Couchzilla.readdoc</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>result = readdoc(db::Database, id::AbstractString; 
@@ -695,6 +693,7 @@ db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
 
 
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/document/common.html#get--db-docid">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/database.jl#L91-L112' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.updatedoc-Tuple{Couchzilla.Database}' href='#Couchzilla.updatedoc-Tuple{Couchzilla.Database}'>#</a>
 <strong><code>Couchzilla.updatedoc</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>result = updatedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing, body=Dict())</code></pre>
@@ -703,6 +702,7 @@ db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
 <p>Update an existing document, creating a new revision.</p>
 <p>Implemented via the _bulk_docs endpoint.</p>
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/database.jl#L180-L188' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.deletedoc-Tuple{Couchzilla.Database}' href='#Couchzilla.deletedoc-Tuple{Couchzilla.Database}'>#</a>
 <strong><code>Couchzilla.deletedoc</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>result = deletedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing)</code></pre>
@@ -710,6 +710,7 @@ db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
 
 <p>Delete a document revision. Implemented via the _bulk_docs endpoint:</p>
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html?#post--db-_bulk_docs">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/database.jl#L194-L200' class='documenter-source'>source</a><br></p>
 <p><a id='Views-2'></a></p>
 <h2 id="views_1">Views</h2>
 <p><a id='Couchzilla.view_index-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}' href='#Couchzilla.view_index-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}'>#</a>
@@ -735,6 +736,7 @@ db, created = createdb(client; database=&quot;mydb&quot;)</code></pre>
 
 
 <p><a href="https://docs.cloudant.com/creating_views.html">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/views.jl#L1-L29' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.view_query' href='#Couchzilla.view_query'>#</a>
 <strong><code>Couchzilla.view_query</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>result = view_query(db::Database, ddoc::AbstractString, name::AbstractString;
@@ -771,6 +773,7 @@ result = view_query(db, &quot;my_ddoc&quot;, &quot;my_view&quot;; keys=[&quot;ad
 
 
 <p><a href="https://docs.cloudant.com/using_views.html">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/views.jl#L43-L78' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.alldocs' href='#Couchzilla.alldocs'>#</a>
 <strong><code>Couchzilla.alldocs</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>alldocs(db::Database;
@@ -791,16 +794,17 @@ result = view_query(db, &quot;my_ddoc&quot;, &quot;my_view&quot;; keys=[&quot;ad
 <ul>
 <li>descending     true/false   – lexicographical ordering of keys. Default false.</li>
 <li>endkey         id           – stop when <code>endkey</code> is reached. Optional.</li>
-<li>startkey       id           – start at <code>startkey</code>. Optional. </li>
+<li>startkey       id           – start at <code>startkey</code>. Optional.</li>
 <li>include_docs   true/false   – return the document body. Default false.</li>
 <li>conflicts      true/false   – also return any conflicting revisions. Default false.</li>
 <li>inclusive_end  true/false   – if <code>endkey</code> is given, should this be included? Default true</li>
 <li>key            id           – return only specific key. Optional.</li>
-<li>keys           [id, id,...] – return only specific set of keys (will POST). Optional. </li>
+<li>keys           [id, id,...] – return only specific set of keys (will POST). Optional.</li>
 <li>limit          int          – return only max <code>limit</code> number of rows. Optional.</li>
 <li>skip           int          – skip over the first <code>skip</code> number of rows. Default 0.</li>
 </ul>
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/database/bulk-api.html#db-all-docs">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/views.jl#L152-L181' class='documenter-source'>source</a><br></p>
 <p><a id='Mango/Cloudant-Query-1'></a></p>
 <h2 id="mangocloudant-query">Mango/Cloudant Query</h2>
 <p><a id='Couchzilla.Selector' href='#Couchzilla.Selector'>#</a>
@@ -820,12 +824,14 @@ sel = and([q&quot;name = bob&quot;, q&quot;age &gt; 18&quot;])</code></pre>
 
 
 <p><a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/selector.jl#L1-L20' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.Selector-Tuple{}' href='#Couchzilla.Selector-Tuple{}'>#</a>
 <strong><code>Couchzilla.Selector</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>Selector()</code></pre>
 
 
 <p>The empty Selector.</p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/selector.jl#L25-L29' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.Selector-Tuple{AbstractString}' href='#Couchzilla.Selector-Tuple{AbstractString}'>#</a>
 <strong><code>Couchzilla.Selector</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>Selector(raw_json::AbstractString)</code></pre>
@@ -833,12 +839,14 @@ sel = and([q&quot;name = bob&quot;, q&quot;age &gt; 18&quot;])</code></pre>
 
 <p>Create a Selector from the raw json.</p>
 <p><a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">API reference</a></p>
-<p><a id='Couchzilla.isempty' href='#Couchzilla.isempty'>#</a>
-<strong><code>Couchzilla.isempty</code></strong> &mdash; <em>Function</em>.</p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/selector.jl#L34-L40' class='documenter-source'>source</a><br></p>
+<p><a id='Base.isempty' href='#Base.isempty'>#</a>
+<strong><code>Base.isempty</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>isempty(sel::Selector)</code></pre>
 
 
 <p>True if sel is the empty Selector.</p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/selector.jl#L45-L49' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.@q_str' href='#Couchzilla.@q_str'>#</a>
 <strong><code>Couchzilla.@q_str</code></strong> &mdash; <em>Macro</em>.</p>
 <pre class="codehilite"><code>q&quot;.....&quot;</code></pre>
@@ -863,6 +871,7 @@ q&quot;occupation in [fishmonger, pilot, welder]&quot;</code></pre>
 <p>sel = and([q"name = bob", q"age &gt; 18"])</p>
 <p>For more information on the actual Selector syntax, see link below.</p>
 <p><a href="https://docs.cloudant.com/cloudant_query.html#selector-syntax">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/selector.jl#L54-L82' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.QueryResult' href='#Couchzilla.QueryResult'>#</a>
 <strong><code>Couchzilla.QueryResult</code></strong> &mdash; <em>Type</em>.</p>
 <pre class="codehilite"><code>type QueryResult
@@ -873,6 +882,7 @@ end</code></pre>
 
 <p>Returned by <code>query(...)</code>.</p>
 <p><code>bookmark</code> is only relevant when querying indexes of type <code>text</code>.</p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/mango.jl#L9-L18' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.mango_query' href='#Couchzilla.mango_query'>#</a>
 <strong><code>Couchzilla.mango_query</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>result = mango_query{T&lt;:AbstractString}(db::Database, selector::Selector;
@@ -901,6 +911,7 @@ end</code></pre>
 <li><a href="https://docs.cloudant.com/cloudant_query.html">API reference</a></li>
 <li><a href="https://cloudant.com/blog/cloudant-query-grows-up-to-handle-ad-hoc-queries/">Cloudant Query blog post</a></li>
 </ul>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/mango.jl#L26-L56' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.paged_mango_query' href='#Couchzilla.paged_mango_query'>#</a>
 <strong><code>Couchzilla.paged_mango_query</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>paged_mango_query{T&lt;:AbstractString}(db::Database, selector::Selector;
@@ -918,29 +929,27 @@ end</code></pre>
 end</code></pre>
 
 
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/tasks.jl#L1-L18' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.mango_index' href='#Couchzilla.mango_index'>#</a>
 <strong><code>Couchzilla.mango_index</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>result = mango_index{T&lt;:AbstractString}(db::Database, fields::AbstractArray; 
   name::T       = &quot;&quot;,
   ddoc::T       = &quot;&quot;, 
   selector      = Selector(),
-  default_field = Dict{UTF8String, Any}(&quot;analyzer&quot; =&gt; &quot;standard&quot;, &quot;enabled&quot; =&gt; true))</code></pre>
+  default_field = Dict{String, Any}(&quot;analyzer&quot; =&gt; &quot;standard&quot;, &quot;enabled&quot; =&gt; true))</code></pre>
 
 
 <p>Create a Mango index. </p>
 <p>All <code>kw</code> parameters are optional. The fields spec is mandatory for JSON-type indexes. For a  text index, if you give an empty vector as the fields, it will index every field, which is occasionally convenient, but a significant performance drain. The index type will defaults to  type <code>"json"</code> and will be assumed to be <code>"text"</code> if the data in the <code>fields</code> array are <code>Dict</code>s.  Note that the <code>text</code> index type is a Cloudant-only feature.</p>
 <p><strong>Examples</strong></p>
 <ul>
-<li>Make a text index (Cloudant only)</li>
-</ul>
-<pre class="codehilite"><code>result = mango_index(db, [Dict(&quot;name&quot;=&gt;&quot;lastname&quot;, &quot;type&quot;=&gt;&quot;string&quot;)]; ddoc=&quot;my-ddoc&quot;,
-  default_field=Dict(&quot;analyzer&quot; =&gt; &quot;german&quot;, &quot;enabled&quot; =&gt; true))</code></pre>
-
-
-<ul>
-<li>Make a json index</li>
-</ul>
+<li>
+<p>Make a text index (Cloudant only)</p>
+<p>result = mango_index(db, [Dict("name"=&gt;"lastname", "type"=&gt;"string")]; ddoc="my-ddoc",     default_field=Dict("analyzer" =&gt; "german", "enabled" =&gt; true))
+  * Make a json index</p>
 <p>result = mango_index(db, ["data", "data2"])</p>
+</li>
+</ul>
 <p><strong>Returns</strong></p>
 <p><code>mango_index()</code> returns a <code>Dict(...)</code> version of the CouchDB response, of the type</p>
 <pre class="codehilite"><code>Dict(
@@ -951,6 +960,7 @@ end</code></pre>
 
 
 <p><a href="https://docs.cloudant.com/cloudant_query.html#creating-an-index">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/mango.jl#L85-L122' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.listindexes-Tuple{Couchzilla.Database}' href='#Couchzilla.listindexes-Tuple{Couchzilla.Database}'>#</a>
 <strong><code>Couchzilla.listindexes</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>result = listindexes(db::Database)</code></pre>
@@ -990,6 +1000,7 @@ end</code></pre>
 
 
 <p><a href="https://docs.cloudant.com/cloudant_query.html#list-all-cloudant-query-indexes">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/mango.jl#L167-L207' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.mango_deleteindex-Tuple{Couchzilla.Database}' href='#Couchzilla.mango_deleteindex-Tuple{Couchzilla.Database}'>#</a>
 <strong><code>Couchzilla.mango_deleteindex</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>result = mango_deleteindex(db::Database; ddoc=&quot;&quot;, name=&quot;&quot;, indextype=&quot;&quot;)</code></pre>
@@ -1003,6 +1014,7 @@ end</code></pre>
 
 
 <p><a href="https://docs.cloudant.com/cloudant_query.html#deleting-an-index">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/mango.jl#L212-L226' class='documenter-source'>source</a><br></p>
 <p><a id='Attachments-1'></a></p>
 <h2 id="attachments">Attachments</h2>
 <p>You can attach files to documents in CouchDB. This can occasionally be convenient, but using attachments has performance implications, especially when combined with  replication. See Cloudant's <a href="https://docs.cloudant.com/attachments.html">docs</a> on  the subject.</p>
@@ -1023,6 +1035,7 @@ result = put_attachment(db, doc[&quot;id&quot;], doc[&quot;rev&quot;], &quot;tes
 
 
 <p><a href="https://docs.cloudant.com/attachments.html">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/attachments.jl#L3-L19' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.get_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString}' href='#Couchzilla.get_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString}'>#</a>
 <strong><code>Couchzilla.get_attachment</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>result = get_attachment(db::Database, id::AbstractString, name::AbstractString; rev::AbstractString = &quot;&quot;)</code></pre>
@@ -1037,6 +1050,7 @@ end</code></pre>
 
 
 <p><a href="https://docs.cloudant.com/attachments.html">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/attachments.jl#L30-L43' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.delete_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}' href='#Couchzilla.delete_attachment-Tuple{Couchzilla.Database,AbstractString,AbstractString,AbstractString}'>#</a>
 <strong><code>Couchzilla.delete_attachment</code></strong> &mdash; <em>Method</em>.</p>
 <pre class="codehilite"><code>result = delete_attachment(db::Database, id::AbstractString, rev::AbstractString, name::AbstractString)</code></pre>
@@ -1048,6 +1062,7 @@ end</code></pre>
 
 
 <p><a href="https://docs.cloudant.com/attachments.html">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/attachments.jl#L49-L59' class='documenter-source'>source</a><br></p>
 <p><a id='Replication-1'></a></p>
 <h2 id="replication">Replication</h2>
 <p>Unlike e.g. <a href="https://pouchdb.com/">PouchDB</a>, <a href="https://github.com/cloudant/CDTDatastore">CDTDatastore</a>  and <a href="https://github.com/cloudant/sync-android">sync-android</a>, <code>Couchzilla</code> is not a replication library  in that it does not implement a local data store. However, you have access to all replication-related endpoints provided by CouchDB. The CouchDB replication algorithm is largely undocumented, but a good <a href="https://github.com/couchbase/couchbase-lite-ios/wiki/Replication-Algorithm">write-up</a> can be found  in Couchbase's repo.</p>
@@ -1072,6 +1087,7 @@ filtered = changes(db; doc_ids=[&quot;25806e48920b4a35b3c9d9f23c16c821&quot;, &q
 
 
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/database/changes.html">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/replication.jl#L113-L136' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.changes_streaming' href='#Couchzilla.changes_streaming'>#</a>
 <strong><code>Couchzilla.changes_streaming</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>changes_streaming(db::Database;
@@ -1104,6 +1120,7 @@ Dict(
 
 
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/database/changes.html">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/replication.jl#L43-L78' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.revs_diff' href='#Couchzilla.revs_diff'>#</a>
 <strong><code>Couchzilla.revs_diff</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>revs_diff{T&lt;:AbstractString}(db::Database; data::Dict{T, Vector{T}} = Dict())</code></pre>
@@ -1131,6 +1148,7 @@ Dict(
 
 
 <p><a href="http://docs.couchdb.org/en/1.6.1/api/database/misc.html#db-revs-diff">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/replication.jl#L161-L190' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.bulk_get' href='#Couchzilla.bulk_get'>#</a>
 <strong><code>Couchzilla.bulk_get</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>bulk_get{T&lt;:AbstractString}(db::Database; data::Vector{Dict{T, T}} = [])</code></pre>
@@ -1169,6 +1187,7 @@ Dict(
 
 
 <p><a href="https://issues.apache.org/jira/browse/COUCHDB-2310">Reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/replication.jl#L195-L238' class='documenter-source'>source</a><br></p>
 <p><a id='Geospatial-1'></a></p>
 <h2 id="geospatial">Geospatial</h2>
 <p><a id='Couchzilla.geo_index' href='#Couchzilla.geo_index'>#</a>
@@ -1194,6 +1213,7 @@ Dict(
 
 
 <p><a href="https://docs.cloudant.com/geo.html">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/geospatial.jl#L31-L55' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.geo_indexinfo' href='#Couchzilla.geo_indexinfo'>#</a>
 <strong><code>Couchzilla.geo_indexinfo</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>result = geo_indexinfo(db::Database, ddoc::AbstractString, name::AbstractString)</code></pre>
@@ -1217,6 +1237,7 @@ Dict(
 
 
 <p><a href="https://docs.cloudant.com/geo.html#obtaining-information-about-a-cloudant-geo-index">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/geospatial.jl#L61-L84' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.geo_query' href='#Couchzilla.geo_query'>#</a>
 <strong><code>Couchzilla.geo_query</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>geo_query(db::Database, ddoc::AbstractString, name::AbstractString;
@@ -1239,33 +1260,33 @@ Dict(
 <p>Query a geospatial index. This quickly becomes complicated. See the references below. </p>
 <p>The "g" parameter is a string representing a <a href="https://en.wikipedia.org/wiki/Well-known_text"><code>Well Known Text</code></a> object (<code>WKT</code>). It can be used to describe various geometries, such as lines and polygons. Currently supported  geometric objects are</p>
 <ul>
-<li>point       </li>
+<li>point</li>
 <li>linestring</li>
-<li>polygon         </li>
-<li>multipoint        </li>
-<li>multilinestring   </li>
-<li>multipolygon    </li>
+<li>polygon</li>
+<li>multipoint</li>
+<li>multilinestring</li>
+<li>multipolygon</li>
 <li>geometrycollection</li>
 </ul>
 <p>Geo queries can be configured to return its results in a number of different formats using the <code>format</code> parameter. The accepted values are:</p>
 <ul>
-<li>legacy              </li>
-<li>geojson                 </li>
-<li>view (default)               </li>
+<li>legacy</li>
+<li>geojson</li>
+<li>view (default)</li>
 <li>application/vnd.geo+json</li>
 </ul>
 <p>The <code>relation</code> parameter follows the <a href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a> spec for geometric relationships. Acceptable values are:</p>
 <ul>
-<li>contains      </li>
+<li>contains</li>
 <li>contains_properly</li>
-<li>covered_by      </li>
-<li>covers          </li>
-<li>crosses         </li>
-<li>disjoint        </li>
+<li>covered_by</li>
+<li>covers</li>
+<li>crosses</li>
+<li>disjoint</li>
 <li>intersects (default)</li>
-<li>overlaps        </li>
-<li>touches         </li>
-<li>within          </li>
+<li>overlaps</li>
+<li>touches</li>
+<li>within</li>
 </ul>
 <p><strong>Examples</strong></p>
 <p>Radial query</p>
@@ -1282,6 +1303,7 @@ Dict(
 
 
 <p><a href="https://docs.cloudant.com/geo.html#querying-a-cloudant-geo-index">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/geospatial.jl#L89-L159' class='documenter-source'>source</a><br></p>
 <p><a id='Auth-1'></a></p>
 <h2 id="auth">Auth</h2>
 <p><a id='Couchzilla.get_permissions' href='#Couchzilla.get_permissions'>#</a>
@@ -1291,6 +1313,7 @@ Dict(
 
 <p>Fetch all current permissions. Note: this is Cloudant-specific.</p>
 <p><a href="https://docs.cloudant.com/authorization.html#viewing-permissions">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/auth.jl#L1-L7' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.set_permissions' href='#Couchzilla.set_permissions'>#</a>
 <strong><code>Couchzilla.set_permissions</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>result = set_permissions(db::Database, current::Dict=Dict{AbstractString, Any}(); key=&quot;&quot;, roles=[])</code></pre>
@@ -1298,6 +1321,7 @@ Dict(
 
 <p>Modify permissions. Note: this is Cloudant-specific.</p>
 <p><a href="https://docs.cloudant.com/authorization.html#modifying-permissions">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/auth.jl#L12-L18' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.make_api_key' href='#Couchzilla.make_api_key'>#</a>
 <strong><code>Couchzilla.make_api_key</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>data = make_api_key(client::Client)</code></pre>
@@ -1306,6 +1330,7 @@ Dict(
 <p>Generate a new API key. Note: this is Cloudant-specific.</p>
 <p>Note also that API keys take a long time to propagate around a cluster. It's unsafe to rely on a newly created key to be immediately available. The reason for this is that Cloudant keeps its auth-related documents centrally, and replicate out to all clusters. </p>
 <p><a href="https://docs.cloudant.com/authorization.html#creating-api-keys">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/auth.jl#L36-L46' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.delete_api_key' href='#Couchzilla.delete_api_key'>#</a>
 <strong><code>Couchzilla.delete_api_key</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>result = delete_api_key(db::Database, key::AbstractString)</code></pre>
@@ -1313,6 +1338,7 @@ Dict(
 
 <p>Remove an existing API key. Note: this is Cloudant-specific. This is implemented via <code>set_permissions()</code>.</p>
 <p><a href="https://docs.cloudant.com/authorization.html#deleting-api-keys">API reference</a></p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/auth.jl#L51-L57' class='documenter-source'>source</a><br></p>
 <p><a id='Utility-stuff-1'></a></p>
 <h2 id="utility-stuff">Utility stuff</h2>
 <p><a id='Couchzilla.retry_settings!-Tuple{}' href='#Couchzilla.retry_settings!-Tuple{}'>#</a>
@@ -1327,12 +1353,14 @@ Dict(
 
 <p>until <code>tries</code> exceed <code>max_retries</code> or the request succeeds.</p>
 <p>Note: it is not sufficient to rely on this behaviour on a rate-limited Cloudant cluster, as persistently hitting the limits can only be fixed by moving to higher reserved  throughput capacity. For this reason this is disabled by default.</p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/utils.jl#L5-L21' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.retry_settings' href='#Couchzilla.retry_settings'>#</a>
 <strong><code>Couchzilla.retry_settings</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>retry_settings()</code></pre>
 
 
 <p>Return the current retry settings.</p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/utils.jl#L31-L35' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.relax' href='#Couchzilla.relax'>#</a>
 <strong><code>Couchzilla.relax</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict())</code></pre>
@@ -1341,12 +1369,14 @@ Dict(
 <p>Makes an HTTP request with the relevant cookies and query strings and deserialises the response, assumed to be json.</p>
 <p>Cloudant implements request throttling based on reerved throughput capacity. Hitting a  capacity limit will return a 429 error (Too many requests). This is Cloudant-specific.</p>
 <p>This function can retry on 429 if this behaviour is enabled. See <code>retry_settings()</code>.</p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/utils.jl#L61-L71' class='documenter-source'>source</a><br></p>
 <p><a id='Couchzilla.endpoint' href='#Couchzilla.endpoint'>#</a>
 <strong><code>Couchzilla.endpoint</code></strong> &mdash; <em>Function</em>.</p>
 <pre class="codehilite"><code>endpoint(uri::URI, path::AbstractString)</code></pre>
 
 
 <p>Appends a path string to the URI, returning as a string.</p>
+<p><a target='_blank' href='https://github.com/xpqz/Couchzilla.jl/tree/74e8a7dfe581bae3daca8052d3ec0044cb8e736f/src/utils.jl#L99-L103' class='documenter-source'>source</a><br></p>
           <aside class="copyright" role="note">
             
             Documentation built with
