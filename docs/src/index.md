@@ -74,7 +74,7 @@ We can now create a client connection, and use that to create a new database:
 ```@example intro
 dbname = "mynewdb"
 client = Client(username, password, host)
-db, created = createdb(client; database=dbname)
+db, created = createdb(client, dbname)
 nothing; # hide
 ```
 
@@ -85,7 +85,7 @@ We can now add documents to the new database using [`createdoc`](@ref). It retur
 `Dict`s showing the `{id, rev}` tuples of the new documents:
 
 ```@example intro
-result = createdoc(db; data=[
+result = createdoc(db, [
     Dict("name" => "adam",    "data" => "hello"),
     Dict("name" => "billy",   "data" => "world"),
     Dict("name" => "cecilia", "data" => "authenticate"),
@@ -217,7 +217,7 @@ from Cloudant's geospatial tutorial [page](https://cloudant.com/using-cloudant-g
 We can re-use the client from before:
 
 ```@example intro
-geodb = connectdb(client; database="crimes")
+geodb = connectdb(client, "crimes")
 nothing; # hide
 ```
 
@@ -294,8 +294,8 @@ There is one gotcha here that you need to be aware of. API keys are created on a
 
 ```@docs
 Couchzilla.Client
-Couchzilla.connectdb(client::Client; database::AbstractString=nothing)
-Couchzilla.createdb(client::Client; database::AbstractString=nothing)
+Couchzilla.connectdb(client::Client, database::AbstractString)
+Couchzilla.createdb(client::Client, database::AbstractString)
 Couchzilla.dbinfo(client::Client, name::AbstractString)
 Couchzilla.listdbs(client::Client)
 Couchzilla.deletedb(client::Client, name::AbstractString)
@@ -310,9 +310,9 @@ type for each.
 
 ```@docs
 Couchzilla.Database
-Couchzilla.bulkdocs(db::Database; data=[], options=Dict())
-Couchzilla.createdoc(db::Database, body=Dict())
-Couchzilla.createdoc(db::Database; data=[Dict()])
+Couchzilla.bulkdocs(db::Database, data::AbstractArray; options=Dict())
+Couchzilla.createdoc(db::Database, body::Dict)
+Couchzilla.createdoc(db::Database, data::AbstractArray)
 Couchzilla.readdoc(db::Database,id::AbstractString;rev="",attachments=false,att_encoding_info=false,atts_since=[],conflicts= false,deleted_conflicts=false,latest=false,meta=false,open_revs=[],revs=false,revs_info=false)
 Couchzilla.updatedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing, body=Dict())
 Couchzilla.deletedoc(db::Database; id::AbstractString=nothing, rev::AbstractString=nothing)
