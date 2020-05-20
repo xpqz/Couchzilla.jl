@@ -77,7 +77,7 @@
   print("  [  ] Multi-page Mango query as a Task ")
   createdoc(db, [Dict("data" => "paged", "data2" => "world$x") for x=1:maxdoc])
   total = 0
-  for page in @task paged_mango_query(db, q"data = paged"; pagesize=10)
+  for page in Channel(paged_mango_query(db, q"data = paged"; pagesize=10))
     total += length(page.docs)
   end
   @test total == maxdoc

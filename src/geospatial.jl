@@ -54,8 +54,8 @@ Returns a `Dict(...)` from the CouchDB response, of the type
 [API reference](https://docs.cloudant.com/geo.html)
 """
 function geo_index(db::Database, ddoc::AbstractString, name::AbstractString, index::AbstractString)
-  data = Dict("st_indexes" => Dict(name => Dict("index" => index)))         
-  relax(put, endpoint(db.url, "_design/$ddoc"); json=data, cookies=db.client.cookies)
+  data = Dict("st_indexes" => Dict(name => Dict("index" => index)))
+  relax(HTTP.put, endpoint(db.url, "_design/$ddoc"); json=data, cookies=db.client.cookies)
 end
 
 """
@@ -83,7 +83,7 @@ Returns a `Dict(...)` from the CouchDB response, of the type
 [API reference](https://docs.cloudant.com/geo.html#obtaining-information-about-a-cloudant-geo-index)
 """
 function geo_indexinfo(db::Database, ddoc::AbstractString, name::AbstractString)
-  relax(get, endpoint(db.url, "_design/$ddoc/_geo_info/$name"), cookies=db.client.cookies)
+  relax(HTTP.get, endpoint(db.url, "_design/$ddoc/_geo_info/$name"), cookies=db.client.cookies)
 end
 
 """
@@ -238,5 +238,5 @@ function geo_query(db::Database, ddoc::AbstractString, name::AbstractString;
     query["limit"] = limit
   end
 
-  relax(get, endpoint(db.url, "_design/$ddoc/_geo/$name"); cookies=db.client.cookies, query=query)
+  relax(HTTP.get, endpoint(db.url, "_design/$ddoc/_geo/$name"); cookies=db.client.cookies, query=query)
 end

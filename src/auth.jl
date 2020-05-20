@@ -6,7 +6,7 @@ Fetch all current permissions. Note: this is Cloudant-specific.
 [API reference](https://docs.cloudant.com/authorization.html#viewing-permissions)
 """
 function get_permissions(db::Database)
-  relax(get, endpoint(db.client.url, "_api/v2/db/$(db.name)/_security"); cookies=db.client.cookies)
+  relax(HTTP.get, endpoint(db.client.url, "_api/v2/db/$(db.name)/_security"); cookies=db.client.cookies)
 end
 
 """
@@ -30,7 +30,7 @@ function set_permissions(db::Database, current::Dict=Dict{AbstractString, Any}()
     current["cloudant"][key] = roles
   end
 
-  relax(put, endpoint(db.client.url, "_api/v2/db/$(db.name)/_security"); json=current, cookies=db.client.cookies)
+  relax(HTTP.put, endpoint(db.client.url, "_api/v2/db/$(db.name)/_security"); json=current, cookies=db.client.cookies)
 end
 
 """
@@ -45,7 +45,7 @@ its auth-related documents centrally, and replicate out to all clusters.
 [API reference](https://docs.cloudant.com/authorization.html#creating-api-keys)
 """
 function make_api_key(client::Client)
-  relax(post, endpoint(client.url, "_api/v2/api_keys"); cookies=client.cookies)
+  relax(HTTP.post, endpoint(client.url, "_api/v2/api_keys"); cookies=client.cookies)
 end
 
 """

@@ -60,8 +60,8 @@ not supported. Use `since` to achieve the same thing.
 
 ### Examples
 
-    for ch in @task changes_streaming(db, limit=1)
-      println(ch)
+    for ch in Channel(changes_streaming(db; limit=1))
+      count += 1
     end
 
     Dict(
@@ -86,26 +86,29 @@ function changes_streaming(db::Database;
   limit = 0,
   since = 0)
 
-  query = opts(conflicts=conflicts, descending=descending, include_docs=include_docs, 
-    attachments=attachments, att_encoding_info=att_encoding_info, limit=limit, 
+  query = opts(conflicts=conflicts, descending=descending, include_docs=include_docs,
+    attachments=attachments, att_encoding_info=att_encoding_info, limit=limit,
     since=since, feed="continuous", timeout=0)
 
   body = Dict{Any, Any}()
-  method = Requests.get_streaming
+  headers = Dict("Content-Type" => "application/json")
+  method = HTTP.get
   if length(doc_ids) > 0
     query["filter"] = "_doc_ids"
     body = Dict("doc_ids" => doc_ids)
-    method = Requests.post_streaming
+    method = HTTP.post
   end
+  stream = method(endpoint(db.url, "_changes"), headers, JSON.json(body); cookies=db.client.cookies, query=query)
 
-  stream = method(endpoint(db.url, "_changes"); cookies=db.client.cookies, query=query, json=body)
-  while true
-    line = strip(readline(stream))
-    if length(line) > 0 && line[1] == '{'
-      produce(JSON.parse(line))
-    end
-    if eof(stream)
-      break
+  function producer(chan::Channel)
+    while true
+      line = strip(readline(stream))
+      if length(line) > 0 && line[1] == '{'
+        put!(chan, JSON.parse(line))
+      end
+      if eof(stream)
+        break
+      end
     end
   end
 end
@@ -147,10 +150,10 @@ function changes(db::Database;
   query = opts(conflicts=conflicts, descending=descending, include_docs=include_docs, 
     attachments=attachments, att_encoding_info=att_encoding_info, limit=limit, since=since)
 
-  method = get
+  method = HTTP.get
   body = Dict{Any, Any}()
   if length(doc_ids) > 0
-    method = post
+    method = HTTP.post
     body = Dict("doc_ids" => doc_ids)
     query["filter"] = "_doc_ids"
   end
@@ -159,7 +162,7 @@ function changes(db::Database;
 end
 
 """
-    revs_diff{T<:AbstractString}(db::Database; data::Dict{T, Vector{T}} = Dict())
+    revs_diff(db::Database; data::Dict{T, Vector{T}} where T<:AbstractString = Dict())
 
 `revs_diff` is a component of the CouchDB replication algorithm.
 
@@ -188,12 +191,12 @@ where missing `rev`s are found. An example:
 
 [API reference](http://docs.couchdb.org/en/1.6.1/api/database/misc.html#db-revs-diff)
 """
-function revs_diff{T<:AbstractString}(db::Database; data::Dict{T, Vector{T}} = Dict())
-  relax(post, endpoint(db.url, "_revs_diff"); json=data, cookies=db.client.cookies)
+function revs_diff(db::Database; data::Dict{T, Vector{T}} where T<:AbstractString = Dict())
+  relax(HTTP.post, endpoint(db.url, "_revs_diff"); json=data, cookies=db.client.cookies)
 end
 
 """
-    bulk_get{T<:AbstractString}(db::Database; data::Vector{Dict{T, T}} = [])
+    bulk_get(db::Database; data::Vector{Dict{T, T}} where T<:AbstractString = [])
 
 `bulk_get` is used as part of an optimisation of the CouchDB replication algorithm in 
 recent versions, allowing the replicator to request many documents with full
@@ -236,6 +239,7 @@ Cloudant at the time of writing.
 
 [Reference](https://issues.apache.org/jira/browse/COUCHDB-2310)
 """
-function bulk_get{T<:AbstractString}(db::Database; data::Vector{Dict{T, T}} = [])
-  relax(post, endpoint(db.url, "_bulk_get"); json=Dict("docs" => data), cookies=db.client.cookies)
+# function bulk_get{T<:AbstractString}(db::Database; data::Vector{Dict{T, T}} = [])
+function bulk_get(db::Database; data::Vector{Dict{T, T}} where T<:AbstractString = [])
+  relax(HTTP.post, endpoint(db.url, "_bulk_get"); json=Dict("docs" => data), cookies=db.client.cookies)
 end

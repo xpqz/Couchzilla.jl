@@ -1,7 +1,7 @@
 @testset "CRUD" begin
   println(testname("CRUD tests"))
   print("  [  ] Read a non-existing id ")
-  @test_throws HTTPException readdoc(db, "this-id-does-not-exist")
+  @test_throws HTTP.ExceptionRequest.StatusError readdoc(db, "this-id-does-not-exist")
   println("\r  [OK] Read a non-existing id")
 
   print("  [  ] Create new doc ")
@@ -47,13 +47,13 @@
   println("\r  [OK] Read doc with all open revs")
 
   print("  [  ] Reading doc by id and bad rev should fail ")
-  @test_throws HTTPException readdoc(db, data["id"]; rev="3-63453748494907")
+  @test_throws HTTP.ExceptionRequest.StatusError readdoc(db, data["id"]; rev="3-63453748494907")
   println("\r  [OK] Reading doc by id and bad rev should fail")
   
   print("  [  ] Update existing doc ")
   doc = updatedoc(db; id=data["id"], rev=data["rev"], body=Dict("item" => "flange", "location" => "garage"))
   @test haskey(doc, "rev")
-  @test contains(doc["rev"], "2-")
+  @test occursin("2-", doc["rev"])
   println("\r  [OK] Update existing doc")
 
   print("  [  ] Delete doc ")

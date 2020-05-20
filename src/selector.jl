@@ -1,5 +1,5 @@
 """
-    immutable Selector
+    struct Selector
       dict::Dict{AbstractString, Any}
     end
   
@@ -18,7 +18,7 @@ expression or a Julia `Dict(...)` representing the same.
 
 [API reference](https://docs.cloudant.com/cloudant_query.html#selector-syntax)
 """
-immutable Selector
+struct Selector
   dict::Dict{AbstractString, Any}
 end
 

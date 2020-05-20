@@ -19,11 +19,12 @@ Write an attachment to an existing document. Attachment read from a file.
 """
 function put_attachment(db::Database, id::AbstractString, rev::AbstractString, name::AbstractString, mimetype::AbstractString, file::AbstractString)
   open(file) do f
-    Requests.json(put(endpoint(db.url, "$id/$name"); 
-      data    = base64encode(read(f)), 
-      cookies = db.client.cookies, 
-      headers = Dict("Content-Type" => mimetype), 
-      query   = Dict("rev" => rev)))
+    headers = Dict("Content-Type" => mimetype)
+    data    = base64encode(read(f))
+    response = HTTP.put(endpoint(db.url, "$id/$name"), headers, data;
+      cookies = db.client.cookies,
+      query   = Dict("rev" => rev))
+    JSON.parse(String(response.body))
   end
 end
 
@@ -42,8 +43,8 @@ Read an attachment.
 [API reference](https://docs.cloudant.com/attachments.html)
 """
 function get_attachment(db::Database, id::AbstractString, name::AbstractString; rev::AbstractString = "")
-  response = get(endpoint(db.url, "$id/$name"); cookies = db.client.cookies, query = rev != "" ? Dict("rev" => rev) : Dict())
-  base64decode(Requests.bytes(response))
+  response = HTTP.get(endpoint(db.url, "$id/$name"); cookies = db.client.cookies, query = rev != "" ? Dict("rev" => rev) : Dict())
+  base64decode(response.body)
 end
 
 """
@@ -58,5 +59,5 @@ Delete an attachment.
 [API reference](https://docs.cloudant.com/attachments.html)
 """
 function delete_attachment(db::Database, id::AbstractString, rev::AbstractString, name::AbstractString)
-  relax(delete, endpoint(db.url, "$id/$name"); cookies=db.client.cookies, query=Dict("rev" => rev))
+  relax(HTTP.delete, endpoint(db.url, "$id/$name"); cookies=db.client.cookies, query=Dict("rev" => rev))
 end

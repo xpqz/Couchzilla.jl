@@ -33,7 +33,7 @@
   println("\r  [OK] Query view (POST)")
 
   print("  [  ] Query view (POST + skip) ")
-  result = view_query(db, "my_ddoc", "my_view"; keys=["adam", "billy"], skip=1, limit=1)
+  result = view_query(db, "my_ddoc", "my_view"; skip=1, limit=1)
   @test length(result["rows"]) == 1
   println("\r  [OK] Query view (POST + skip)")
 

@@ -3,7 +3,7 @@
   print("  [  ] Streaming changes ")
   count = 0
   maxch = 5
-  for ch in @task changes_streaming(db; limit=maxch)
+  for ch in Channel(changes_streaming(db; limit=maxch))
     count += 1
   end
   @test count == maxch + 1 # In stream mode, last item is the CouchDB "last_seq" so need to add 1.
@@ -21,7 +21,7 @@
 
   print("  [  ] Streaming changes, filtered ")
   count = 0
-  for ch in @task changes_streaming(db; doc_ids=[data["results"][1]["id"], data["results"][2]["id"], data["results"][3]["id"]])
+  for ch in Channel(changes_streaming(db; doc_ids=[data["results"][1]["id"], data["results"][2]["id"], data["results"][3]["id"]]))
     count += 1
   end
   @test count > 0 

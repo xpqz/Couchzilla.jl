@@ -38,7 +38,7 @@ function retry_settings()
 end
 
 """
-    immutable HTTPException <: Exception 
+    struct HTTPException <: Exception
       status
       response
       request
@@ -47,7 +47,7 @@ end
 
 HTTP error exception, thrown by `relax()`.
 """
-immutable HTTPException <: Exception 
+struct HTTPException <: Exception
   status
   response
   request
@@ -75,23 +75,23 @@ function relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict(), j
   # end
   settings = retry_settings()
   tries = 0
+  headers["Content-Type"] = "application/json";
   while true
-    response = cookies == "" ? fun(url_string; query=query, headers=headers, json=json) : fun(url_string; cookies=cookies, query=query, headers=headers, json=json)
+    response = cookies == "" ? fun(url_string, headers=headers, body=JSON.json(json); query=query) : fun(url_string, headers=headers, body=JSON.json(json); cookies=cookies, query=query)
+
     if response.status == 429 && settings["enabled"]
       tries += 1
       if tries > settings["max_retries"]
-        request = requestfor(response)
         throw(HTTPException(response.status, "Too many requests", "request", "max retries reached"))
       end
       sleep((tries * settings["delay_ms"] + rand(1:10))/1000.0)
       continue
     end
-
     if response.status in 400:599
-      request = requestfor(response)
-      throw(HTTPException(response.status, Requests.json(response), string(request), ""))
+      throw(HTTPException(response.status, JSON.json(response), string(response.request), ""))
+      throw(HTTPException(response.status, JSON.json(response), ""))
     else
-      return Requests.json(response)
+      return JSON.parse(String(response.body))
     end
   end
 end
@@ -102,5 +102,5 @@ end
 Appends a path string to the URI, returning as a string.
 """
 function endpoint(uri::URI, path::AbstractString)
-  string(URI(uri.scheme, uri.host, uri.port, replace("$(uri.path)/$path", "//", "/")))
+  string(URI(uri.scheme, uri.host, uri.port, replace("$(uri.path)/$path", r"//" => s"/")))
 end
