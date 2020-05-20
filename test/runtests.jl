@@ -32,8 +32,8 @@ try
   include("alldocs_tests.jl")    
   include("view_tests.jl")      
   include("retry_tests.jl")        
-  include("geo_tests.jl")          
-  include("apikey_tests.jl")            
+  # include("geo_tests.jl")
+  # include("apikey_tests.jl")
 
   # Include new tests above this line
   include("delete_db_tests.jl")
