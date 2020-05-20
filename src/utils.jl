@@ -75,9 +75,9 @@ function relax(fun, url_string; cookies=nothing, query=Dict(), headers=Dict(), j
   # end
   settings = retry_settings()
   tries = 0
-  headers["Content-Type"] = "application/json";
+  headers["Content-Type"] = "application/json"
   while true
-    response = cookies == "" ? fun(url_string, headers=headers, body=JSON.json(json); query=query) : fun(url_string, headers=headers, body=JSON.json(json); cookies=cookies, query=query)
+    response = cookies == "" ? fun(url_string, headers=headers, body=JSON.json(json); query=query) : fun(url_string, headers=headers, body=JSON.json(json); cookies=true, query=query)
 
     if response.status == 429 && settings["enabled"]
       tries += 1

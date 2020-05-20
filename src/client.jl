@@ -30,9 +30,11 @@ false, this does nothing.
 """
 function cookieauth!(client::Client, username::AbstractString, password::AbstractString, auth::Bool=true)
   if auth
-    response = HTTP.post(endpoint(client.url, "_session");
-      data=Dict("name" => username, "password" => password))
-    client.cookies = cookies(response)
+    headers = Dict("Content-Type" => "application/json")
+    body = Dict("name" => username, "password" => password)
+    response = HTTP.post(endpoint(client.url, "_session"), headers, JSON.json(body), cookies=true)
+    # HTTP package manages cookies itself, under the hood
+    client.cookies = true
   else
     client.cookies = ""
   end
