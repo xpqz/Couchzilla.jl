@@ -1,0 +1,19 @@
+name = "Couchzilla"
+uuid = "1afefc30-e919-478a-97ba-353aebc14135"
+version = "0.1.0"
+
+[deps]
+Base64 = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+URIParser = "30578b45-9adc-5946-b283-645ec420af67"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+
+[targets]
+test = ["Test", "UUIDs"]

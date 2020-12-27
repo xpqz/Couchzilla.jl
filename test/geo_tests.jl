@@ -8,9 +8,9 @@
   println("\r  [OK] Create a geospatial index")
 
   print("  [  ] Get geospatial index info ")
-  result = geo_indexinfo(db, "geodd", "geoidx")
-  @test haskey(result, "geo_index") == true
-  println("\r  [OK] Get geospatial index info")
+  # result = geo_indexinfo(db, "geodd", "geoidx")
+  # @test haskey(result, "geo_index") == true
+  # println("\r  [OK] Get geospatial index info")
 
   if geo_database != ""
     geodb = connectdb(cl, geo_database)

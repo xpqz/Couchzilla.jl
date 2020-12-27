@@ -36,8 +36,8 @@ function view_index(db::Database, ddoc::AbstractString, name::AbstractString, ma
   if reduce != ""
     data["views"][name]["reduce"] = reduce
   end
-         
-  relax(put, endpoint(db.url, "_design/$ddoc"); json=data, cookies=db.client.cookies)
+
+  relax(HTTP.put, endpoint(db.url, "_design/$ddoc"); json=data, cookies=db.client.cookies)
 end
 
 """
@@ -143,9 +143,9 @@ function view_query(db::Database, ddoc::AbstractString, name::AbstractString;
 
   url = endpoint(db.url, "_design/$ddoc/_view/$name")
   if length(keys) > 0
-    relax(post, url; json=Dict("keys" => keys), cookies=db.client.cookies, query=query)
+    relax(HTTP.post, url; json=Dict("keys" => keys), cookies=db.client.cookies, query=query)
   else
-    relax(get, url; cookies=db.client.cookies, query=query)
+    relax(HTTP.get, url; cookies=db.client.cookies, query=query)
   end
 end
 
@@ -230,8 +230,8 @@ function alldocs(db::Database;
   end
 
   if length(keys) > 0
-    relax(post, endpoint(db.url, "_all_docs"); json=Dict("keys" => keys), cookies=db.client.cookies, query=query)
+    relax(HTTP.post, endpoint(db.url, "_all_docs"); json=Dict("keys" => keys), cookies=db.client.cookies, query=query)
   else
-    relax(get, endpoint(db.url, "_all_docs"); cookies=db.client.cookies, query=query)
+    relax(HTTP.get, endpoint(db.url, "_all_docs"); cookies=db.client.cookies, query=query)
   end
 end

@@ -10,7 +10,7 @@
 import Base.isempty
 
 """
-    immutable Database
+    struct Database
       url
       name
       client
@@ -30,7 +30,7 @@ normally not created directly, but via a call to `connectdb()`, or `createdb()`.
     # Create a new db if it doesn't exist, otherwise connect 
     db, created = createdb(client; database="mydb")
 """
-immutable Database
+struct Database
   url
   name
   client
@@ -52,7 +52,7 @@ so as to save on the HTTP overhead.
 """
 function bulkdocs(db::Database, data::AbstractArray; options=Dict())
   post_url = endpoint(db.url, "_bulk_docs")
-  relax(post, post_url; json=Dict("docs" => data), cookies=db.client.cookies, query=options)
+  relax(HTTP.post, post_url; json=Dict("docs" => data), cookies=db.client.cookies, query=options)
 end
 
 """
@@ -174,7 +174,7 @@ function readdoc(db::Database, id::AbstractString;
     end
   end
 
-  relax(get, endpoint(db.url, id); cookies=db.client.cookies, query=query, headers=headers)
+  relax(HTTP.get, endpoint(db.url, id); cookies=db.client.cookies, query=query, headers=headers)
 end
 
 """

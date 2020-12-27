@@ -7,7 +7,7 @@
 # 
 
 """
-    type QueryResult
+    struct QueryResult
       docs::Vector{Dict{AbstractString, Any}}
       bookmark::AbstractString 
     end
@@ -16,7 +16,7 @@ Returned by `query(...)`.
 
 `bookmark` is only relevant when querying indexes of type `text`.
 """
-type QueryResult
+struct QueryResult
   docs::Vector{Dict{AbstractString, Any}}
   # Bookmarks only relevant to queries on Lucene indexes (type "text").
   # JSON indexes have to be limit/skipped, as are views underneath
@@ -24,12 +24,12 @@ type QueryResult
 end
 
 """
-    result = mango_query{T<:AbstractString}(db::Database, selector::Selector;
-      fields::Vector{T}          = Vector{AbstractString}(),
-      sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
-      limit                      = 0,
-      skip                       = 0,
-      bookmark                   = "")
+    result = mango_query(db::Database, selector::Selector;
+      fields::Any                                        = [],
+      sort::Vector{Dict{T, Any}} where T<:AbstractString = Vector{Dict{AbstractString, Any}}(),
+      limit                                              = 0,
+      skip                                               = 0,
+      bookmark                                           = "")
 
 Query database (Mango/Cloudant Query).
 
@@ -49,17 +49,17 @@ on `year`. Set the page size to 10.
 
 ### Returns
 
-    type QueryResult
+    struct QueryResult
 
 * [API reference](https://docs.cloudant.com/cloudant_query.html)
 * [Cloudant Query blog post](https://cloudant.com/blog/cloudant-query-grows-up-to-handle-ad-hoc-queries/)
 """
-function mango_query{T<:AbstractString}(db::Database, selector::Selector;
-  fields                     = [],
-  sort::Vector{Dict{T, Any}} = Vector{Dict{AbstractString, Any}}(),
-  limit                      = 0,
-  skip                       = 0,
-  bookmark                   = "")
+function mango_query(db::Database, selector::Selector;
+  fields::Any                                        = [],
+  sort::Vector{Dict{T, Any}} where T<:AbstractString = Vector{Dict{AbstractString, Any}}(),
+  limit                                              = 0,
+  skip                                               = 0,
+  bookmark                                           = "")
 
   body = Dict{String, Any}("selector" => selector.dict, "skip" => skip)
   if length(fields) > 0
@@ -78,16 +78,16 @@ function mango_query{T<:AbstractString}(db::Database, selector::Selector;
     body["bookmark"] = bookmark
   end
 
-  result = relax(post, endpoint(db.url, "_find"); json=body, cookies=db.client.cookies)
+  result = relax(HTTP.post, endpoint(db.url, "_find"); json=body, cookies=db.client.cookies)
   QueryResult(result["docs"], haskey(result, "bookmark") ? result["bookmark"] : "")
 end
 
 """
-    result = mango_index{T<:AbstractString}(db::Database, fields::AbstractArray; 
-      name::T       = "",
-      ddoc::T       = "", 
-      selector      = Selector(),
-      default_field = Dict{String, Any}("analyzer" => "standard", "enabled" => true))
+    result = mango_index(db::Database, fields::AbstractArray;
+      name::T where T<:AbstractString   = "",
+      ddoc::T where T<:AbstractString   = "",
+      selector                          = Selector(),
+      default_field                     = Dict{String, Any}("analyzer" => "standard", "enabled" => true))
 
 Create a Mango index. 
 
@@ -120,16 +120,16 @@ Note that the `text` index type is a Cloudant-only feature.
 
 [API reference](https://docs.cloudant.com/cloudant_query.html#creating-an-index)
 """
-function mango_index{T<:AbstractString}(db::Database, fields::AbstractArray; 
-  name::T       = "",
-  ddoc::T       = "", 
-  selector      = Selector(),
-  default_field = Dict{String, Any}("analyzer" => "standard", "enabled" => true))
+function mango_index(db::Database, fields::AbstractArray;
+  name::T where T<:AbstractString = "",
+  ddoc::T where T<:AbstractString = "",
+  selector                        = Selector(),
+  default_field                   = Dict{String, Any}("analyzer" => "standard", "enabled" => true))
 
-  idxquery = fields == [] ? Dict{T, Any}("index" => Dict{T, Any}()) : Dict{T, Any}("index" => Dict{T, Any}("fields" => fields))
+  idxquery = fields == [] ? Dict{T where T<:AbstractString, Any}("index" => Dict{T where T<:AbstractString, Any}()) : Dict{T where T<:AbstractString, Any}("index" => Dict{T where T<:AbstractString, Any}("fields" => fields))
 
   indextype = "json"
-  if length(fields) > 0 && isa(fields[1], Associative)
+  if length(fields) > 0 && isa(fields[1], AbstractDict)
     indextype = "text"
   end
 
@@ -160,8 +160,8 @@ function mango_index{T<:AbstractString}(db::Database, fields::AbstractArray;
   if indextype != "json"
     idxquery["type"] = "text"
   end
-  
-  relax(post, endpoint(db.url, "_index"); json=idxquery, cookies=db.client.cookies)
+
+  relax(HTTP.post, endpoint(db.url, "_index"); json=idxquery, cookies=db.client.cookies)
 end
 
 """
@@ -206,7 +206,7 @@ addition to the primary index.
 [API reference](https://docs.cloudant.com/cloudant_query.html#list-all-cloudant-query-indexes)
 """
 function listindexes(db::Database)
-  relax(get, endpoint(db.url, "_index"); cookies=db.client.cookies)
+  relax(HTTP.get, endpoint(db.url, "_index"); cookies=db.client.cookies)
 end
 
 """
@@ -231,6 +231,6 @@ function mango_deleteindex(db::Database; ddoc="", name="", indextype="")
   if ddoc == "" || name == ""
     error("Expected a ddoc and index name")
   end
-    
-  relax(delete, endpoint(db.url, "_index/$ddoc/$indextype/$name"); cookies=db.client.cookies)
+
+  relax(HTTP.delete, endpoint(db.url, "_index/$ddoc/$indextype/$name"); cookies=db.client.cookies)
 end

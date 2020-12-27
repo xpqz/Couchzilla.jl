@@ -1,5 +1,3 @@
-__precompile__()
-
 """
 The CouchDB API.
 
@@ -78,11 +76,10 @@ The CouchDB API.
 """
 module Couchzilla
 
-using Requests
+using HTTP
 using URIParser
 using JSON
-
-import Requests: get, post, put, delete, requestfor, headers
+using Base64
 
 include("utils.jl")
 include("client.jl")
@@ -96,7 +93,7 @@ include("tasks.jl")
 include("geospatial.jl")
 include("auth.jl")
 
-export Client, Database, HTTPException 
+export Client, Database, HTTPException
 export createdb, connectdb, dbinfo, listdbs, deletedb
 export updatedoc, deletedoc, createdoc, readdoc
 export put_attachment, get_attachment, delete_attachment
